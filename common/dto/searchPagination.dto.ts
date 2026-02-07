@@ -1,10 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-/**
- * DTO for handling search and pagination query parameters.
- * Validates and transforms query parameters for paginated search endpoints.
- */
+// Extend PaginationDto to include search functionality
 export class searchPaginationQueryDto {
   @IsOptional()
   @Type(() => Number)

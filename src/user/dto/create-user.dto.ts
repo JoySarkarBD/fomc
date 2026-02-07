@@ -1,4 +1,3 @@
-import { Field, InputType } from '@nestjs/graphql';
 import {
   IsDefined,
   IsEmail,
@@ -18,14 +17,11 @@ import {
  * @property {string} email - Email address of the user.
  * @property {string} password - Password for the user.
  */
-@InputType()
-export class CreateUserInput {
-  @Field({ description: 'Employee ID of the user', nullable: true })
+export class CreateUserDto {
   @IsString({ message: 'Employee ID must be a string' })
   @IsOptional()
   employeeId?: string;
 
-  @Field({ description: 'Name of the user', nullable: true })
   @IsDefined({ message: 'Name is required' })
   @IsString({ message: 'Name must be a string' })
   @IsNotEmpty({ message: 'Name is required' })
@@ -35,16 +31,13 @@ export class CreateUserInput {
 
   @IsString({ message: 'Phone number must be a string' })
   @IsOptional()
-  @Field({ description: 'Phone number of the user', nullable: true })
   phoneNumber?: string;
 
-  @Field({ description: 'Email address of the user', nullable: true })
   @IsDefined({ message: 'Email is required' })
   @IsEmail({}, { message: 'Email must be a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
   email!: string;
 
-  @Field({ description: 'Password for the user', nullable: true })
   @IsDefined({ message: 'Password is required' })
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })
