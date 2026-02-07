@@ -30,6 +30,7 @@ export class UserService {
       employeeId: doc.employeeId ?? null,
       name: doc.name,
       email: doc.email,
+      phoneNumber: doc.phoneNumber ?? null,
       role: doc.role ?? UserRole.EMPLOYEE,
       department: doc.department ?? null,
     } as User;

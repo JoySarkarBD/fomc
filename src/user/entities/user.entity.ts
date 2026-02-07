@@ -53,7 +53,7 @@ export class User {
   @Field()
   name!: string; // Name of the user
 
-  @Prop()
+  @Prop({ required: true })
   @Field()
   phoneNumber?: string; // Name of the user
 
@@ -62,7 +62,7 @@ export class User {
   email!: string; // Email address of the user
 
   @Prop({ required: true, select: false })
-  password!: string; // Password for the user (should be hashed in production)
+  password?: string; // Password for the user (should be hashed in production)
 
   @Prop({ default: UserRole.EMPLOYEE, enum: UserRole })
   @Field(() => UserRole)

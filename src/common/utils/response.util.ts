@@ -78,14 +78,15 @@ export function mapHttpException(
     };
   }
 
-  // Handle specific exceptions like ConflictException and NotFoundException with custom messages
+  // Handle ConflictException with a single message only
   if (error instanceof ConflictException) {
     return {
       statusCode: error.getStatus(),
-      message: error.message,
-      errors: options.conflictField
-        ? [{ field: options.conflictField, messages: [error.message] }]
-        : [],
+      message:
+        typeof error.message === 'string'
+          ? error.message
+          : options.defaultMessage,
+      errors: [],
     };
   }
 
@@ -93,7 +94,10 @@ export function mapHttpException(
   if (error instanceof NotFoundException) {
     return {
       statusCode: error.getStatus(),
-      message: error.message,
+      message:
+        typeof error.message === 'string'
+          ? error.message
+          : options.defaultMessage,
       errors: [],
     };
   }
@@ -102,7 +106,10 @@ export function mapHttpException(
   if (error instanceof HttpException) {
     return {
       statusCode: error.getStatus(),
-      message: error.message,
+      message:
+        typeof error.message === 'string'
+          ? error.message
+          : options.defaultMessage,
       errors: [],
     };
   }

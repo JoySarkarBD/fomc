@@ -21,7 +21,7 @@ import { UserModule } from './user/user.module';
   imports: [
     // Connect to local MongoDB instance and use database named `graphQL`.
     MongooseModule.forRoot(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/',
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/office-management',
     ),
     // Configure GraphQL (Apollo driver) and generate schema at `src/schema.gql`.
     GraphQLModule.forRoot({
@@ -41,6 +41,9 @@ import { UserModule } from './user/user.module';
 
         if (validationErrors && validationErrors.length > 0) {
           return {
+            statusCode: 409,
+            success: false,
+            timestamp: new Date().toISOString(),
             message: 'Validation failed',
             errors: validationErrors,
           };
