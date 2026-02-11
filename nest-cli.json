@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/fb-international-bd/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/fb-international-bd/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/fb-international-bd",
+  "projects": {
+    "fb-international-bd": {
+      "type": "application",
+      "root": "apps/fb-international-bd",
+      "entryFile": "main",
+      "sourceRoot": "apps/fb-international-bd/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/fb-international-bd/tsconfig.app.json"
+      }
+    },
+    "user-service": {
+      "type": "application",
+      "root": "apps/user-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user-service/tsconfig.app.json"
+      }
+    }
+  }
+}
