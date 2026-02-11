@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 /**
  * Mongoose document type for User.
@@ -10,20 +10,20 @@ export type UserDocument = User & Document;
  * Enum for user roles within the organization.
  */
 export enum UserRole {
-  DIRECTOR = 'DIRECTOR',
-  HR = 'HR',
-  PROJECT_MANAGER = 'PROJECT_MANAGER',
-  TEAM_LEADER = 'TEAM_LEADER',
-  EMPLOYEE = 'EMPLOYEE',
+  DIRECTOR = "DIRECTOR",
+  HR = "HR",
+  PROJECT_MANAGER = "PROJECT_MANAGER",
+  TEAM_LEADER = "TEAM_LEADER",
+  EMPLOYEE = "EMPLOYEE",
 }
 
 /**
  * Enum for departments within the organization.
  */
 export enum Department {
-  SHOPIFY = 'SHOPIFY',
-  WORDPRESS = 'WORDPRESS',
-  CUSTOM = 'CUSTOM',
+  SHOPIFY = "SHOPIFY",
+  WORDPRESS = "WORDPRESS",
+  CUSTOM = "CUSTOM",
 }
 
 /**
