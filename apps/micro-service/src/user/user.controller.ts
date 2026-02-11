@@ -12,7 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserParamDto } from './dto/user-param.dto';
 import { UserService } from './user.service';
 
-@Controller(['user', 'users'])
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

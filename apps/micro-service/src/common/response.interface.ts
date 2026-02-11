@@ -6,4 +6,5 @@ export interface ServiceResponse<T = any> {
   timestamp: string;
   statusCode: number;
   data?: T;
+  errors?: Array<{ fieldName: string; error: string }>;
 }
