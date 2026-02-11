@@ -1,11 +1,12 @@
 import {
   IsEmail,
   IsEnum,
+  IsMongoId,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
-import { Department, UserRole } from './create-user.dto';
+import { Department, UserRole } from '../../../../user/src/schemas/user.schema';
 
 export class UpdateUserDto {
   @IsString({ message: 'Name must be a string' })
@@ -40,4 +41,9 @@ export class UpdateUserDto {
   @IsEnum(Department, { message: 'Department must be a valid Department' })
   @IsOptional()
   department?: Department;
+}
+
+export class UpdateUserMessageDto extends UpdateUserDto {
+  @IsMongoId({ message: 'ID must be a valid Mongo ID' })
+  id!: string;
 }

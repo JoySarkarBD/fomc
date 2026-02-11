@@ -5,73 +5,80 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ValidationError } from 'class-validator';
 import { ServiceResponse } from './response.interface';
 
 /**
- * Global exception filter to catch all unhandled exceptions and format the response
- * according to the ServiceResponse structure.
- * This filter handles both HttpExceptions (like 404, 400, etc.) and any other unexpected errors, ensuring that clients receive a consistent error response format.
- * The filter extracts relevant information from the exception and the request to provide a detailed error response, including the HTTP method, endpoint, status code, and a timestamp. It also handles validation errors by parsing the message array and returning a structured list of field errors when applicable.
- * This filter is registered globally in the main.ts file, ensuring that all exceptions thrown within the application are processed through this filter, providing a unified error handling mechanism across the entire microservice.
- * By centralizing exception handling in this filter, we can maintain cleaner controller and service code, as they can simply throw exceptions without worrying about the response formatting, while still ensuring that clients receive informative and consistent error responses.
- * Overall, this HttpExceptionFilter enhances the robustness and user-friendliness of the API by providing clear and structured error responses for all types of exceptions that may occur during request processing.
- * Note: This filter should be used in conjunction with the ResponseInterceptor to ensure that all responses, including errors, adhere to the same response structure defined by the ServiceResponse interface.
+ * HttpExceptionFilter
  *
+ * Global exception filter for handling all HTTP exceptions and validation errors
+ * in a consistent format according to the ServiceResponse interface.
+ *
+ * Features:
+ * - Handles standard HTTP exceptions (e.g., 400, 404, 500)
+ * - Handles class-validator validation errors and maps them to a structured errors array
+ * - Provides metadata such as HTTP method, endpoint, timestamp, and status code
  */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  /**
+   * Catch method is invoked when an exception is thrown.
+   *
+   * @param exception The exception object thrown
+   * @param host ArgumentsHost containing request and response objects
+   */
   catch(exception: unknown, host: ArgumentsHost) {
-    // Extract the HTTP context from the ArgumentsHost
+    // Get the HTTP request/response context
     const ctx = host.switchToHttp();
-    // Get the response and request objects from the context
     const response = ctx.getResponse();
-    // Get the request object to extract method and URL information
     const request = ctx.getRequest();
-    // Determine the HTTP status code based on the type of exception
-    const status =
+
+    // Determine HTTP status code
+    let status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    // Initialize a default error message and an optional data object to hold additional error details
+
+    // Default response values
     let message = 'Request failed';
-    let data: Record<string, unknown> | null = null;
-    let errors: Array<{ fieldName: string; error: string }> | undefined;
-    // If the exception is an instance of HttpException, extract the response body to determine the error message and any additional details
-    if (exception instanceof HttpException) {
-      // The response body can be a string or an object. If it's a string, use it directly as the message. If it's an object, check for 'message' and 'error' properties to construct the response.
+    let errors: Array<{ field: string; message: string }> | undefined;
+    let error: string | undefined;
+
+    // Handle validation errors returned from class-validator
+    if (Array.isArray(exception)) {
+      message = 'Validation failed';
+      errors = exception.flatMap((err: ValidationError) => {
+        const field = err.property; // preserves DTO property name
+        const constraints = err.constraints
+          ? Object.values(err.constraints)
+          : ['Invalid value'];
+
+        // Map all constraint messages for this field
+        return constraints.map((msg) => ({ field, message: msg }));
+      });
+      status = HttpStatus.BAD_REQUEST;
+    }
+    // Handle standard HttpException
+    else if (exception instanceof HttpException) {
       const responseBody = exception.getResponse();
-      // If the response body is a string, use it as the message. If it's an object, check for 'message' and 'error' properties to construct the response. If 'message' is an array (e.g., validation errors), set a generic validation failed message and include the array in the data. If there's an 'error' property, include it in the data as well.
+
       if (typeof responseBody === 'string') {
         message = responseBody;
+        error = responseBody;
       } else if (responseBody && typeof responseBody === 'object') {
-        const body = responseBody as {
-          message?: string | string[];
-          error?: string;
-        };
-        if (Array.isArray(body.message)) {
-          message = 'Validation failed';
-          errors = body.message.map((entry) => {
-            const [fieldName, ...rest] = entry.split(' ');
-            return {
-              fieldName: fieldName ?? 'field',
-              error: rest.join(' ').trim() || entry,
-            };
-          });
-          data = null;
-        } else if (body.message) {
-          message = body.message;
-        }
-        if (body.error && !errors) {
-          data = { ...(data ?? {}), error: body.error };
-        }
+        const body = responseBody as any;
+        message = body.message || message;
+        error = body.error;
       }
     }
 
+    // Handle 404 Not Found
     if (status === HttpStatus.NOT_FOUND) {
       message = 'Path not found';
-      data = null;
+      error = 'Path not found';
     }
-    // Construct the response payload according to the ServiceResponse structure, including success status, message, method, endpoint, status code, timestamp, and any additional error data
+
+    // Build the structured service response payload
     const payload: ServiceResponse = {
       success: false,
       message,
@@ -79,10 +86,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       endpoint: request?.originalUrl || request?.url || '',
       statusCode: status,
       timestamp: new Date().toISOString(),
-      data: data ?? undefined,
-      errors,
+      ...(errors && { errors }),
+      ...(error && !errors && { error }),
     };
-    // Send the formatted error response back to the client with the appropriate HTTP status code
+
+    // Send JSON response
     response.status(status).json(payload);
   }
 }
