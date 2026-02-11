@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { USER_COMMANDS } from './constants/user.constants';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserMessageDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -26,7 +27,7 @@ export class UserController {
    *
    * @returns {Promise<any>} List of users.
    */
-  @MessagePattern({ cmd: 'get_users' })
+  @MessagePattern(USER_COMMANDS.GET_USERS)
   getUsers() {
     return this.userService.getUsers();
   }
@@ -39,7 +40,7 @@ export class UserController {
    * @param {string} id - Unique identifier of the user.
    * @returns {Promise<any>} User details.
    */
-  @MessagePattern({ cmd: 'get_user' })
+  @MessagePattern(USER_COMMANDS.GET_USER)
   getUser(id: string) {
     return this.userService.getUser(id);
   }
@@ -52,7 +53,7 @@ export class UserController {
    * @param {CreateUserDto} data - Data transfer object containing user creation payload.
    * @returns {Promise<any>} Newly created user.
    */
-  @MessagePattern({ cmd: 'create_user' })
+  @MessagePattern(USER_COMMANDS.CREATE_USER)
   createUser(data: CreateUserDto) {
     return this.userService.createUser(data);
   }
@@ -65,7 +66,7 @@ export class UserController {
    * @param {UpdateUserMessageDto} data - Object containing user ID and update payload.
    * @returns {Promise<any>} Updated user data.
    */
-  @MessagePattern({ cmd: 'update_user' })
+  @MessagePattern(USER_COMMANDS.UPDATE_USER)
   updateUser(data: UpdateUserMessageDto) {
     const { id, ...payload } = data;
     return this.userService.updateUser(id, payload);
@@ -79,7 +80,7 @@ export class UserController {
    * @param {string} id - Unique identifier of the user.
    * @returns {Promise<any>} Deletion result.
    */
-  @MessagePattern({ cmd: 'delete_user' })
+  @MessagePattern(USER_COMMANDS.DELETE_USER)
   deleteUser(id: string) {
     return this.userService.deleteUser(id);
   }
