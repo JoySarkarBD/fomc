@@ -11,18 +11,24 @@ export class UserController {
     return this.userService.getUsers();
   }
 
-  @MessagePattern({ cmd: 'get_users_basic' })
-  getUsersBasic() {
-    return this.userService.getUsersBasic();
-  }
-
   @MessagePattern({ cmd: 'get_user' })
   getUser(id: number) {
     return this.userService.getUser(id);
   }
 
-  @MessagePattern({ cmd: 'get_user_basic' })
-  getUserBasic(id: number) {
-    return this.userService.getUserBasic(id);
+  @MessagePattern({ cmd: 'create_user' })
+  createUser(data: { name: string; email: string }) {
+    return this.userService.createUser(data);
+  }
+
+  @MessagePattern({ cmd: 'update_user' })
+  updateUser(data: { id: number; name: string; email: string }) {
+    const { id, ...payload } = data;
+    return this.userService.updateUser(id, payload);
+  }
+
+  @MessagePattern({ cmd: 'delete_user' })
+  deleteUser(id: number) {
+    return this.userService.deleteUser(id);
   }
 }

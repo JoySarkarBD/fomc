@@ -23,12 +23,29 @@ export class UserService {
     return user;
   }
 
-  getUsersBasic(): User[] {
-    return this.users;
+  async createUser(data: { name: string; email: string }): Promise<User> {
+    const nextId =
+      this.users.reduce((maxId, user) => Math.max(maxId, user.id), 0) + 1;
+    const newUser: User = { id: nextId, ...data };
+    this.users.push(newUser);
+    return newUser;
   }
 
-  getUserBasic(id: number): User | null {
-    const user = this.users.find((u) => u.id === id);
-    return user || null;
+  async updateUser(
+    id: number,
+    data: { name: string; email: string },
+  ): Promise<User | null> {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1) return null;
+    const updatedUser: User = { ...this.users[index], ...data };
+    this.users[index] = updatedUser;
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<User | null> {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1) return null;
+    const [deletedUser] = this.users.splice(index, 1);
+    return deletedUser ?? null;
   }
 }

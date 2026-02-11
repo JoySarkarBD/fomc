@@ -7,4 +7,4 @@ async function bootstrap() {
     console.log(`Micro gateway is running on port ${process.env.PORT ?? 3000}`);
   });
 }
-bootstrap();
+void bootstrap();
