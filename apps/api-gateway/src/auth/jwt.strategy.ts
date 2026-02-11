@@ -1,17 +1,17 @@
-import { Injectable, Inject } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
-import { jwtConfig } from "../common/jwt.config";
+import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { USER_COMMANDS } from "../user/constants/user.constants";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
 import { firstValueFrom } from "rxjs";
+import { jwtConfig } from "../common/jwt.config";
+import { USER_COMMANDS } from "../user/constants/user.constants";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(@Inject("USER_SERVICE") private userClient: ClientProxy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: jwtConfig.secret,
+      secretOrKey: jwtConfig.secret as unknown as string,
     });
   }
 
