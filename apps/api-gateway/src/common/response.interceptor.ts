@@ -3,10 +3,10 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ServiceResponse } from './response.interface';
+} from "@nestjs/common";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { ServiceResponse } from "./response.interface";
 
 /**
  * ResponseInterceptor
@@ -34,10 +34,10 @@ export class ResponseInterceptor implements NestInterceptor {
     const httpRes = context.switchToHttp().getResponse();
 
     const method = req?.method;
-    const url: string = req?.originalUrl || req?.url || '';
+    const url: string = req?.originalUrl || req?.url || "";
 
     // Skip response wrapping for the root API path
-    if (url === '/api' || url === '/api/') {
+    if (url === "/api" || url === "/api/") {
       return next.handle();
     }
 
@@ -49,16 +49,29 @@ export class ResponseInterceptor implements NestInterceptor {
         }
 
         const statusCode = httpRes?.statusCode ?? 200;
+        const isEnvelope =
+          data &&
+          typeof data === "object" &&
+          (Object.prototype.hasOwnProperty.call(data, "message") ||
+            Object.prototype.hasOwnProperty.call(data, "data"));
+        const responseMessage =
+          isEnvelope && Object.prototype.hasOwnProperty.call(data, "message")
+            ? data.message
+            : "Request successful";
+        const responseData =
+          isEnvelope && Object.prototype.hasOwnProperty.call(data, "data")
+            ? data.data
+            : data;
 
         // Construct the standardized service response
         const response: ServiceResponse = {
           success: statusCode >= 200 && statusCode < 300,
-          message: data?.message || 'Request successful',
+          message: responseMessage,
           method,
           endpoint: url,
           statusCode,
           timestamp: new Date().toISOString(),
-          data: data?.data !== undefined ? data.data : data, // wrap actual payload
+          data: responseData, // wrap actual payload
         };
 
         return response;
