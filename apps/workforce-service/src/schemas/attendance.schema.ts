@@ -65,4 +65,7 @@ export class Attendance extends Document {
   shiftType!: ShiftType;
 }
 
+/**
+ * Mongoose schema for the Attendance class
+ */
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

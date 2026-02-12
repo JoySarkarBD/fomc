@@ -47,4 +47,7 @@ export class Leave extends Document {
   reason!: string;
 }
 
+/**
+ * Mongoose schema for the Leave class
+ */
 export const LeaveSchema = SchemaFactory.createForClass(Leave);
