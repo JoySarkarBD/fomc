@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { TaskModule } from './task/task.module';
 import config from "../../config/config";
 
 @Module({
@@ -10,6 +11,7 @@ import config from "../../config/config";
         : "mongodb://127.0.0.1:27017/office-management",
     ),
     MongooseModule.forFeature([]),
+    TaskModule,
   ],
 
   /**
