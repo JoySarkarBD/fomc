@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
+import { User } from "../../../user-service/src/schemas/user.schema";
+import { GetUser } from "../common/decorators/get-user.decorator";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import type { AuthUser } from "../common/interfaces/auth-user.interface";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserParamDto } from "./dto/user-param.dto";
 import { UserService } from "./user.service";
@@ -14,22 +26,33 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getUsers(): Promise<any> {
+  async getUsers(): Promise<User[]> {
     return await this.userService.getUsers();
   }
 
   @Get(":id")
-  async getUser(@Param() params: UserParamDto): Promise<any> {
+  async getUser(@Param() params: UserParamDto): Promise<User> {
     return await this.userService.getUser(params.id);
   }
 
   @Post("")
-  async createUser(@Body() data: CreateUserDto): Promise<any> {
+  async createUser(@Body() data: CreateUserDto): Promise<User> {
     return await this.userService.createUser(data);
   }
 
   @Delete(":id")
-  async deleteUser(@Param() params: UserParamDto): Promise<any> {
+  async deleteUser(@Param() params: UserParamDto): Promise<User> {
     return await this.userService.deleteUser(params.id);
+  }
+
+  /**
+   * Endpoint for retrieving the profile of the currently authenticated user.
+   * Utilizes the UserService to fetch the profile information based on the authenticated user's context.
+   * @returns The profile information of the authenticated user.
+   */
+  @Get("profile/me")
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@GetUser() user: AuthUser): Promise<User> {
+    return await this.userService.getUser(user._id as string);
   }
 }

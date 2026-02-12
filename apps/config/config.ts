@@ -31,7 +31,8 @@ interface Config {
   REDIS_HOST: string;
   REDIS_PORT: number;
   REDIS_PASSWORD: string;
-  REDIS_DB: number;
+  REDIS_DB_SESSION: number;
+  REDIS_DB_AUTH: number;
 }
 
 const config: Config = {
@@ -63,7 +64,8 @@ const config: Config = {
   REDIS_HOST: process.env.REDIS_HOST as string,
   REDIS_PORT: parseInt(process.env.REDIS_PORT as string, 10),
   REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
-  REDIS_DB: parseInt(process.env.REDIS_DB as string, 10),
+  REDIS_DB_SESSION: parseInt(process.env.REDIS_DB_SESSION as string, 10),
+  REDIS_DB_AUTH: parseInt(process.env.REDIS_DB_AUTH as string, 10),
 };
 
 export default config;

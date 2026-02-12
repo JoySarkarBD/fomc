@@ -17,7 +17,7 @@ export class RedisTokenService {
    */
   async storeToken(tokenId: string, token: string, ttlSeconds: number) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
-    await this.redisClient.getClient().set(key, token, "EX", ttlSeconds);
+    await this.redisClient.getClientAuth().set(key, token, "EX", ttlSeconds);
   }
 
   /**
@@ -27,7 +27,7 @@ export class RedisTokenService {
    */
   async getToken(tokenId: string) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
-    return this.redisClient.getClient().get(key);
+    return this.redisClient.getClientAuth().get(key);
   }
 
   /**
@@ -36,6 +36,6 @@ export class RedisTokenService {
    */
   async deleteToken(tokenId: string) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
-    await this.redisClient.getClient().del(key);
+    await this.redisClient.getClientAuth().del(key);
   }
 }
