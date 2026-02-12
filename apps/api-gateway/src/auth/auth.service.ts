@@ -9,7 +9,6 @@ import { ClientProxy } from "@nestjs/microservices";
 import * as bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
-import { jwtConfig } from "../common/jwt.config";
 import { RedisService } from "../common/redis/redis.service";
 import { buildResponse } from "../common/response.util";
 import { USER_COMMANDS } from "../user/constants/user.constants";
@@ -70,32 +69,6 @@ export class AuthService {
     return safeUser;
   }
 
-  private getTokenTtlSeconds(token: string): number {
-    const decoded = this.jwtService.decode(token) as { exp?: number } | null;
-    if (decoded?.exp) {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      return Math.max(decoded.exp - nowSeconds, 1);
-    }
-
-    const expiresIn = jwtConfig.signOptions?.expiresIn;
-    if (typeof expiresIn === "number" && Number.isFinite(expiresIn)) {
-      return Math.max(Math.floor(expiresIn), 1);
-    }
-
-    if (typeof expiresIn === "string") {
-      const match = /^\d+[smhd]$/.exec(expiresIn);
-      if (match) {
-        const value = Number(expiresIn.slice(0, -1));
-        const unit = expiresIn.slice(-1);
-        const multiplier =
-          unit === "s" ? 1 : unit === "m" ? 60 : unit === "h" ? 3600 : 86400;
-        return Math.max(value * multiplier, 1);
-      }
-    }
-
-    return 7 * 24 * 60 * 60;
-  }
-
   /**
    * Register a new user by sending the registration data to the User Service.
    * If the email already exists, a ConflictException is thrown.
@@ -145,9 +118,12 @@ export class AuthService {
     const payload = { sub: id, email: safeUser.email, role: safeUser.role };
     const accessToken = this.jwtService.sign(payload);
     const tokenId = randomUUID();
-    const ttlSeconds = this.getTokenTtlSeconds(accessToken);
 
-    await this.redisService.storeToken(tokenId, accessToken, ttlSeconds);
+    await this.redisService.storeToken(
+      tokenId,
+      accessToken,
+      process.env.JWT_EXPIRES_IN ? Number(process.env.JWT_EXPIRES_IN) : 2592000,
+    );
 
     // Return a success response with the generated JWT token and sanitized user details
     return buildResponse("Login successful", {
