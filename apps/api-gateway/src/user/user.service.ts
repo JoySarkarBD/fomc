@@ -3,7 +3,6 @@ import { ClientProxy } from "@nestjs/microservices";
 import { firstValueFrom } from "rxjs";
 import { USER_COMMANDS } from "./constants/user.constants";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 
 /**
  * UserService
@@ -51,22 +50,6 @@ export class UserService {
     return firstValueFrom(
       this.userClient.send(USER_COMMANDS.CREATE_USER, data),
     );
-  }
-
-  /**
-   * Update an existing user by ID.
-   *
-   * @param id - User ID
-   * @param data - Data transfer object containing updated user fields
-   * @returns Promise resolving to the updated user object
-   * @throws NotFoundException if the user does not exist
-   */
-  async updateUser(id: string, data: UpdateUserDto): Promise<any> {
-    const updatedUser = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.UPDATE_USER, { id, ...data }),
-    );
-    if (!updatedUser) throw new NotFoundException("User not found");
-    return updatedUser;
   }
 
   /**

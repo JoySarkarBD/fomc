@@ -42,9 +42,8 @@ export class UserService {
    * @throws {NotFoundException} If the user does not exist.
    * @returns {Promise<User>} The found user document.
    */
-  async getUser(id: string): Promise<User> {
+  async getUser(id: string): Promise<User | null> {
     const user = await this.userModel.findById(id).exec();
-    if (!user) throw new NotFoundException("User not found");
     return user;
   }
 
@@ -160,12 +159,10 @@ export class UserService {
    * @throws {NotFoundException} If the user does not exist.
    * @returns {Promise<User>} Updated user document.
    */
-  async updateUser(id: string, data: UpdateUserDto): Promise<User> {
+  async updateUser(id: string, data: UpdateUserDto): Promise<User | null> {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, data, { new: true, runValidators: true })
       .exec();
-
-    if (!updatedUser) throw new NotFoundException("User not found");
     return updatedUser;
   }
 
@@ -176,9 +173,8 @@ export class UserService {
    * @throws {NotFoundException} If the user does not exist.
    * @returns {Promise<User>} Deleted user document.
    */
-  async deleteUser(id: string): Promise<User> {
+  async deleteUser(id: string): Promise<User | null> {
     const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
-    if (!deletedUser) throw new NotFoundException("User not found");
     return deletedUser;
   }
 }

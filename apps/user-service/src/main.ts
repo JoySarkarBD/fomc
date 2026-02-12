@@ -1,8 +1,8 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import 'dotenv/config';
-import { UserModule } from './user.module';
+import { ValidationPipe } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import "dotenv/config";
+import { UserModule } from "./user.module";
 
 /**
  * Bootstrap function
@@ -18,7 +18,7 @@ async function bootstrap(): Promise<void> {
    * Resolve service host and port from environment variables.
    * Fallbacks are provided for local development.
    */
-  const host = process.env.USER_SERVICE_HOST ?? '127.0.0.1';
+  const host = process.env.USER_SERVICE_HOST ?? "127.0.0.1";
   const port = Number(process.env.USER_SERVICE_PORT ?? 3001);
 
   /**
@@ -59,14 +59,8 @@ async function bootstrap(): Promise<void> {
    */
   await app.listen();
 
-  /**
-   * Log successful startup message.
-   */
-  console.log(`User Microservice is listening on port ${port}`);
+  console.log(`🚀 User Service is running at ${host}:${port} (TCP transport)`);
 }
 
-/**
- * Execute bootstrap function.
- * `void` prevents unhandled promise warnings.
- */
+// Call the bootstrap function to start the application.
 void bootstrap();

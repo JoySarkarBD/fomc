@@ -23,7 +23,7 @@ export class UserController {
   /**
    * Retrieve all users.
    *
-   * Message Pattern: { cmd: 'get_users' }
+   * Message Pattern: { cmd: USER_COMMANDS.GET_USERS }
    *
    * @returns {Promise<any>} List of users.
    */
@@ -35,7 +35,7 @@ export class UserController {
   /**
    * Retrieve a single user by ID.
    *
-   * Message Pattern: { cmd: 'get_user' }
+   * Message Pattern: { cmd: USER_COMMANDS.GET_USER }
    *
    * @param {string} id - Unique identifier of the user.
    * @returns {Promise<any>} User details.
@@ -48,7 +48,7 @@ export class UserController {
   /**
    * Create a new user.
    *
-   * Message Pattern: { cmd: 'create_user' }
+   * Message Pattern: { cmd: USER_COMMANDS.CREATE_USER }
    *
    * @param {CreateUserDto} data - Data transfer object containing user creation payload.
    * @returns {Promise<any>} Newly created user.
@@ -61,7 +61,7 @@ export class UserController {
   /**
    * Update an existing user.
    *
-   * Message Pattern: { cmd: 'update_user' }
+   * Message Pattern: { cmd: USER_COMMANDS.UPDATE_USER }
    *
    * @param {UpdateUserMessageDto} data - Object containing user ID and update payload.
    * @returns {Promise<any>} Updated user data.
@@ -75,7 +75,7 @@ export class UserController {
   /**
    * Delete a user by ID.
    *
-   * Message Pattern: { cmd: 'delete_user' }
+   * Message Pattern: { cmd: USER_COMMANDS.DELETE_USER }
    *
    * @param {string} id - Unique identifier of the user.
    * @returns {Promise<any>} Deletion result.
@@ -87,7 +87,7 @@ export class UserController {
 
   /**
    * Find user by email
-   * Message Pattern: { cmd: 'find_user_by_email' }
+   * Message Pattern: { cmd: USER_COMMANDS.FIND_BY_EMAIL }
    */
   @MessagePattern(USER_COMMANDS.FIND_BY_EMAIL)
   findByEmail(email: string) {
@@ -96,7 +96,7 @@ export class UserController {
 
   /**
    * Set a password reset token for a user
-   * Message Pattern: { cmd: 'set_reset_token' }
+   * Message Pattern: { cmd: USER_COMMANDS.SET_RESET_PASSWORD_OTP }
    */
   @MessagePattern(USER_COMMANDS.SET_RESET_PASSWORD_OTP)
   setResetPasswordOtp(payload: { email: string; otp: string; expiry: string }) {
@@ -106,7 +106,7 @@ export class UserController {
 
   /**
    * Reset password using token
-   * Message Pattern: { cmd: 'reset_password' }
+   * Message Pattern: { cmd: USER_COMMANDS.RESET_PASSWORD }
    */
   @MessagePattern(USER_COMMANDS.RESET_PASSWORD)
   resetPassword(payload: { otp: string; newPassword: string }) {
@@ -115,9 +115,9 @@ export class UserController {
 
   /**
    * Change password given user id and current password
-   * Message Pattern: { cmd: 'change_password' }
+   * Message Pattern: { cmd: USER_COMMANDS.CHANGE_PASSWORD }
    */
-  @MessagePattern({ cmd: "change_password" })
+  @MessagePattern(USER_COMMANDS.CHANGE_PASSWORD)
   changePassword(payload: {
     id: string;
     currentPassword: string;
