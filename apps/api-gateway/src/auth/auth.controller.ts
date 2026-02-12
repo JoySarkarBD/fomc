@@ -1,5 +1,14 @@
-import { Body, Controller, Post, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Post,
+  Put,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from "@nestjs/common";
 import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
+import type { Request } from "express";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import type { AuthUser } from "../common/interfaces/auth-user.interface";
@@ -83,5 +92,28 @@ export class AuthController {
       data.currentPassword,
       data.newPassword,
     );
+  }
+
+  /**
+   * Endpoint for logging out the user.
+   * Protected by the JwtAuthGuard to ensure that only authenticated users can access this endpoint.
+   * Retrieves the authenticated user's information using the GetUser decorator and calls the AuthService to perform the logout operation, which may involve invalidating the user's JWT token in Redis.
+   * Returns a success message or an error message based on the result of the logout operation.
+   */
+  @Post("logout")
+  @UseGuards(JwtAuthGuard)
+  async logout(@Req() req: Request) {
+    const header = req.headers.authorization;
+
+    const headerValue = Array.isArray(header) ? header[0] : header;
+
+    if (!headerValue) throw new UnauthorizedException("No token provided");
+
+    const [type, tokenId] = headerValue.split(" ");
+
+    if (!tokenId || type.toLowerCase() !== "bearer")
+      throw new UnauthorizedException("Invalid token format");
+
+    return this.authService.logout(tokenId);
   }
 }

@@ -221,4 +221,16 @@ export class AuthService {
     // Return a success response indicating that the password has been changed successfully if the current password is correct and the password change operation was successful.
     return buildResponse("Password changed successfully", null);
   }
+
+  /**
+   * Logout the user by deleting the associated JWT token from Redis, effectively invalidating the token and preventing further use for authentication.
+   * This operation is protected by authentication to ensure that only the authenticated user can perform the logout action.
+   * If the token deletion is successful, a success response is returned. If there is an issue with token deletion, an error may be thrown, which should be handled appropriately.
+   * @param tokenId - The ID of the JWT token to be invalidated and deleted from Redis
+   * @returns A response indicating that the logout was successful if the token was deleted successfully, or an error message if there was an issue with token deletion.
+   */
+  async logout(tokenId: string) {
+    await this.redisTokenService.deleteToken(tokenId);
+    return buildResponse("Logout successful", null);
+  }
 }
