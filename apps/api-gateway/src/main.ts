@@ -1,12 +1,12 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import "dotenv/config";
+import helmet from "helmet";
+import morgan from "morgan";
 import config from "../../config/config";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/http-exception.filter";
 import { ResponseInterceptor } from "./common/response.interceptor";
-import helmet from "helmet";
-import morgan from "morgan";
 
 /**
  * Bootstrap function to initialize and start the NestJS application.
