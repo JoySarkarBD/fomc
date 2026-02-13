@@ -1,6 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo } from "mongoose";
+import { Document, Types } from "mongoose";
 
+/**
+ * Mongoose document type for Task.
+ */
+export type TaskDocument = Task & Document;
+
+/**
+ * Enum for task priorities within the workforce management system.
+ */
 export enum TaskPriority {
   LOW = "LOW",
   MEDIUM = "MEDIUM",
@@ -8,6 +16,9 @@ export enum TaskPriority {
   CRITICAL = "CRITICAL",
 }
 
+/**
+ * Enum for task statuses within the workforce management system.
+ */
 export enum TaskStatus {
   PENDING = "PENDING",
   WIP = "WORK_IN_PROGRESS",
@@ -15,8 +26,6 @@ export enum TaskStatus {
   BLOCKED = "BLOCKED",
   DELIVERED = "DELIVERED",
 }
-
-export type TaskDocument = Task & Document;
 
 /**
  * Task Schema
@@ -34,12 +43,12 @@ export class Task extends Document {
   name!: string;
 
   // For now it will be a string but in future it will be a reference to the client collection
-  @Prop()
-  client!: string | mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "Client" })
+  client!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the project collection
-  @Prop()
-  project!: string | mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "Project" })
+  project!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the user collection
   @Prop()
@@ -58,12 +67,12 @@ export class Task extends Document {
   status!: TaskStatus;
 
   // For now it will be a string but in future it will be a reference to the user collection
-  @Prop()
-  createdBy!: mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "User" })
+  createdBy!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the user collection
-  @Prop()
-  assignTo!: mongo.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
+  assignTo!: Types.ObjectId[];
 }
 
 /**

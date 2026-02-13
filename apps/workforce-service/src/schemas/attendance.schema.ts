@@ -1,6 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo } from "mongoose";
 
+/**
+ * Mongoose document type for Attendance.
+ */
+export type AttendanceDocument = Attendance & Document;
+
+/**
+ * Enum for attendance types within the workforce management system.
+ */
 export enum AttendanceInType {
   PRESENT = "PRESENT",
   LATE = "LATE",
@@ -11,13 +19,14 @@ export enum AttendanceInType {
   WEEKEND_EXCHANGE = "WEEKEND_EXCHANGE",
 }
 
+/**
+ * Enum for shift types within the workforce management system.
+ */
 export enum ShiftType {
   MORNING = "MORNING",
   EVENING = "EVENING",
   NIGHT = "NIGHT",
 }
-
-export type AttendanceDocument = Attendance & Document;
 
 /**
  * Attendance Schema
@@ -56,4 +65,7 @@ export class Attendance extends Document {
   shiftType!: ShiftType;
 }
 
+/**
+ * Mongoose schema for the Attendance class
+ */
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

@@ -6,7 +6,7 @@ import type { Request } from "express";
 import { Strategy } from "passport-custom";
 import { firstValueFrom } from "rxjs";
 import { jwtConfig } from "../common/jwt.config";
-import { RedisTokenService } from "../common/redis/redis-token.service";
+import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
 import { USER_COMMANDS } from "../user/constants/user.constants";
 
 /**
