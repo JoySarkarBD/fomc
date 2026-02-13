@@ -63,11 +63,17 @@ export class User extends Document {
   password?: string;
 
   // OTP for password reset flows
-  @Prop({ type: String, default: null, maxlength: 6, minlength: 6 })
+  @Prop({
+    type: String,
+    default: null,
+    maxlength: 6,
+    minlength: 6,
+    select: false,
+  })
   otp?: string | null;
 
   // Expiry date for the OTP
-  @Prop({ type: Date, default: null })
+  @Prop({ type: Date, default: null, select: false })
   otpExpiry?: Date | null;
 
   // Role of the user in the organization
@@ -77,6 +83,18 @@ export class User extends Document {
   // Department of the user (optional)
   @Prop({ default: null, enum: Department })
   department?: Department;
+
+  // Employment status (active/inactive)
+  @Prop({ type: Boolean, default: true })
+  employmentStatus!: boolean;
+
+  // Date of resignations
+  @Prop()
+  resignedDates?: Date[];
+
+  // Date(s) of re-joining the organization
+  @Prop()
+  reJoiningDates?: Date[];
 }
 
 /**
