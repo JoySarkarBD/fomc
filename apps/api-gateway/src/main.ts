@@ -5,6 +5,8 @@ import config from "../../config/config";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/http-exception.filter";
 import { ResponseInterceptor } from "./common/response.interceptor";
+import helmet from "helmet";
+import morgan from "morgan";
 
 /**
  * Bootstrap function to initialize and start the NestJS application.
@@ -18,6 +20,12 @@ async function bootstrap(): Promise<void> {
 
   // Set a global prefix for all routes in the application. This means that all endpoints will be prefixed with "/api", providing a clear namespace for the API and helping to avoid route conflicts with other potential services or applications running on the same server.
   app.setGlobalPrefix("api");
+
+  // Use Helmet to set secure HTTP headers
+  app.use(helmet());
+
+  // Log each HTTP request to terminal in a compact, colored format
+  app.use(morgan("dev"));
 
   /**
    * Apply global validation pipe.
