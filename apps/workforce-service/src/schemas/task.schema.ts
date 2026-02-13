@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Document, Schema as MongooseSchema, Types } from "mongoose";
 
 /**
  * Mongoose document type for Task.
@@ -43,12 +43,18 @@ export class Task extends Document {
   name!: string;
 
   // For now it will be a string but in future it will be a reference to the client collection
-  @Prop({ type: Types.ObjectId, ref: "Client" })
-  client!: Types.ObjectId;
+  @Prop({
+    type: MongooseSchema.Types.Mixed, // Mixed type to allow both string and ObjectId for client reference
+    required: true,
+  })
+  client!: string | Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the project collection
-  @Prop({ type: Types.ObjectId, ref: "Project" })
-  project!: Types.ObjectId;
+  @Prop({
+    type: MongooseSchema.Types.Mixed, // Mixed type to allow both string and ObjectId for project reference
+    required: true,
+  })
+  project!: string | Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the user collection
   @Prop()
@@ -62,15 +68,15 @@ export class Task extends Document {
   @Prop()
   description?: string;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  //
   @Prop({ enum: TaskStatus, default: TaskStatus.PENDING })
   status!: TaskStatus;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  // Reference to the user collection
   @Prop({ type: Types.ObjectId, ref: "User" })
   createdBy!: Types.ObjectId;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  // Reference to the user collection
   @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
   assignTo!: Types.ObjectId[];
 }

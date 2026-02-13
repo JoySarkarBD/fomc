@@ -5,9 +5,9 @@ import { PassportStrategy } from "@nestjs/passport";
 import type { Request } from "express";
 import { Strategy } from "passport-custom";
 import { firstValueFrom } from "rxjs";
+import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { jwtConfig } from "../common/jwt.config";
 import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
-import { USER_COMMANDS } from "../user/constants/user.constants";
 
 /**
  * JWT Strategy for validating tokens in the API Gateway.

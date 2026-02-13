@@ -6,8 +6,8 @@ import {
 } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { firstValueFrom } from "rxjs";
+import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { buildResponse } from "../common/response.util";
-import { USER_COMMANDS } from "./constants/user.constants";
 import { CreateUserDto } from "./dto/create-user.dto";
 
 /**

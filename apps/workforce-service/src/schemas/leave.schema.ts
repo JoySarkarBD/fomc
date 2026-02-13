@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo } from "mongoose";
+import { Document, Schema as MongooseSchema, Types } from "mongoose";
 
 /**
  * Mongoose document type for Leave.
@@ -30,20 +30,39 @@ export enum LeaveType {
  */
 @Schema({ timestamps: true, versionKey: false })
 export class Leave extends Document {
-  @Prop({ required: true })
-  user!: string | mongo.ObjectId;
+  // Reference to the user requesting leave
+  @Prop({
+    type: MongooseSchema.Types.Mixed, // Mixed type to allow both string and ObjectId for user reference
+    required: true,
+  })
+  user!: string | Types.ObjectId;
 
+  // Type of leave being requested (e.g., sick leave, casual leave)
   @Prop({ required: true, enum: LeaveType })
   type!: LeaveType;
 
+  // Start date of the leave
   @Prop({ required: true })
   startDate!: Date;
 
+  // End date of the leave
   @Prop({ required: true })
   endDate!: Date;
 
+  // Reason for requesting the leave
   @Prop({ required: true })
   reason!: string;
+
+  // Optional field to indicate if the leave has been approved
+  @Prop()
+  isApproved?: boolean;
+
+  // Optional field to indicate who approved the leave (could be a reference to a user or just a string)
+  @Prop({
+    type: MongooseSchema.Types.Mixed, // Mixed type to allow both string and ObjectId for approver reference
+    required: true,
+  })
+  approvedBy?: string | Types.ObjectId;
 }
 
 /**
