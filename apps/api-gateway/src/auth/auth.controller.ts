@@ -8,18 +8,18 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
-import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import type { Request } from "express";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import type { AuthUser } from "../common/interfaces/auth-user.interface";
 import { AuthService } from "./auth.service";
-import { FORGOT_PASSWORD_THROTTLE } from "./constants/auth-throttle.constants";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ForgotThrottleGuard } from "./throttles/forgot-throttle.guard";
+import { ResetThrottleGuard } from "./throttles/reset-throttle.guard";
 
 /**
  * Authentication Controller responsible for handling authentication-related HTTP requests.
@@ -61,8 +61,7 @@ export class AuthController {
    * Returns a success message or an error message based on the result of the password reset initiation.
    */
   @Post("forgot-password")
-  @UseGuards(ThrottlerGuard)
-  @Throttle(FORGOT_PASSWORD_THROTTLE)
+  @UseGuards(ForgotThrottleGuard)
   async forgot(@Body() data: ForgotPasswordDto) {
     return this.authService.forgotPassword(data.email);
   }
@@ -74,8 +73,7 @@ export class AuthController {
    * Returns a success message or an error message based on the result of the password reset operation.
    */
   @Patch("reset-password")
-  @UseGuards(ThrottlerGuard)
-  @Throttle(FORGOT_PASSWORD_THROTTLE)
+  @UseGuards(ResetThrottleGuard)
   async reset(@Body() data: ResetPasswordDto) {
     return this.authService.resetPassword(data.otp, data.newPassword);
   }

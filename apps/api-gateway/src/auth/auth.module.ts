@@ -1,28 +1,16 @@
-import { ThrottlerStorageRedisService } from "@nest-lab/throttler-storage-redis";
-import { ExecutionContext, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { PassportModule } from "@nestjs/passport";
-import { ThrottlerModule } from "@nestjs/throttler";
-import * as crypto from "crypto";
 import config from "../../../config/config";
 import { jwtConfig } from "../common/jwt.config";
-import { RedisClientService } from "../common/redis/redis.client";
 import { RedisModule } from "../common/redis/redis.module";
 import { MailModule } from "../utils/mail.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { PASSWORD_THROTTLER } from "./constants/auth-throttle.constants";
 import { JwtStrategy } from "./jwt.strategy";
-
-/**
- * Helper function to hash a unique identifier (e.g., device ID or IP address) for use in throttling keys. This function takes an identifier string as input, hashes it using the SHA-256 algorithm, and returns the resulting hash as a hexadecimal string. Hashing the identifier helps to create a consistent and secure key for tracking requests in the throttling mechanism, while also protecting sensitive information by not storing raw identifiers directly.
- * @param identifier - The unique identifier to be hashed, such as a device ID or IP address, used for tracking requests in the throttling mechanism.
- * @returns A hexadecimal string representing the hashed identifier, which can be used as a key in the throttling storage to track request counts and enforce rate limits.
- */
-function hashIdentifier(identifier: string): string {
-  return crypto.createHash("sha256").update(identifier).digest("hex");
-}
+import { ForgotThrottleGuard } from "./throttles/forgot-throttle.guard";
+import { ResetThrottleGuard } from "./throttles/reset-throttle.guard";
 
 /**
  * Authentication Module responsible for managing authentication-related functionality within the API Gateway.
@@ -38,31 +26,6 @@ function hashIdentifier(identifier: string): string {
      */
     JwtModule.register(jwtConfig),
     PassportModule.register({ defaultStrategy: "jwt" }),
-
-    /**
-     * Throttler Module configured with a custom throttler for password-related operations, providing rate limiting to enhance security and prevent abuse of authentication endpoints, particularly those related to password resets.
-     * This helps to mitigate brute-force attacks and ensures that users cannot make excessive requests to sensitive endpoints.
-     */
-    ThrottlerModule.forRootAsync({
-      useFactory: () => ({
-        throttlers: [PASSWORD_THROTTLER],
-        storage: new ThrottlerStorageRedisService(
-          new RedisClientService().getClientThrottle(),
-        ),
-        getTracker: (req: Record<string, any>, context: ExecutionContext) => {
-          // Unique identifier for tracking requests(e,g, device id)
-          return req.headers["x-device-id"] || req.ip;
-        },
-        generateKey: (
-          context: ExecutionContext,
-          trackerString: string,
-          throttlerName: string,
-        ) => {
-          // Hash the tracker string to create a unique key for throttling
-          return `${throttlerName}:${hashIdentifier(trackerString)}`;
-        },
-      }),
-    }),
 
     /**
      * Mail Module responsible for handling email-related functionality, such as sending OTPs for password resets and other authentication-related notifications.
@@ -103,7 +66,12 @@ function hashIdentifier(identifier: string): string {
    * The AuthService contains methods that perform these operations, interacting with the User Service and other dependencies as needed.
    * The JwtStrategy is also provided to handle JWT validation and authentication logic for protected routes.
    */
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    ForgotThrottleGuard,
+    ResetThrottleGuard,
+  ],
 
   /**
    * Exports the JwtModule, PassportModule, and MailModule to make their services available for use in other modules of the application.
