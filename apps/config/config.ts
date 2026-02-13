@@ -16,6 +16,7 @@ interface Config {
 
   // The number of salt rounds to use for bcrypt hashing, which determines the computational cost of hashing passwords. A higher number of salt rounds increases security but also increases the time required to hash passwords, so it should be set to a value that balances security and performance.
   BCRYPT_SALT_ROUNDS: number;
+  BCRYPT_SALT_ROUNDS_FOR_THROTTLE: number;
 
   // The time-to-live (TTL) for rate limiting, specified in seconds, which defines the duration for which a rate limit will be applied to a client after they exceed the allowed number of requests.
   RATE_LIMIT_TTL: number;
@@ -37,6 +38,7 @@ interface Config {
   REDIS_PORT: number;
   REDIS_PASSWORD: string;
   REDIS_DB_SESSION: number;
+  REDIS_DB_THROTTLE: number;
   REDIS_DB_AUTH: number;
 }
 
@@ -57,6 +59,10 @@ const config: Config = {
 
   // The number of salt rounds to use for bcrypt hashing, which determines the computational cost of hashing passwords. A higher number of salt rounds increases security but also increases the time required to hash passwords, so it should be set to a value that balances security and performance.
   BCRYPT_SALT_ROUNDS: parseInt(process.env.BCRYPT_SALT_ROUNDS as string, 10),
+  BCRYPT_SALT_ROUNDS_FOR_THROTTLE: parseInt(
+    process.env.BCRYPT_SALT_ROUNDS_FOR_THROTTLE as string,
+    10,
+  ),
 
   // The time-to-live (TTL) for rate limiting, specified in seconds, which defines the duration for which a rate limit will be applied to a client after they exceed the allowed number of requests. This helps to mitigate abuse and ensure fair usage of the API Gateway's resources.
   RATE_LIMIT_TTL: parseInt(process.env.RATE_LIMIT_TTL as string, 10),
@@ -78,6 +84,7 @@ const config: Config = {
   REDIS_PORT: parseInt(process.env.REDIS_PORT as string, 10),
   REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
   REDIS_DB_SESSION: parseInt(process.env.REDIS_DB_SESSION as string, 10),
+  REDIS_DB_THROTTLE: parseInt(process.env.REDIS_DB_THROTTLE as string, 10),
   REDIS_DB_AUTH: parseInt(process.env.REDIS_DB_AUTH as string, 10),
 };
 

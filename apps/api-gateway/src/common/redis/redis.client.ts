@@ -9,11 +9,13 @@ import config from "../../../../config/config";
 export class RedisClientService implements OnModuleDestroy {
   private readonly clientAuth: Redis;
   private readonly clientSession: Redis;
+  private readonly clientThrottle: Redis;
 
   /**
    * Constructor initializes the Redis client with the specified configuration parameters. It uses environment variables or default values to set the host, port, password, and database index for the Redis connection. This allows for flexible configuration of the Redis client based on different deployment environments (e.g., development, staging, production) without hardcoding sensitive information in the codebase. The initialized Redis client is stored as a private property of the service for use in other methods that require access to Redis operations.
    */
   constructor() {
+    // Initialize the Redis client with configuration parameters from the environment variables or default values
     this.clientAuth = new Redis({
       host: config.REDIS_HOST ?? "127.0.0.1",
       port: Number(config.REDIS_PORT ?? 6379),
@@ -21,6 +23,17 @@ export class RedisClientService implements OnModuleDestroy {
       db: config.REDIS_DB_AUTH ? Number(config.REDIS_DB_AUTH) : undefined,
     });
 
+    // Initialize a separate Redis client for session management, allowing for separation of concerns and potentially different configurations for session-related operations.
+    this.clientThrottle = new Redis({
+      host: config.REDIS_HOST ?? "127.0.0.1",
+      port: Number(config.REDIS_PORT ?? 6379),
+      password: config.REDIS_PASSWORD || undefined,
+      db: config.REDIS_DB_THROTTLE
+        ? Number(config.REDIS_DB_THROTTLE)
+        : undefined,
+    });
+
+    // Initialize a separate Redis client for session management, allowing for separation of concerns and potentially different configurations for session-related operations.
     this.clientSession = new Redis({
       host: config.REDIS_HOST ?? "127.0.0.1",
       port: Number(config.REDIS_PORT ?? 6379),
@@ -43,11 +56,16 @@ export class RedisClientService implements OnModuleDestroy {
     return this.clientSession;
   }
 
+  getClientThrottle() {
+    return this.clientThrottle;
+  }
+
   /**
    * onModuleDestroy lifecycle hook is implemented to ensure that the Redis connection is properly closed when the module is destroyed. This method is called automatically by NestJS when the application is shutting down or when the module is being unloaded. By calling `this.clientAuth.quit()` and `this.clientSession.quit()`, we can gracefully close the Redis connections, preventing potential memory leaks and ensuring that all pending Redis commands are completed before the application exits. This is an important aspect of resource management in applications that maintain persistent connections to external services like Redis.
    */
   async onModuleDestroy() {
     await this.clientAuth.quit();
     await this.clientSession.quit();
+    await this.clientThrottle.quit();
   }
 }

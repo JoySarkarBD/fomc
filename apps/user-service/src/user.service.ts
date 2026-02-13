@@ -68,7 +68,10 @@ export class UserService {
         return { emailExist: true, message: "Email already exists" };
       }
       // Hash the user's password before saving it to the database to ensure security.
-      const hashedPassword = await bcrypt.hash(data.password, 10);
+      const hashedPassword = await bcrypt.hash(
+        data.password,
+        config.BCRYPT_SALT_ROUNDS,
+      );
       data.password = hashedPassword;
       const createdUser = new this.userModel(data);
       const newUser = await createdUser.save();

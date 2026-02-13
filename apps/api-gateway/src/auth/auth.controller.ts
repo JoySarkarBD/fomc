@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Patch,
   Post,
   Put,
   Req,
@@ -13,7 +14,7 @@ import { GetUser } from "../common/decorators/get-user.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import type { AuthUser } from "../common/interfaces/auth-user.interface";
 import { AuthService } from "./auth.service";
-import { PASSWORD_THROTTLE } from "./constants/auth-throttle.constants";
+import { FORGOT_PASSWORD_THROTTLE } from "./constants/auth-throttle.constants";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -61,7 +62,7 @@ export class AuthController {
    */
   @Post("forgot-password")
   @UseGuards(ThrottlerGuard)
-  @Throttle(PASSWORD_THROTTLE)
+  @Throttle(FORGOT_PASSWORD_THROTTLE)
   async forgot(@Body() data: ForgotPasswordDto) {
     return this.authService.forgotPassword(data.email);
   }
@@ -72,7 +73,9 @@ export class AuthController {
    * Validates the input data and attempts to reset the user's password using the AuthService, which verifies the OTP and updates the password if valid.
    * Returns a success message or an error message based on the result of the password reset operation.
    */
-  @Put("reset-password")
+  @Patch("reset-password")
+  @UseGuards(ThrottlerGuard)
+  @Throttle(FORGOT_PASSWORD_THROTTLE)
   async reset(@Body() data: ResetPasswordDto) {
     return this.authService.resetPassword(data.otp, data.newPassword);
   }
