@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo } from "mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Mongoose document type for Task.
@@ -43,12 +43,12 @@ export class Task extends Document {
   name!: string;
 
   // For now it will be a string but in future it will be a reference to the client collection
-  @Prop()
-  client!: string | mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "Client" })
+  client!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the project collection
-  @Prop()
-  project!: string | mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "Project" })
+  project!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the user collection
   @Prop()
@@ -67,12 +67,12 @@ export class Task extends Document {
   status!: TaskStatus;
 
   // For now it will be a string but in future it will be a reference to the user collection
-  @Prop()
-  createdBy!: mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "User" })
+  createdBy!: Types.ObjectId;
 
   // For now it will be a string but in future it will be a reference to the user collection
-  @Prop()
-  assignTo!: mongo.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
+  assignTo!: Types.ObjectId[];
 }
 
 /**

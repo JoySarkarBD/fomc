@@ -10,7 +10,7 @@ import * as bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
 import config from "../../../config/config";
-import { RedisTokenService } from "../common/redis/redis-token.service";
+import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
 import { buildResponse } from "../common/response.util";
 import { USER_COMMANDS } from "../user/constants/user.constants";
 import { MailService } from "../utils/mail.service";

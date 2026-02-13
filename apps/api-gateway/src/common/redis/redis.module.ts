@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { RedisTokenService } from "./redis-token.service";
+import { RedisTokenService } from "./redis-services/auth/redis-token.service";
 import { RedisClientService } from "./redis.client";
 
 /**
