@@ -162,16 +162,26 @@ export class UserService {
     id: MongoIdDto["id"],
     myId?: MongoIdDto["id"],
     myDepartment?: Department,
-  ): Promise<User | null> {
+  ): Promise<User | { message: string; exception: any }> {
     const user = await this.userModel.findById(id).exec();
-    if (!user) throw new NotFoundException("User not found");
+    // if (!user) throw new NotFoundException("User not found");
+    if (!user) {
+      return {
+        message: "User not found",
+        exception: "NotFoundException",
+      };
+    }
 
     // EMPLOYEE: Can only access their own profile
     if (myRole === UserRole.EMPLOYEE) {
       if (myId && user._id.equals(myId)) {
         return user;
       }
-      throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+      return {
+        message: "Access denied",
+        exception: "HttpException",
+      };
+      // throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
     }
 
     // Allow any authenticated user to fetch their own profile
@@ -186,7 +196,11 @@ export class UserService {
       case UserRole.HR:
         // HR can access all users except DIRECTOR
         if (user.role === UserRole.DIRECTOR) {
-          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+          return {
+            message: "Access denied",
+            exception: "HttpException",
+          };
+          // throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
         }
         return user;
 
@@ -195,21 +209,38 @@ export class UserService {
         // Can only fetch users from the same department
         // Cannot access HR or DIRECTOR profiles
         if (!myDepartment) {
-          throw new HttpException(
-            "Department required for this role",
-            HttpStatus.FORBIDDEN,
-          );
+          return {
+            message: "Department required for this role",
+            exception: "HttpException",
+          };
+          // throw new HttpException(
+          //   "Department required for this role",
+          //   HttpStatus.FORBIDDEN,
+          // );
         }
         if (user.role === UserRole.HR || user.role === UserRole.DIRECTOR) {
-          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+          return {
+            message: "Access denied",
+            exception: "HttpException",
+          };
+
+          // throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
         }
         if (user.department !== myDepartment) {
-          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+          return {
+            message: "Access denied",
+            exception: "HttpException",
+          };
+          // throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
         }
         return user;
 
       default:
-        throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
+        return {
+          message: "Invalid role",
+          exception: "HttpException",
+        };
+      // throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
     }
   }
 

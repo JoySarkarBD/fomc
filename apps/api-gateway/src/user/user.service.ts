@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
@@ -75,7 +77,14 @@ export class UserService {
         myDepartment,
       }),
     );
-    if (!user) throw new NotFoundException("User not found");
+
+    switch (user?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(user.message);
+      case "HttpException":
+        throw new HttpException(user.message, HttpStatus.FORBIDDEN);
+    }
+
     return buildResponse("User fetched successfully", user);
   }
 
