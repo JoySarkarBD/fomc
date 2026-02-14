@@ -182,7 +182,7 @@ export class UserService {
     id: MongoIdDto["id"],
     myId?: MongoIdDto["id"],
     myDepartment?: Department,
-  ): Promise<User | { message: string; exception: any }> {
+  ): Promise<User | { message: string; exception: string }> {
     const user = await this.userModel.findById(id).exec();
     // if (!user) throw new NotFoundException("User not found");
     if (!user) {

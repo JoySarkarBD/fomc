@@ -1,13 +1,7 @@
 export const ATTENDANCE_COMMANDS = {
-  PRESENT_ATTENDANCE: "present_attendance",
-  OUT_ATTENDANCE: "out_attendance",
-  WEEKEND_EXCHANGE: "weekend_exchange",
-} as const;
-
-export const ATTENDANCE_COMMAND_NAMES = {
-  PRESENT_ATTENDANCE: "present_attendance",
-  OUT_ATTENDANCE: "out_attendance",
-  WEEKEND_EXCHANGE: "weekend_exchange",
+  PRESENT_ATTENDANCE: { cmd: "present_attendance" },
+  OUT_ATTENDANCE: { cmd: "out_attendance" },
+  WEEKEND_EXCHANGE: { cmd: "weekend_exchange" },
 } as const;
 
 /* 
