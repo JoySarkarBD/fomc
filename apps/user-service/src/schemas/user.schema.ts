@@ -21,9 +21,11 @@ export enum UserRole {
  * Enum for departments within the organization.
  */
 export enum Department {
-  SHOPIFY = "SHOPIFY",
+  /*   SHOPIFY = "SHOPIFY",
   WORDPRESS = "WORDPRESS",
-  CUSTOM = "CUSTOM",
+  CUSTOM = "CUSTOM", */
+  OPERATIONS = "OPERATIONS",
+  SALES = "SALES",
 }
 
 /**
