@@ -42,6 +42,8 @@ export class UserService {
    *
    * @param {UserRole} myRole - Role of the requesting user to apply role-based access control.
    * @param {UserSearchQueryDto} query - Optional search query parameters for filtering users.
+   * @param {MongoIdDto["id"]} myId - ID of the requesting user.
+   * @param {Department} myDepartment - Department of the requesting user.
    * @returns {Promise<{users: User[]; total: number; totalPages: number}>} Array of user documents with pagination info.
    */
   async getUsers(
@@ -58,10 +60,30 @@ export class UserService {
     // Role-based access control
     switch (myRole) {
       case UserRole.DIRECTOR:
-        // Director can see everyone
+        // Director can see everyone - no restrictions
         break;
       case UserRole.HR:
-        // HR can see all employees and team leads
+        // HR can see all users except DIRECTOR
+        filter.role = {
+          $in: [
+            UserRole.EMPLOYEE,
+            UserRole.TEAM_LEADER,
+            UserRole.PROJECT_MANAGER,
+            UserRole.HR,
+          ],
+        };
+        break;
+      case UserRole.PROJECT_MANAGER:
+      case UserRole.TEAM_LEADER:
+        // Managers/Leads can see only users from their department
+        // Cannot see HR or DIRECTOR
+        if (!myDepartment) {
+          throw new HttpException(
+            "Department required for this role",
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        filter.department = myDepartment;
         filter.role = {
           $in: [
             UserRole.EMPLOYEE,
@@ -70,18 +92,13 @@ export class UserService {
           ],
         };
         break;
-      case UserRole.PROJECT_MANAGER:
-      case UserRole.TEAM_LEADER:
-        // Managers/Leads can see only their department/team members
-        if (!myDepartment) {
-          throw new HttpException("Invalid department", HttpStatus.FORBIDDEN);
-        }
-        filter.department = myDepartment;
-        filter.role = { $in: [UserRole.EMPLOYEE, UserRole.TEAM_LEADER] };
-        break;
       case UserRole.EMPLOYEE:
+        // Employee can only see their own record
         if (!myId) {
-          throw new HttpException("Invalid user", HttpStatus.FORBIDDEN);
+          throw new HttpException(
+            "User ID required for this role",
+            HttpStatus.FORBIDDEN,
+          );
         }
         filter._id = myId;
         break;
@@ -94,10 +111,23 @@ export class UserService {
       filter.$text = { $search: searchKey };
     }
 
-    // Apply department and role filters from query if provided (Director can use these)
-    if (department && myRole === UserRole.DIRECTOR)
+    // Apply department and role filters from query if provided (Director and HR can use these)
+    if (
+      department &&
+      (myRole === UserRole.DIRECTOR || myRole === UserRole.HR)
+    ) {
       filter.department = department;
-    if (role && myRole === UserRole.DIRECTOR) filter.role = role;
+    }
+    if (role && (myRole === UserRole.DIRECTOR || myRole === UserRole.HR)) {
+      // Ensure HR cannot filter for DIRECTOR role
+      if (myRole === UserRole.HR && role === UserRole.DIRECTOR) {
+        throw new HttpException(
+          "HR cannot access DIRECTOR role",
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      filter.role = role;
+    }
 
     // Execute the query to find users based on the constructed filter, applying pagination using skip and limit. Simultaneously, count the total number of documents that match the filter to provide pagination metadata. Finally, return the users along with total count and total pages calculated from the total count and page size.
     const [users, total] = await Promise.all([
@@ -121,7 +151,10 @@ export class UserService {
    *
    * @param {UserRole} myRole - Role of the requesting user to apply role-based access control.
    * @param {MongoIdDto["id"]} id - Unique identifier of the user.
+   * @param {MongoIdDto["id"]} myId - ID of the requesting user.
+   * @param {Department} myDepartment - Department of the requesting user.
    * @throws {NotFoundException} If the user does not exist.
+   * @throws {HttpException} If access is denied (403 Forbidden).
    * @returns {Promise<User>} The found user document.
    */
   async getUser(
@@ -133,39 +166,51 @@ export class UserService {
     const user = await this.userModel.findById(id).exec();
     if (!user) throw new NotFoundException("User not found");
 
-    // Allow users to always fetch their own profile.
+    // EMPLOYEE: Can only access their own profile
+    if (myRole === UserRole.EMPLOYEE) {
+      if (myId && user._id.equals(myId)) {
+        return user;
+      }
+      throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+    }
+
+    // Allow any authenticated user to fetch their own profile
     if (myId && user._id.equals(myId)) return user;
 
     // Role-based access control
     switch (myRole) {
       case UserRole.DIRECTOR:
+        // Director can access any user
         return user;
+
       case UserRole.HR:
-        if (
-          [
-            UserRole.EMPLOYEE,
-            UserRole.TEAM_LEADER,
-            UserRole.PROJECT_MANAGER,
-          ].includes(user.role)
-        ) {
-          return user;
+        // HR can access all users except DIRECTOR
+        if (user.role === UserRole.DIRECTOR) {
+          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
         }
-        break;
+        return user;
+
       case UserRole.PROJECT_MANAGER:
       case UserRole.TEAM_LEADER:
-        if (
-          myDepartment &&
-          user.department === myDepartment &&
-          [UserRole.EMPLOYEE, UserRole.TEAM_LEADER].includes(user.role)
-        ) {
-          return user;
+        // Can only fetch users from the same department
+        // Cannot access HR or DIRECTOR profiles
+        if (!myDepartment) {
+          throw new HttpException(
+            "Department required for this role",
+            HttpStatus.FORBIDDEN,
+          );
         }
-        break;
-      case UserRole.EMPLOYEE:
-        break;
-    }
+        if (user.role === UserRole.HR || user.role === UserRole.DIRECTOR) {
+          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+        }
+        if (user.department !== myDepartment) {
+          throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+        }
+        return user;
 
-    throw new HttpException("Access denied", HttpStatus.FORBIDDEN);
+      default:
+        throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
+    }
   }
 
   /**

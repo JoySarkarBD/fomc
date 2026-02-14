@@ -43,6 +43,7 @@ export class UserController {
     UserRole.HR,
     UserRole.PROJECT_MANAGER,
     UserRole.TEAM_LEADER,
+    UserRole.EMPLOYEE,
   )
   @Get()
   async getUsers(
@@ -52,7 +53,7 @@ export class UserController {
     return await this.userService.getUsers(
       user.role as UserRole,
       query,
-      user._id as MongoIdDto["id"],
+      (user._id ?? user.id) as MongoIdDto["id"],
       user.department,
     );
   }
@@ -70,13 +71,14 @@ export class UserController {
     UserRole.HR,
     UserRole.PROJECT_MANAGER,
     UserRole.TEAM_LEADER,
+    UserRole.EMPLOYEE,
   )
   @Get(":id")
   async getUser(@GetUser() user: AuthUser, @Param() params: MongoIdDto) {
     const result = await this.userService.getUser(
       user.role as UserRole,
       params.id as MongoIdDto["id"],
-      user._id as MongoIdDto["id"],
+      (user._id ?? user.id) as MongoIdDto["id"],
       user.department,
     );
     return result;
@@ -116,8 +118,8 @@ export class UserController {
   async getProfile(@GetUser() user: AuthUser) {
     return await this.userService.getUser(
       user.role as UserRole,
-      user._id as MongoIdDto["id"],
-      user._id as MongoIdDto["id"],
+      (user._id ?? user.id) as MongoIdDto["id"],
+      (user._id ?? user.id) as MongoIdDto["id"],
       user.department,
     );
   }

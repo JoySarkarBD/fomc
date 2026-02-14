@@ -9,7 +9,10 @@ import { firstValueFrom } from "rxjs";
 import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
 import { UserSearchQueryDto } from "../../../user-service/src/dto/user-query.dto";
-import { Department, UserRole } from "../../../user-service/src/schemas/user.schema";
+import {
+  Department,
+  UserRole,
+} from "../../../user-service/src/schemas/user.schema";
 import { MongoIdDto } from "../common/dto/mongo-id.dto";
 import { buildResponse } from "../common/response.util";
 

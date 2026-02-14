@@ -35,7 +35,7 @@ export class UserController {
   getUsers(
     payload: UserSearchQueryDto & {
       myRole: UserRole;
-      myId?: MongoIdDto["id"];
+      myId?: string;
       myDepartment?: Department;
     },
   ) {
