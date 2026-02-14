@@ -1,7 +1,6 @@
 import {
   ConflictException,
   HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -51,7 +50,10 @@ export class UserService {
     query: UserSearchQueryDto,
     myId?: MongoIdDto["id"],
     myDepartment?: Department,
-  ): Promise<{ users: User[]; total: number; totalPages: number }> {
+  ): Promise<
+    | { users: User[]; total: number; totalPages: number }
+    | { message: string; exception: any }
+  > {
     const { pageNo, pageSize, searchKey, department, role } = query;
 
     // Build a dynamic filter object based on the presence of search key, department, and role in the query parameters. This allows for flexible querying of users based on different criteria.
@@ -78,10 +80,14 @@ export class UserService {
         // Managers/Leads can see only users from their department
         // Cannot see HR or DIRECTOR
         if (!myDepartment) {
-          throw new HttpException(
-            "Department required for this role",
-            HttpStatus.FORBIDDEN,
-          );
+          return {
+            message: "Department required for this role",
+            exception: "HttpException",
+          };
+          // throw new HttpException(
+          //   "Department required for this role",
+          //   HttpStatus.FORBIDDEN,
+          // );
         }
         filter.department = myDepartment;
         filter.role = {
@@ -95,15 +101,24 @@ export class UserService {
       case UserRole.EMPLOYEE:
         // Employee can only see their own record
         if (!myId) {
-          throw new HttpException(
-            "User ID required for this role",
-            HttpStatus.FORBIDDEN,
-          );
+          return {
+            message: "User ID required for this role",
+            exception: "HttpException",
+          };
+          // throw new HttpException(
+          //   "User ID required for this role",
+          //   HttpStatus.FORBIDDEN,
+          // );
         }
         filter._id = myId;
         break;
       default:
-        throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
+        return {
+          message: "Invalid role",
+          exception: "HttpException",
+        };
+
+      // throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
     }
 
     // If a search key is provided, add a case-insensitive regex filter on both the name and email fields to allow searching for users by either their name or email.
@@ -121,10 +136,15 @@ export class UserService {
     if (role && (myRole === UserRole.DIRECTOR || myRole === UserRole.HR)) {
       // Ensure HR cannot filter for DIRECTOR role
       if (myRole === UserRole.HR && role === UserRole.DIRECTOR) {
-        throw new HttpException(
-          "HR cannot access DIRECTOR role",
-          HttpStatus.FORBIDDEN,
-        );
+        return {
+          message: "HR cannot access DIRECTOR role",
+          exception: "HttpException",
+        };
+
+        // throw new HttpException(
+        //   "HR cannot access DIRECTOR role",
+        //   HttpStatus.FORBIDDEN,
+        // );
       }
       filter.role = role;
     }

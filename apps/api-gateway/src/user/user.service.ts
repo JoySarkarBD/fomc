@@ -41,7 +41,7 @@ export class UserService {
     myId?: MongoIdDto["id"],
     myDepartment?: Department,
   ) {
-    const { users, total, totalPages } = await firstValueFrom(
+    const result = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USERS, {
         ...query,
         myRole,
@@ -49,11 +49,13 @@ export class UserService {
         myDepartment,
       }),
     );
-    return buildResponse("Users fetched successfully", {
-      users,
-      total,
-      totalPages,
-    });
+
+    switch (result?.exception) {
+      case "HttpException":
+        throw new HttpException(result.message, HttpStatus.FORBIDDEN);
+    }
+
+    return buildResponse("Users fetched successfully", result);
   }
 
   /**
