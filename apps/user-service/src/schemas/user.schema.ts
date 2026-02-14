@@ -43,7 +43,7 @@ export class User extends Document {
   name!: string;
 
   // Optional employee identifier
-  @Prop({ default: null })
+  @Prop({ default: null, unique: true, sparse: true, uppercase: true })
   employeeId?: string;
 
   // Primary phone number (required)
@@ -104,10 +104,23 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 /**
  * Index for faster queries on commonly filtered fields:
- * - employeeId
- * - phoneNumber
- * - department
+ * - role: to quickly find users by their role (e.g., all employees, all managers).
+ * - department: to quickly find users by their department (e.g., all Shopify employees).
+ * - text index on name and email for efficient search functionality.
+ * - OTP index to quickly find users during password reset flows.
  */
-UserSchema.index({ employeeId: 1, phoneNumber: 1, department: 1 });
+
+// Separate indexes for filters
+UserSchema.index({ role: 1 });
+UserSchema.index({ department: 1 });
+
+// Text index for searchKey
+UserSchema.index({
+  name: "text",
+  email: "text",
+  phone: "text",
+  employeeId: "text",
+});
+
 // Optional index to quickly find user by OTP during password reset
 UserSchema.index({ otp: 1 });

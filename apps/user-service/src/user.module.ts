@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import config from "../../config/config";
+import { MongooseConnectionsModule } from "../../common/src/mongoose/mongoose-connections.module";
 import { User, UserSchema } from "./schemas/user.schema";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
@@ -19,17 +19,21 @@ import { UserService } from "./user.service";
      * Mongoose Module configured to connect to the MongoDB database using the connection string provided in the environment variables.
      * This allows the User Service to interact with the MongoDB database for storing and retrieving user data, enabling persistence and data management for user-related operations.
      */
-    MongooseModule.forRoot(
-      config.MONGO_URI
-        ? config.MONGO_URI
-        : "mongodb://127.0.0.1:27017/office-management",
-    ),
+    MongooseConnectionsModule,
 
     /**
      * Mongoose Module configured with the User schema, defining the structure of user documents in the MongoDB database.
      * This allows the User Service to perform CRUD operations on user data, ensuring that user documents adhere to the defined schema and enabling efficient data management and retrieval.
      */
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature(
+      [{ name: User.name, schema: UserSchema }],
+      "PRIMARY_DB",
+    ),
+    MongooseModule.forFeature(
+      [{ name: User.name, schema: UserSchema }],
+      "SECONDARY_DB",
+    ),
   ],
 
   /**

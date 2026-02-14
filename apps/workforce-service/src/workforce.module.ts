@@ -1,18 +1,9 @@
 import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
-import { TaskModule } from './task/task.module';
-import config from "../../config/config";
+import { MongooseConnectionsModule } from "../../common/src/mongoose/mongoose-connections.module";
+import { TaskModule } from "./task/task.module";
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(
-      config.MONGO_URI
-        ? config.MONGO_URI
-        : "mongodb://127.0.0.1:27017/office-management",
-    ),
-    MongooseModule.forFeature([]),
-    TaskModule,
-  ],
+  imports: [MongooseConnectionsModule, TaskModule],
 
   /**
    * Controllers responsible for handling incoming microservice messages related to user operations, such as creating, retrieving, updating, and deleting users.

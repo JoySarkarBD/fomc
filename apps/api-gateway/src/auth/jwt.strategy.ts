@@ -63,7 +63,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
     try {
       // Retrieve the user information from the User Service using the user ID from the JWT payload.
       const user = await firstValueFrom(
-        this.userClient.send(USER_COMMANDS.GET_USER, id),
+        this.userClient.send(USER_COMMANDS.GET_USER, {
+          id,
+          myRole: payload?.role,
+          myId: id,
+        }),
       );
 
       // If the user is not found, return null to indicate an invalid token or user.

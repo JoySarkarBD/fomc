@@ -5,7 +5,7 @@ import { USER_COMMANDS } from "./constants/user.constants";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserMessageDto } from "./dto/update-user.dto";
 import { UserSearchQueryDto } from "./dto/user-query.dto";
-import { UserRole } from "./schemas/user.schema";
+import { Department, UserRole } from "./schemas/user.schema";
 import { UserService } from "./user.service";
 
 /**
@@ -32,9 +32,20 @@ export class UserController {
    * @returns {Promise<any>} List of users.
    */
   @MessagePattern(USER_COMMANDS.GET_USERS)
-  getUsers(payload: UserSearchQueryDto & { myRole: UserRole }) {
-    const { myRole, ...query } = payload ?? {};
-    return this.userService.getUsers(myRole, query as UserSearchQueryDto);
+  getUsers(
+    payload: UserSearchQueryDto & {
+      myRole: UserRole;
+      myId?: MongoIdDto["id"];
+      myDepartment?: Department;
+    },
+  ) {
+    const { myRole, myId, myDepartment, ...query } = payload ?? {};
+    return this.userService.getUsers(
+      myRole,
+      query as UserSearchQueryDto,
+      myId,
+      myDepartment,
+    );
   }
 
   /**
@@ -46,9 +57,14 @@ export class UserController {
    * @returns {Promise<any>} User details.
    */
   @MessagePattern(USER_COMMANDS.GET_USER)
-  getUser(payload: { id: MongoIdDto["id"]; myRole: UserRole }) {
-    const { id, myRole } = payload ?? {};
-    return this.userService.getUser(myRole, id);
+  getUser(payload: {
+    id: MongoIdDto["id"];
+    myRole: UserRole;
+    myId?: MongoIdDto["id"];
+    myDepartment?: Department;
+  }) {
+    const { id, myRole, myId, myDepartment } = payload ?? {};
+    return this.userService.getUser(myRole, id, myId, myDepartment);
   }
 
   /**

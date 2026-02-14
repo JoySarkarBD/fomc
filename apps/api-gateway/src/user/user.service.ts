@@ -9,7 +9,7 @@ import { firstValueFrom } from "rxjs";
 import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
 import { UserSearchQueryDto } from "../../../user-service/src/dto/user-query.dto";
-import { UserRole } from "../../../user-service/src/schemas/user.schema";
+import { Department, UserRole } from "../../../user-service/src/schemas/user.schema";
 import { MongoIdDto } from "../common/dto/mongo-id.dto";
 import { buildResponse } from "../common/response.util";
 
@@ -30,9 +30,19 @@ export class UserService {
    *
    * @returns Promise resolving to an array of users
    */
-  async getUsers(myRole: UserRole, query: UserSearchQueryDto) {
+  async getUsers(
+    myRole: UserRole,
+    query: UserSearchQueryDto,
+    myId?: MongoIdDto["id"],
+    myDepartment?: Department,
+  ) {
     const { users, total, totalPages } = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USERS, { ...query, myRole }),
+      this.userClient.send(USER_COMMANDS.GET_USERS, {
+        ...query,
+        myRole,
+        myId,
+        myDepartment,
+      }),
     );
     return buildResponse("Users fetched successfully", {
       users,
@@ -48,9 +58,19 @@ export class UserService {
    * @returns Promise resolving to the user object
    * @throws NotFoundException if the user does not exist
    */
-  async getUser(myRole: UserRole, id: MongoIdDto["id"]) {
+  async getUser(
+    myRole: UserRole,
+    id: MongoIdDto["id"],
+    myId?: MongoIdDto["id"],
+    myDepartment?: Department,
+  ) {
     const user = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USER, { id, myRole }),
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id,
+        myRole,
+        myId,
+        myDepartment,
+      }),
     );
     if (!user) throw new NotFoundException("User not found");
     return buildResponse("User fetched successfully", user);

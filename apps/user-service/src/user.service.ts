@@ -13,7 +13,12 @@ import config from "../../config/config";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserSearchQueryDto } from "./dto/user-query.dto";
-import { User, UserDocument, UserRole } from "./schemas/user.schema";
+import {
+  Department,
+  User,
+  UserDocument,
+  UserRole,
+} from "./schemas/user.schema";
 
 /**
  * UserService
@@ -42,6 +47,8 @@ export class UserService {
   async getUsers(
     myRole: UserRole,
     query: UserSearchQueryDto,
+    myId?: MongoIdDto["id"],
+    myDepartment?: Department,
   ): Promise<{ users: User[]; total: number; totalPages: number }> {
     const { pageNo, pageSize, searchKey, department, role } = query;
 
@@ -66,10 +73,17 @@ export class UserService {
       case UserRole.PROJECT_MANAGER:
       case UserRole.TEAM_LEADER:
         // Managers/Leads can see only their department/team members
-        if (department) {
-          filter.department = department;
+        if (!myDepartment) {
+          throw new HttpException("Invalid department", HttpStatus.FORBIDDEN);
         }
+        filter.department = myDepartment;
         filter.role = { $in: [UserRole.EMPLOYEE, UserRole.TEAM_LEADER] };
+        break;
+      case UserRole.EMPLOYEE:
+        if (!myId) {
+          throw new HttpException("Invalid user", HttpStatus.FORBIDDEN);
+        }
+        filter._id = myId;
         break;
       default:
         throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
@@ -77,10 +91,7 @@ export class UserService {
 
     // If a search key is provided, add a case-insensitive regex filter on both the name and email fields to allow searching for users by either their name or email.
     if (searchKey) {
-      filter.$or = [
-        { name: { $regex: searchKey, $options: "i" } },
-        { email: { $regex: searchKey, $options: "i" } },
-      ];
+      filter.$text = { $search: searchKey };
     }
 
     // Apply department and role filters from query if provided (Director can use these)
@@ -113,10 +124,17 @@ export class UserService {
    * @throws {NotFoundException} If the user does not exist.
    * @returns {Promise<User>} The found user document.
    */
-  async getUser(myRole: UserRole, id: MongoIdDto["id"]): Promise<User | null> {
+  async getUser(
+    myRole: UserRole,
+    id: MongoIdDto["id"],
+    myId?: MongoIdDto["id"],
+    myDepartment?: Department,
+  ): Promise<User | null> {
     const user = await this.userModel.findById(id).exec();
-
     if (!user) throw new NotFoundException("User not found");
+
+    // Allow users to always fetch their own profile.
+    if (myId && user._id.equals(myId)) return user;
 
     // Role-based access control
     switch (myRole) {
@@ -136,14 +154,14 @@ export class UserService {
       case UserRole.PROJECT_MANAGER:
       case UserRole.TEAM_LEADER:
         if (
-          user.department === user.department &&
+          myDepartment &&
+          user.department === myDepartment &&
           [UserRole.EMPLOYEE, UserRole.TEAM_LEADER].includes(user.role)
         ) {
           return user;
         }
         break;
       case UserRole.EMPLOYEE:
-        if (user._id.equals(id)) return user;
         break;
     }
 

@@ -21,8 +21,7 @@ export class CreateUserDto {
   name!: string;
 
   @IsString({ message: "Employee ID must be a string" })
-  @IsOptional()
-  employeeId?: string;
+  employeeId!: string;
 
   @IsString({ message: "Phone number must be a string" })
   @IsNotEmpty({ message: "Phone number is required" })

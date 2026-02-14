@@ -56,19 +56,19 @@ export class Task extends Document {
   })
   project!: string | Types.ObjectId;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  // Due date for the task
   @Prop()
   dueDate!: Date;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  // Priority of the task (e.g., low, medium, high)
   @Prop({ enum: TaskPriority, default: TaskPriority.LOW })
   priority!: TaskPriority;
 
-  // For now it will be a string but in future it will be a reference to the user collection
+  // Optional description of the task
   @Prop()
   description?: string;
 
-  //
+  // Status of the task (e.g., pending, work in progress, completed)
   @Prop({ enum: TaskStatus, default: TaskStatus.PENDING })
   status!: TaskStatus;
 
