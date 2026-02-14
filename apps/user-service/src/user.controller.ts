@@ -9,7 +9,7 @@ import { Department, UserRole } from "./schemas/user.schema";
 import { UserService } from "./user.service";
 
 /**
- * UserController
+ * User Controller
  *
  * Handles all user-related microservice message patterns.
  * Communicates through message-based transport (e.g., TCP, RMQ, Kafka).

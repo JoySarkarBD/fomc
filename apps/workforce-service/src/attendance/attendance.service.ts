@@ -1,25 +1,155 @@
-import { Injectable } from "@nestjs/common";
-import { PresentAttendanceDto } from "./dto/create-attendance.dto";
+import { Inject, Injectable } from "@nestjs/common";
+import { ClientProxy } from "@nestjs/microservices";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { firstValueFrom } from "rxjs";
+import type { AuthUser } from "../../../api-gateway/src/common/interfaces/auth-user.interface";
+import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
+import { Department } from "../../../user-service/src/schemas/user.schema";
+import {
+  Attendance,
+  AttendanceDocument,
+  AttendanceInType,
+  ShiftTypeForOperations,
+  ShiftTypeForSales,
+} from "../schemas/attendance.schema";
 
 /* 
   attendance logic:-
-  for the operation department er jonno ekta shifting
+  for the operation department there will be one shift; day shift from 9:00 to 18:00
 
-  sales e shift 3 times; morning, evening, night
+  for the sales department there will be three shifts; morning shift from 7:00 to 15:00, evening shift from 15:00 to 23:00 and night shift from 23:00 to 7:00
 
-
-
-  shift-timing er sathe 15 min er modhye attendance mark korte hobe, otherwise late mark hobe
-  
-  shift timing -
-  
+  if the user marks attendance within 15 minutes of shift timing, then it will be marked as present, otherwise it will be marked as late
 */
 
 @Injectable()
 export class AttendanceService {
-  presentAttendance(presentAttendanceDto: PresentAttendanceDto) {
-    const { checkInTime } = presentAttendanceDto;
-    console.log("Check-in time:", checkInTime);
-    return "This action adds a new attendance";
+  constructor(
+    @Inject("USER_SERVICE") private readonly userClient: ClientProxy,
+    @InjectModel(Attendance.name)
+    private readonly attendanceModel: Model<AttendanceDocument>,
+  ) {}
+
+  /**
+   * Marks the attendance of a user as present or late based on their check-in time and shift timings.
+   *
+   * @param user - The authenticated user for whom the attendance is being marked.
+   * @return A promise that resolves to the attendance record if successfully marked, or an object containing a message and exception if there was an error (e.g., user not found, attendance already marked, no shift matched).
+   */
+  async presentAttendance(
+    user: AuthUser,
+  ): Promise<Attendance | { message: string; exception: string }> {
+    const userId = (user.id ?? user._id) as string;
+
+    // Check user existence from user-service
+    const userExist = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id: userId,
+        myRole: user.role,
+        myId: userId,
+        myDepartment: user.department,
+      }),
+    );
+
+    if (userExist.exception) {
+      return {
+        message: userExist.message,
+        exception: userExist.exception,
+      };
+    }
+
+    // Current BD Time
+    const nowUTC = new Date();
+    const bdNow = new Date(
+      nowUTC.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
+    );
+
+    // Today start and end
+    const todayStart = new Date(bdNow);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(bdNow);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Prevent duplicate attendance
+    const existingAttendance = await this.attendanceModel.findOne({
+      user: new Types.ObjectId(userId),
+      date: { $gte: todayStart, $lte: todayEnd },
+    });
+
+    if (existingAttendance) {
+      return {
+        message: "Attendance already marked for today",
+        exception: "HttpException",
+      };
+    }
+
+    const currentMinutes = bdNow.getHours() * 60 + bdNow.getMinutes();
+
+    let shiftType: string;
+    let shiftStartMinutes = 0;
+
+    // Fixed shift for HR
+    if (user.role === "HR") {
+      shiftType = ShiftTypeForOperations.DAY; // 09:00 → 18:00
+      shiftStartMinutes = 9 * 60; // 09:00 AM
+    } else {
+      // SWITCH BASED ON DEPARTMENT
+      switch (user.department) {
+        case Department.OPERATIONS:
+          shiftType = ShiftTypeForOperations.DAY;
+          shiftStartMinutes = 9 * 60;
+          break;
+
+        case Department.SALES: {
+          const morningStart = 7 * 60;
+          const morningEnd = 15 * 60;
+          const eveningStart = 15 * 60;
+          const eveningEnd = 23 * 60;
+          const nightStart = 23 * 60;
+          const nightEnd = 7 * 60;
+
+          if (currentMinutes >= morningStart && currentMinutes < morningEnd) {
+            shiftType = ShiftTypeForSales.MORNING;
+            shiftStartMinutes = morningStart;
+          } else if (
+            currentMinutes >= eveningStart &&
+            currentMinutes < eveningEnd
+          ) {
+            shiftType = ShiftTypeForSales.EVENING;
+            shiftStartMinutes = eveningStart;
+          } else {
+            shiftType = ShiftTypeForSales.NIGHT;
+            shiftStartMinutes = nightStart;
+          }
+          break;
+        }
+
+        default:
+          return {
+            message: "Department not found",
+            exception: "HttpException",
+          };
+      }
+    }
+
+    const graceLimit = shiftStartMinutes + 15;
+    let isLate = currentMinutes > graceLimit;
+
+    const attendanceType = isLate
+      ? AttendanceInType.LATE
+      : AttendanceInType.PRESENT;
+
+    // Save Attendance
+    const attendance = await this.attendanceModel.create({
+      user: new Types.ObjectId(userId),
+      checkInTime: bdNow,
+      date: todayStart,
+      inType: attendanceType,
+      shiftType,
+      isLate,
+    });
+
+    return attendance as Attendance;
   }
 }
