@@ -1,32 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, mongo } from "mongoose";
 
 /**
  * Mongoose document type for User.
  */
 export type UserDocument = User & Document;
-
-/**
- * Enum for user roles within the organization.
- */
-export enum UserRole {
-  DIRECTOR = "DIRECTOR",
-  HR = "HR",
-  PROJECT_MANAGER = "PROJECT_MANAGER",
-  TEAM_LEADER = "TEAM_LEADER",
-  EMPLOYEE = "EMPLOYEE",
-}
-
-/**
- * Enum for departments within the organization.
- */
-export enum Department {
-  /*   SHOPIFY = "SHOPIFY",
-  WORDPRESS = "WORDPRESS",
-  CUSTOM = "CUSTOM", */
-  OPERATIONS = "OPERATIONS",
-  SALES = "SALES",
-}
 
 /**
  * User Schema
@@ -79,12 +57,15 @@ export class User extends Document {
   otpExpiry?: Date | null;
 
   // Role of the user in the organization
-  @Prop({ default: UserRole.EMPLOYEE, enum: UserRole })
-  role: UserRole = UserRole.EMPLOYEE;
+  @Prop({ ref: "Role" })
+  role!: mongo.ObjectId; // Reference to the Role document
 
-  // Department of the user (optional)
-  @Prop({ default: null, enum: Department })
-  department?: Department;
+  // Department of the user in the organization
+  @Prop({ ref: "Department" })
+  department?: mongo.ObjectId; // Reference to the Department document
+
+  @Prop({ required: true, ref: "Designation" })
+  designation?: mongo.ObjectId; // Reference to the Designation document
 
   // Employment status (active/inactive)
   @Prop({ type: Boolean, default: true })
