@@ -1,11 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import {
-  Permission,
-  PermissionName,
-} from "../../../user-service/src/schemas/permission.schema";
-import { Role } from "../../../user-service/src/schemas/role.schema";
+import { Department } from "../schemas/department.schema";
+import { Designation } from "../schemas/designation.schema";
 
 @Injectable()
 export class SeedDepartmentAndDesignationService {
@@ -14,292 +11,225 @@ export class SeedDepartmentAndDesignationService {
   );
 
   constructor(
-    @InjectModel(Role.name) private roleModel: Model<Role>,
-    @InjectModel(Permission.name) private permissionModel: Model<Permission>,
+    @InjectModel(Department.name)
+    private readonly departmentModel: Model<Department>,
+
+    @InjectModel(Designation.name)
+    private readonly designationModel: Model<Designation>,
   ) {}
 
   async onModuleInit() {
-    await this.seedDepartmentAndDesignations();
+    await this.seed();
   }
 
-  async seedDepartmentAndDesignations() {
-    // -----------------------
-    // Roles Upsert
-    // -----------------------
-    const rolesData = [
-      {
-        name: "DIRECTOR",
-        description: "Director role with all permissions",
-        isSystem: true,
-      },
+  async seed() {
+    this.logger.log("Starting database seeding...");
+
+    const departmentMap = await this.seedDepartments();
+    await this.seedDesignations(departmentMap);
+
+    this.logger.log("Database seeding completed successfully.");
+  }
+
+  // ===============================
+  // Seed Departments
+  // ===============================
+  private async seedDepartments() {
+    const departmentsData = [
       {
         name: "HR",
-        description: "HR role with permissions to manage users and departments",
+        description: "Human Resources department",
         isSystem: true,
       },
       {
-        name: "PROJECT MANAGER",
-        description:
-          "Project Manager role with permissions to manage projects and teams",
+        name: "Sales",
+        description: "Sales department",
         isSystem: true,
       },
       {
-        name: "TEAM LEADER",
-        description:
-          "Team Leader role with permissions to manage team members and tasks",
-        isSystem: true,
-      },
-      {
-        name: "EMPLOYEE",
-        description: "Employee role with basic permissions",
-        isSystem: true,
-      },
-      {
-        name: "INTERN",
-        description: "Intern role with limited permissions",
+        name: "Operations",
+        description: "Operations & Software Engineering department",
         isSystem: true,
       },
     ];
 
-    for (const roleData of rolesData) {
-      await this.roleModel.updateOne(
-        { name: roleData.name },
-        { $set: roleData },
-        { upsert: true },
+    const departmentMap: Record<string, any> = {};
+
+    for (const dept of departmentsData) {
+      const updatedDepartment = await this.departmentModel.findOneAndUpdate(
+        { name: dept.name },
+        { $set: dept },
+        { upsert: true, new: true },
       );
+
+      departmentMap[dept.name] = updatedDepartment;
     }
-    this.logger.log("Roles seeded/upserted successfully.");
 
-    // -----------------------
-    // Fetch roles
-    // -----------------------
-    const roles = await this.roleModel.find().exec();
-    const getRoleId = (name: string) => roles.find((r) => r.name === name)?._id;
+    this.logger.log("Departments seeded/upserted successfully.");
 
-    // -----------------------
-    // Permissions Upsert
-    // -----------------------
-    const permissionsData = [
-      // DIRECTOR
+    return departmentMap;
+  }
+
+  // ===============================
+  // Seed Designations
+  // ===============================
+  private async seedDesignations(departmentMap: Record<string, any>) {
+    const designationsData = [
+      // ================= HR =================
       {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.USER,
-        description: "Manage users",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
+        name: "HR Manager",
+        description: "Manages HR operations",
+        departmentName: "HR",
       },
       {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.DEPARTMENT,
-        description: "Manage departments",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-      },
-      {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.ROLE,
-        description: "Manage roles",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-      },
-      {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.DESIGNATION,
-        description: "Manage designations",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-      },
-      {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.PERMISSION,
-        description: "Manage permissions",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-      },
-      {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.ATTENDANCE,
-        description: "Manage attendance",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-      },
-      {
-        role: getRoleId("DIRECTOR"),
-        name: PermissionName.LEAVE,
-        description: "Manage leaves",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
+        name: "Recruiter",
+        description: "Handles recruitment process",
+        departmentName: "HR",
       },
 
-      // HR
+      // ================= Sales =================
       {
-        role: getRoleId("HR"),
-        name: PermissionName.USER,
-        description: "Manage users",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Sales Executive",
+        description: "Handles client sales",
+        departmentName: "Sales",
       },
       {
-        role: getRoleId("HR"),
-        name: PermissionName.DEPARTMENT,
-        description: "Manage departments",
-        canCreate: true,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
-      },
-      {
-        role: getRoleId("HR"),
-        name: PermissionName.ATTENDANCE,
-        description: "View attendance",
-        canCreate: false,
-        canRead: true,
-        canUpdate: false,
-        canDelete: false,
-      },
-      {
-        role: getRoleId("HR"),
-        name: PermissionName.LEAVE,
-        description: "Approve leaves",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Sales Manager",
+        description: "Manages sales team",
+        departmentName: "Sales",
       },
 
-      // PROJECT MANAGER
+      // ================= Operations (All Software Roles) =================
       {
-        role: getRoleId("PROJECT MANAGER"),
-        name: PermissionName.USER,
-        description: "Update team users",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Frontend Developer",
+        description: "Develops frontend applications",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("PROJECT MANAGER"),
-        name: PermissionName.DESIGNATION,
-        description: "Assign roles",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Backend Developer",
+        description: "Develops backend services and APIs",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("PROJECT MANAGER"),
-        name: PermissionName.ATTENDANCE,
-        description: "Track attendance",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Full Stack Developer",
+        description: "Handles both frontend and backend development",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("PROJECT MANAGER"),
-        name: PermissionName.LEAVE,
-        description: "Approve leaves",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
-      },
-
-      // TEAM LEADER
-      {
-        role: getRoleId("TEAM LEADER"),
-        name: PermissionName.USER,
-        description: "Manage team members",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Mobile App Developer",
+        description: "Develops Android and iOS applications",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("TEAM LEADER"),
-        name: PermissionName.ATTENDANCE,
-        description: "Track attendance",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
+        name: "Shopify Developer",
+        description: "Develops and maintains Shopify e-commerce stores",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("TEAM LEADER"),
-        name: PermissionName.LEAVE,
-        description: "Approve leaves",
-        canCreate: false,
-        canRead: true,
-        canUpdate: true,
-        canDelete: false,
-      },
-
-      // EMPLOYEE
-      {
-        role: getRoleId("EMPLOYEE"),
-        name: PermissionName.ATTENDANCE,
-        description: "View attendance",
-        canCreate: false,
-        canRead: true,
-        canUpdate: false,
-        canDelete: false,
+        name: "WordPress Developer",
+        description: "Develops and maintains WordPress websites",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("EMPLOYEE"),
-        name: PermissionName.LEAVE,
-        description: "Request leave",
-        canCreate: true,
-        canRead: true,
-        canUpdate: false,
-        canDelete: false,
-      },
-
-      // INTERN
-      {
-        role: getRoleId("INTERN"),
-        name: PermissionName.ATTENDANCE,
-        description: "View attendance",
-        canCreate: false,
-        canRead: true,
-        canUpdate: false,
-        canDelete: false,
+        name: "DevOps Engineer",
+        description: "Manages CI/CD pipelines and infrastructure",
+        departmentName: "Operations",
       },
       {
-        role: getRoleId("INTERN"),
-        name: PermissionName.LEAVE,
-        description: "Request leave",
-        canCreate: true,
-        canRead: true,
-        canUpdate: false,
-        canDelete: false,
+        name: "QA Engineer",
+        description: "Ensures software quality and testing",
+        departmentName: "Operations",
+      },
+      {
+        name: "UI/UX Designer",
+        description: "Designs user interface and user experience",
+        departmentName: "Operations",
+      },
+      {
+        name: "Software Architect",
+        description: "Designs scalable system architecture",
+        departmentName: "Operations",
+      },
+      {
+        name: "Database Administrator",
+        description: "Manages databases and performance tuning",
+        departmentName: "Operations",
+      },
+      {
+        name: "Cyber Security Engineer",
+        description: "Handles system and data security",
+        departmentName: "Operations",
+      },
+      {
+        name: "Cloud Engineer",
+        description: "Manages cloud infrastructure (AWS, Azure, GCP)",
+        departmentName: "Operations",
+      },
+      {
+        name: "AI/ML Engineer",
+        description: "Develops machine learning models and AI systems",
+        departmentName: "Operations",
+      },
+      {
+        name: "Data Scientist",
+        description: "Analyzes data and builds predictive models",
+        departmentName: "Operations",
+      },
+      {
+        name: "Technical Project Manager",
+        description: "Manages software development projects",
+        departmentName: "Operations",
+      },
+      {
+        name: "Product Manager",
+        description: "Defines product vision and roadmap",
+        departmentName: "Operations",
+      },
+      {
+        name: "Technical Support Engineer",
+        description: "Provides technical support to clients",
+        departmentName: "Operations",
+      },
+      {
+        name: "IT Support Specialist",
+        description: "Provides IT support and troubleshooting",
+        departmentName: "Operations",
+      },
+      {
+        name: "System Administrator",
+        description: "Manages and maintains IT systems",
+        departmentName: "Operations",
+      },
+      {
+        name: "Network Engineer",
+        description: "Designs and manages network infrastructure",
+        departmentName: "Operations",
+      },
+      {
+        name: "Software Trainer",
+        description: "Provides training on software tools and technologies",
+        departmentName: "Operations",
       },
     ];
 
-    for (const perm of permissionsData) {
-      if (!perm.role) continue; // Skip if role not found
-      await this.permissionModel.updateOne(
-        { role: perm.role, name: perm.name },
-        { $set: { ...perm, isSystem: true } },
+    for (const desg of designationsData) {
+      const department = departmentMap[desg.departmentName];
+
+      if (!department) continue;
+
+      await this.designationModel.updateOne(
+        { name: desg.name },
+        {
+          $set: {
+            name: desg.name,
+            description: desg.description,
+            departmentId: department._id,
+          },
+        },
         { upsert: true },
       );
     }
 
-    this.logger.log("Permissions seeded/upserted successfully.");
+    this.logger.log("Designations seeded/upserted successfully.");
   }
 }

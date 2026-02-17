@@ -29,7 +29,17 @@ import { UserService } from "./user.service";
      * Mongoose Module configured with the User schema, defining the structure of user documents in the MongoDB database.
      * This allows the User Service to perform CRUD operations on user data, ensuring that user documents adhere to the defined schema and enabling efficient data management and retrieval.
      */
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      {
+        name: Role.name,
+        schema: RoleSchema,
+      },
+      {
+        name: Permission.name,
+        schema: PermissionSchema,
+      },
+    ]),
     MongooseModule.forFeature(
       [
         { name: User.name, schema: UserSchema },
@@ -58,8 +68,8 @@ import { UserService } from "./user.service";
       ],
       "SECONDARY_DB",
     ),
-    SeedRollAndPermissionModule,
     RoleModule,
+    SeedRollAndPermissionModule,
   ],
 
   /**
