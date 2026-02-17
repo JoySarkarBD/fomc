@@ -8,8 +8,10 @@ import {
 import { Role } from "../../../user-service/src/schemas/role.schema";
 
 @Injectable()
-export class SeedRolesAndPermissionService {
-  private readonly logger = new Logger(SeedRolesAndPermissionService.name);
+export class SeedDepartmentAndDesignationService {
+  private readonly logger = new Logger(
+    SeedDepartmentAndDesignationService.name,
+  );
 
   constructor(
     @InjectModel(Role.name) private roleModel: Model<Role>,
@@ -17,10 +19,10 @@ export class SeedRolesAndPermissionService {
   ) {}
 
   async onModuleInit() {
-    await this.seedRolesAndPermissions();
+    await this.seedDepartmentAndDesignations();
   }
 
-  async seedRolesAndPermissions() {
+  async seedDepartmentAndDesignations() {
     // -----------------------
     // Roles Upsert
     // -----------------------

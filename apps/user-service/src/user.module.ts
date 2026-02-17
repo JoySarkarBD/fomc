@@ -5,7 +5,7 @@ import { RoleModule } from "./role/role.module";
 import { Permission, PermissionSchema } from "./schemas/permission.schema";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
-import { SeedRollAndPermissionModule } from "./seed/seed.module";
+import { SeedRollAndPermissionModule } from "./seed/seed-role-and-permission.module";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 
