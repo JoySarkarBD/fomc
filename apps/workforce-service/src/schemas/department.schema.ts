@@ -26,6 +26,10 @@ export class Department extends Document {
   @Prop({ default: null })
   description?: string;
 
+  // System department cannot be modified or deleted through the application
+  @Prop({ default: false })
+  isSystem!: boolean;
+
   @Prop({ default: null })
   createdBy?: mongo.ObjectId; // Reference to the user who created the department
 }
