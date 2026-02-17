@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Permission, PermissionSchema } from "../schemas/permission.schema";
 import { Role, RoleSchema } from "../schemas/role.schema";
-import { SeedService } from "./seed.service";
+import { SeedRollAndPermissionService } from "./seed.service";
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { SeedService } from "./seed.service";
       { name: Permission.name, schema: PermissionSchema },
     ]),
   ],
-  providers: [SeedService],
-  exports: [SeedService],
+  providers: [SeedRollAndPermissionService],
+  exports: [SeedRollAndPermissionService],
 })
-export class SeedModule {}
+export class SeedRollAndPermissionModule {}

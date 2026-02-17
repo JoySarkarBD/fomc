@@ -1,14 +1,13 @@
-import { SeedModule } from "./seed/seed.module";
-
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MongooseConnectionsModule } from "../../common/src/mongoose/mongoose-connections.module";
+import { RoleModule } from "./role/role.module";
 import { Permission, PermissionSchema } from "./schemas/permission.schema";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
+import { SeedRollAndPermissionModule } from "./seed/seed.module";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
-import { RoleModule } from './role/role.module';
 
 /**
  * User Module responsible for managing user-related functionality within the User Service.
@@ -59,7 +58,7 @@ import { RoleModule } from './role/role.module';
       ],
       "SECONDARY_DB",
     ),
-    SeedModule,
+    SeedRollAndPermissionModule,
     RoleModule,
   ],
 
