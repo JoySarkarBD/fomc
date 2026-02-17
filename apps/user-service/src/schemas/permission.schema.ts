@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo, Types } from "mongoose";
+import { Document, mongo } from "mongoose";
 
 export enum PermissionName {
-  USER = "USER",
-  DEPARTMENT = "DEPARTMENT",
-  ROLE = "ROLE",
-  DESIGNATION = "DESIGNATION",
-  PERMISSION = "PERMISSION",
-  ATTENDANCE = "ATTENDANCE",
-  LEAVE = "LEAVE",
+  USER = "USER MANAGEMENT",
+  DEPARTMENT = "DEPARTMENT MANAGEMENT",
+  ROLE = "ROLE MANAGEMENT",
+  DESIGNATION = "DESIGNATION MANAGEMENT",
+  PERMISSION = "PERMISSION MANAGEMENT",
+  ATTENDANCE = "ATTENDANCE MANAGEMENT",
+  LEAVE = "LEAVE MANAGEMENT",
 }
 
 /**
@@ -28,9 +28,6 @@ export type PermissionDocument = Permission & Document;
  */
 @Schema({ timestamps: true, versionKey: false })
 export class Permission extends Document {
-  @Prop({ type: Types.ObjectId, ref: "Role", required: true })
-  role!: mongo.ObjectId; // Reference to the role associated with this permission
-
   @Prop({ required: true, enum: PermissionName })
   name!: PermissionName;
 

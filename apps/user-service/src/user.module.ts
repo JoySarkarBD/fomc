@@ -1,6 +1,10 @@
+import { SeedModule } from "./seed/seed.module";
+
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MongooseConnectionsModule } from "../../common/src/mongoose/mongoose-connections.module";
+import { Permission, PermissionSchema } from "./schemas/permission.schema";
+import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
@@ -27,13 +31,34 @@ import { UserService } from "./user.service";
      */
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature(
-      [{ name: User.name, schema: UserSchema }],
+      [
+        { name: User.name, schema: UserSchema },
+        {
+          name: Role.name,
+          schema: RoleSchema,
+        },
+        {
+          name: Permission.name,
+          schema: PermissionSchema,
+        },
+      ],
       "PRIMARY_DB",
     ),
     MongooseModule.forFeature(
-      [{ name: User.name, schema: UserSchema }],
+      [
+        { name: User.name, schema: UserSchema },
+        {
+          name: Role.name,
+          schema: RoleSchema,
+        },
+        {
+          name: Permission.name,
+          schema: PermissionSchema,
+        },
+      ],
       "SECONDARY_DB",
     ),
+    SeedModule,
   ],
 
   /**

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo } from "mongoose";
+import { Document, mongo, Types } from "mongoose";
 
 /**
  * Mongoose document type for Role.
@@ -18,8 +18,8 @@ export type RoleDocument = Role & Document;
  */
 @Schema({ timestamps: true, versionKey: false })
 export class Role extends Document {
-  // Name of the role (e.g., "Admin", "User", "Manager", "Employee")
-  @Prop({ required: true, unique: true })
+  // Name of the role (e.g., "DIRECTOR", "HR", "PROJECT MANAGER", "EMPLOYEE")
+  @Prop({ required: true, unique: true, uppercase: true })
   name!: string;
 
   @Prop({ default: null })
@@ -29,11 +29,14 @@ export class Role extends Document {
   @Prop({ default: false })
   isSystem!: boolean;
 
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: "Permission" }],
+    default: [],
+  })
+  permissions!: Types.ObjectId[];
+
   @Prop({ default: null })
   createdBy?: mongo.ObjectId; // Reference to the user who created the role
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
-
-// Create a text index on the 'name' field for efficient searching
-RoleSchema.index({ name: "text" });

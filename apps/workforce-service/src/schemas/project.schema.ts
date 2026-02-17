@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-import { Department } from "../../../user-service/src/schemas/user.schema";
 
 /**
  * Mongoose document type for Project.
@@ -74,8 +73,8 @@ export class Review {
  */
 @Schema({ _id: false })
 export class DepartmentTransfer {
-  @Prop({ required: true, enum: Department })
-  department!: Department;
+  @Prop({ required: true, type: Types.ObjectId })
+  department!: Types.ObjectId;
 
   @Prop({ required: true })
   reason!: string;
@@ -138,11 +137,10 @@ export class Project extends Document {
 
   // Departments currently assigned to handle the project.
   @Prop({
-    type: [String],
-    enum: Department,
+    type: [Types.ObjectId],
     required: true,
   })
-  assignedDepartment!: Department[];
+  assignedDepartment!: Types.ObjectId[];
 
   // History of department transfers.
   @Prop({

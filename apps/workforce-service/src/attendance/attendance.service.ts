@@ -1,17 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
-import { firstValueFrom } from "rxjs";
-import type { AuthUser } from "../../../api-gateway/src/common/interfaces/auth-user.interface";
-import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
-import {
-  Attendance,
-  AttendanceDocument,
-  AttendanceInType,
-  ShiftTypeForOperations,
-  ShiftTypeForSales,
-} from "../schemas/attendance.schema";
+import { Model } from "mongoose";
+import { Attendance, AttendanceDocument } from "../schemas/attendance.schema";
 
 /* 
   attendance logic:-
@@ -36,7 +27,7 @@ export class AttendanceService {
    * @param user - The authenticated user for whom the attendance is being marked.
    * @return A promise that resolves to the attendance record if successfully marked, or an object containing a message and exception if there was an error (e.g., user not found, attendance already marked, no shift matched).
    */
-  async presentAttendance(
+  /* async presentAttendance(
     user: AuthUser,
   ): Promise<Attendance | { message: string; exception: string }> {
     const userId = (user.id ?? user._id) as string;
@@ -150,5 +141,5 @@ export class AttendanceService {
     });
 
     return attendance as Attendance;
-  }
+  } */
 }
