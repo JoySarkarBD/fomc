@@ -13,16 +13,23 @@ export class SeedService {
     @InjectModel(Permission.name) private permissionModel: Model<Permission>,
   ) {}
 
+  // Self invoking method to seed roles and permissions on application startup
+  async onModuleInit() {
+    await this.seedRolesAndPermissions();
+  }
+
   async seedRolesAndPermissions() {
     // -----------------------
     // Seed Permissions
     // -----------------------
     const existingPermissions = await this.permissionModel.find().exec();
+    let allPermissions: Permission[];
 
     if (existingPermissions.length > 0) {
       this.logger.warn(
         "Permissions already exist. Skipping permission seeding.",
       );
+      allPermissions = existingPermissions;
     } else {
       const permissionsData = [
         {
@@ -83,13 +90,11 @@ export class SeedService {
         },
       ];
 
-      const createdPermissions = await this.permissionModel.insertMany(
+      allPermissions = await this.permissionModel.insertMany(
         permissionsData.map((p) => ({ ...p, isSystem: true })),
       );
 
-      this.logger.log(
-        `Seeded ${createdPermissions.length} system permissions.`,
-      );
+      this.logger.log(`Seeded ${allPermissions.length} system permissions.`);
     }
 
     // -----------------------
@@ -101,63 +106,71 @@ export class SeedService {
       return;
     }
 
-    // Fetch permission IDs to assign to roles
-    const allPermissions = await this.permissionModel.find().exec();
-    const permissionIds = allPermissions.map((p) => p._id);
+    // Helper function: get permission ID by name
+    const getPermissionId = (name: PermissionName) =>
+      allPermissions.find((p) => p.name === name)?._id;
 
     const rolesData = [
       {
         name: "DIRECTOR",
         description: "Director role with all permissions",
-        permissions: permissionIds, // all permissions
+        permissions: allPermissions.map((p) => p._id), // All permissions
         isSystem: true,
       },
       {
         name: "HR",
         description: "HR role with permissions to manage users and departments",
-        permissions: permissionIds.filter(
-          (p, i) => [0, 1, 5, 6].includes(i), // USER, DEPARTMENT, ATTENDANCE, LEAVE
-        ),
+        permissions: [
+          getPermissionId(PermissionName.USER),
+          getPermissionId(PermissionName.DEPARTMENT),
+          getPermissionId(PermissionName.ATTENDANCE),
+          getPermissionId(PermissionName.LEAVE),
+        ].filter(Boolean),
         isSystem: true,
       },
       {
         name: "PROJECT MANAGER",
         description:
           "Project Manager role with permissions to manage projects and teams",
-        permissions: permissionIds.filter(
-          (p, i) => [0, 3, 5, 6].includes(i), // USER, DESIGNATION, ATTENDANCE, LEAVE
-        ),
+        permissions: [
+          getPermissionId(PermissionName.USER),
+          getPermissionId(PermissionName.DESIGNATION),
+          getPermissionId(PermissionName.ATTENDANCE),
+          getPermissionId(PermissionName.LEAVE),
+        ].filter(Boolean),
         isSystem: true,
       },
       {
         name: "TEAM LEADER",
         description:
           "Team Leader role with permissions to manage team members and tasks",
-        permissions: permissionIds.filter(
-          (p, i) => [0, 5, 6].includes(i), // USER, ATTENDANCE, LEAVE
-        ),
+        permissions: [
+          getPermissionId(PermissionName.USER),
+          getPermissionId(PermissionName.ATTENDANCE),
+          getPermissionId(PermissionName.LEAVE),
+        ].filter(Boolean),
         isSystem: true,
       },
       {
         name: "EMPLOYEE",
         description: "Employee role with basic permissions",
-        permissions: permissionIds.filter(
-          (p, i) => [5, 6].includes(i), // ATTENDANCE, LEAVE
-        ),
+        permissions: [
+          getPermissionId(PermissionName.ATTENDANCE),
+          getPermissionId(PermissionName.LEAVE),
+        ].filter(Boolean),
         isSystem: true,
       },
       {
         name: "INTERN",
         description: "Intern role with limited permissions",
-        permissions: permissionIds.filter((p, i) => [5].includes(i)), // ATTENDANCE only
+        permissions: [getPermissionId(PermissionName.ATTENDANCE)].filter(
+          Boolean,
+        ),
         isSystem: true,
       },
     ];
 
-    const createdRoles = await this.roleModel.insertMany(
-      rolesData.map((r) => ({ ...r, isSystem: true })),
-    );
-
+    const createdRoles = await this.roleModel.insertMany(rolesData);
     this.logger.log(`Seeded ${createdRoles.length} system roles.`);
   }
 }
