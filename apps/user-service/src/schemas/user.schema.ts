@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, mongo } from "mongoose";
+import { Document, mongo, Types } from "mongoose";
 
 /**
  * Mongoose document type for User.
@@ -57,7 +57,7 @@ export class User extends Document {
   otpExpiry?: Date | null;
 
   // Role of the user in the organization
-  @Prop({ ref: "Role" })
+  @Prop({ type: Types.ObjectId, ref: "Role", required: true })
   role!: mongo.ObjectId; // Reference to the Role document
 
   // Department of the user in the organization

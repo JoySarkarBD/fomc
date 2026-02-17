@@ -12,12 +12,7 @@ import config from "../../config/config";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserSearchQueryDto } from "./dto/user-query.dto";
-import {
-  Department,
-  User,
-  UserDocument,
-  UserRole,
-} from "./schemas/user.schema";
+import { User, UserDocument } from "./schemas/user.schema";
 
 /**
  * UserService
@@ -46,10 +41,10 @@ export class UserService {
    * @returns {Promise<{users: User[]; total: number; totalPages: number}>} Array of user documents with pagination info.
    */
   async getUsers(
-    myRole: UserRole,
+    myRole: string,
     query: UserSearchQueryDto,
     myId?: MongoIdDto["id"],
-    myDepartment?: Department,
+    myDepartment?: string,
   ): Promise<
     | { users: User[]; total: number; totalPages: number }
     | { message: string; exception: any }
