@@ -8,6 +8,7 @@ import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
+import { RoleModule } from './role/role.module';
 
 /**
  * User Module responsible for managing user-related functionality within the User Service.
@@ -59,6 +60,7 @@ import { UserService } from "./user.service";
       "SECONDARY_DB",
     ),
     SeedModule,
+    RoleModule,
   ],
 
   /**
