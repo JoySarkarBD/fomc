@@ -1,6 +1,6 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { MongoIdDto } from "apps/api-gateway/src/common/dto/mongo-id.dto";
+import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
 import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
 import { ROLE_COMMANDS } from "../constants/role.constants";
 import { CreateRoleDto } from "./dto/create-role.dto";
