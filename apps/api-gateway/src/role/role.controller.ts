@@ -53,8 +53,8 @@ export class RoleController {
    * @return Promise resolving to the role details.
    */
   @Get(":id")
-  async findRoleById(@Param("id") id: MongoIdDto["id"]) {
-    return await this.roleService.findRoleById(id);
+  async findRoleById(@Param() params: MongoIdDto) {
+    return await this.roleService.findRoleById(params.id);
   }
 
   /**
@@ -65,10 +65,10 @@ export class RoleController {
    */
   @Patch(":id")
   async updateRoleById(
-    @Param("id") id: MongoIdDto["id"],
+    @Param() params: MongoIdDto,
     @Body() data: UpdateRoleDto,
   ) {
-    return await this.roleService.updateRoleById(id, data);
+    return await this.roleService.updateRoleById(params.id, data);
   }
 
   /**
@@ -78,7 +78,7 @@ export class RoleController {
    * @return Promise resolving to the result of the delete operation.
    */
   @Delete(":id")
-  async deleteRoleById(@Param("id") id: MongoIdDto["id"]) {
-    return await this.roleService.deleteRoleById(id);
+  async deleteRoleById(@Param() params: MongoIdDto) {
+    return await this.roleService.deleteRoleById(params.id);
   }
 }

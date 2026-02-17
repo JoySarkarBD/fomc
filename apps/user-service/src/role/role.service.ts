@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { SearchQueryDto } from "apps/api-gateway/src/common/dto/search-query.dto";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
 import { Permission } from "../schemas/permission.schema";
 import { Role, RoleDocument } from "../schemas/role.schema";
@@ -165,10 +165,10 @@ export class RoleService {
       canDelete: boolean;
     }[];
   } | null> {
-    return await this.roleModel
+    const result = await this.roleModel
       .aggregate([
         {
-          $match: { _id: id },
+          $match: { _id: new Types.ObjectId(id) },
         },
         {
           $lookup: {
@@ -215,7 +215,9 @@ export class RoleService {
           },
         },
       ])
-      .then((results) => (results.length > 0 ? results[0] : null));
+      .exec();
+
+    return result[0] || null;
   }
 
   /**
@@ -235,9 +237,29 @@ export class RoleService {
       };
     }
 
-    return await this.roleModel.findByIdAndUpdate(id, updateRoleDto, {
-      new: true,
-    });
+    // If the role is already exist with the same name, we should not allow update
+    if (updateRoleDto.name) {
+      const duplicateRole = await this.roleModel.findOne({
+        _id: { $ne: id },
+        name: updateRoleDto.name.toUpperCase(),
+      });
+
+      if (duplicateRole) {
+        return {
+          message: "Role with the same name already exists",
+          exception: "Conflict",
+        };
+      }
+    }
+
+    existingRole.name = updateRoleDto.name
+      ? updateRoleDto.name.toUpperCase()
+      : existingRole.name;
+    existingRole.description = updateRoleDto.description
+      ? updateRoleDto.description
+      : existingRole.description;
+
+    return await existingRole.save();
   }
 
   /**
@@ -252,6 +274,13 @@ export class RoleService {
     // If the role is a system role, we should not allow deletion
     const existingRole = await this.roleModel.findById(id);
 
+    if (!existingRole) {
+      return {
+        message: "Role not found",
+        exception: "NotFoundException",
+      };
+    }
+
     if (existingRole && existingRole.isSystem) {
       return {
         message: "System roles cannot be deleted",
@@ -260,7 +289,9 @@ export class RoleService {
     }
 
     // If the role associated with any permissions, we should not allow deletion
-    const associatedPermissions = await this.permissionModel.find({ role: id });
+    const associatedPermissions = await this.permissionModel.find({
+      role: new Types.ObjectId(id),
+    });
 
     if (associatedPermissions.length > 0) {
       return {
