@@ -2,7 +2,7 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
 import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
-import { DEPARTMENT_COMMANDS } from "../../../user-service/src/constants/department.constants";
+import { DEPARTMENT_COMMANDS } from "./constants/department.constants";
 import { DepartmentService } from "./department.service";
 import { CreateDepartmentDto } from "./dto/create-department.dto";
 import { UpdateDepartmentDto } from "./dto/update-department.dto";

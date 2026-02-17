@@ -10,7 +10,7 @@ import {
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 
 import { ClientProxy } from "@nestjs/microservices";
-import { DEPARTMENT_COMMANDS } from "apps/user-service/src/constants/department.constants";
+import { DEPARTMENT_COMMANDS } from "apps/workforce-service/src/department/constants/department.constants";
 import { firstValueFrom } from "rxjs";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
 import { MongoIdDto } from "../common/dto/mongo-id.dto";
