@@ -61,15 +61,16 @@ export class RoleController {
    *
    * Message Pattern: { cmd: ROLE_COMMANDS.UPDATE_ROLE }
    *
-   * @param {UpdateRoleDto} updateRoleDto - The data transfer object containing the details of the role to be updated, including the role ID and the fields to be updated.
+   * @param {Object} payload - Object containing the role ID and the data to update.
+   * @param {MongoIdDto["id"]} payload.id - The ID of the role to be updated.
+   * @param {UpdateRoleDto} payload.data - The data transfer object containing the details of the role to be updated, including the fields to be updated.
    * @returns {Promise<any>} Updated role details.
    */
   @MessagePattern(ROLE_COMMANDS.UPDATE_ROLE)
-  update(@Payload() updateRoleDto: UpdateRoleDto): Promise<any> {
-    return this.roleService.updateRoleById(
-      updateRoleDto.id as string,
-      updateRoleDto,
-    );
+  update(
+    @Payload() payload: { id: MongoIdDto["id"]; data: UpdateRoleDto },
+  ): Promise<any> {
+    return this.roleService.updateRoleById(payload.id, payload.data);
   }
 
   /**

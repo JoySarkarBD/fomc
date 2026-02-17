@@ -3,6 +3,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AttendanceModule } from "./attendance/attendance.module";
 import { AuthModule } from "./auth/auth.module";
+import { RoleModule } from "./role/role.module";
 import { UserModule } from "./user/user.module";
 
 /**
@@ -17,7 +18,7 @@ import { UserModule } from "./user/user.module";
    * The UserModule handles operations related to user management, such as retrieving user information and managing user data, while the AuthModule manages authentication processes, including user registration, login, password reset, and password change.
    * By importing these modules, the AppModule integrates their functionality into the API Gateway, allowing it to provide comprehensive user and authentication services to clients.
    */
-  imports: [UserModule, AuthModule, AttendanceModule],
+  imports: [UserModule, AuthModule, RoleModule, AttendanceModule],
 
   /**
    * Controllers responsible for handling incoming HTTP requests. The AppController is registered as the main controller for the API Gateway, defining endpoints and request handling logic for basic operations, such as a health check endpoint at the root ("/") that returns a status message indicating that the API Gateway is running.

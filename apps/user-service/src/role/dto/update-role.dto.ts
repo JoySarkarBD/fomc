@@ -1,5 +1,4 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsMongoId } from "class-validator";
 import { CreateRoleDto } from "./create-role.dto";
 
 /**
@@ -8,7 +7,4 @@ import { CreateRoleDto } from "./create-role.dto";
  * The UpdateRoleDto is used in the role service to handle update role requests and ensure that the provided data meets the required format before processing the request to update an existing role in the system.
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid role information is accepted when updating roles through the user service.
  */
-export class UpdateRoleDto extends PartialType(CreateRoleDto) {
-  @IsMongoId({ message: "ID must be a valid Mongo ID" })
-  id!: string;
-}
+export class UpdateRoleDto extends PartialType(CreateRoleDto) {}

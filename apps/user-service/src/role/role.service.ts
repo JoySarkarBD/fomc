@@ -82,7 +82,10 @@ export class RoleService {
       this.roleModel.aggregate([
         {
           $match: {
-            name: { $regex: searchKey, $options: "i" },
+            $or: [
+              { name: { $regex: searchKey, $options: "i" } },
+              { description: { $regex: searchKey, $options: "i" } },
+            ],
           },
         },
         {
