@@ -3,13 +3,20 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo, Types } from "mongoose";
 
 export enum PermissionName {
-  USER = "USER MANAGEMENT",
-  DEPARTMENT = "DEPARTMENT MANAGEMENT",
-  ROLE = "ROLE MANAGEMENT",
-  DESIGNATION = "DESIGNATION MANAGEMENT",
-  PERMISSION = "PERMISSION MANAGEMENT",
-  ATTENDANCE = "ATTENDANCE MANAGEMENT",
-  LEAVE = "LEAVE MANAGEMENT",
+  USER = "USER MANAGEMENT", // User management permissions (create, read, update, delete users)
+  DEPARTMENT = "DEPARTMENT MANAGEMENT", // Department management permissions (create, read, update, delete departments)
+  ROLE = "ROLE MANAGEMENT", // Role management permissions (create, read, update, delete roles)
+  DESIGNATION = "DESIGNATION MANAGEMENT", // Designation management permissions (create, read, update, delete designations)
+  PERMISSION = "PERMISSION MANAGEMENT", // Permission management permissions (create, read, update, delete permissions)
+  ATTENDANCE = "ATTENDANCE MANAGEMENT", // Attendance management permissions (mark attendance, view attendance records)
+  LEAVE = "LEAVE MANAGEMENT", // Leave management permissions (apply for leave, approve/reject leave, view leave records)
+  TASK = "TASK MANAGEMENT", // Task management permissions (create, read, update, delete tasks, assign tasks)
+  PROJECT = "PROJECT MANAGEMENT", // Project management permissions (create, read, update, delete projects, assign projects)
+  DCR = "DCR MANAGEMENT", // Daily Call Report management permissions (create, read, update, delete DCRs)
+  SHIFT = "SHIFT MANAGEMENT", // Shift scheduling and management permissions (create, read, update, delete shifts, assign shifts)
+  LEARNING = "LEARNING MANAGEMENT", // Training and development management permissions (create, read, update, delete training programs, assign training)
+  PERFORMANCE = "PERFORMANCE MANAGEMENT", // Performance review management permissions (create, read, update, delete performance reviews)
+  FEEDBACK = "FEEDBACK MANAGEMENT", // Feedback management permissions (create, read, update, delete feedback)
 }
 
 /**
