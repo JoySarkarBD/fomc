@@ -15,8 +15,6 @@ export enum PermissionName {
   DCR = "DCR MANAGEMENT", // Daily Call Report management permissions (create, read, update, delete DCRs)
   SHIFT = "SHIFT MANAGEMENT", // Shift scheduling and management permissions (create, read, update, delete shifts, assign shifts)
   LEARNING = "LEARNING MANAGEMENT", // Training and development management permissions (create, read, update, delete training programs, assign training)
-  PERFORMANCE = "PERFORMANCE MANAGEMENT", // Performance review management permissions (create, read, update, delete performance reviews)
-  FEEDBACK = "FEEDBACK MANAGEMENT", // Feedback management permissions (create, read, update, delete feedback)
 }
 
 /**
