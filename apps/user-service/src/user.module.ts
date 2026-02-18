@@ -1,11 +1,12 @@
+/** @fileoverview User module. Registers Mongoose schemas, controllers, providers, and sub-modules for the user microservice. @module user-service/user.module */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MongooseConnectionsModule } from "../../database/mongoose-connections.module";
+import { MongooseConnectionsModule } from "@shared/database/mongoose-connections.module";
 import { RoleModule } from "./role/role.module";
 import { Permission, PermissionSchema } from "./schemas/permission.schema";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
-import { SeedRollAndPermissionModule } from "./seed/seed-role-and-permission.module";
+import { SeedRoleAndPermissionModule } from "./seed/seed-role-and-permission.module";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 
@@ -69,7 +70,7 @@ import { UserService } from "./user.service";
       "SECONDARY_DB",
     ),
     RoleModule,
-    SeedRollAndPermissionModule,
+    SeedRoleAndPermissionModule,
   ],
 
   /**

@@ -1,3 +1,4 @@
+/** @fileoverview Role Mongoose schema. Defines the Role document structure and properties for the MongoDB collection. @module user-service/schemas/role.schema */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo } from "mongoose";
 

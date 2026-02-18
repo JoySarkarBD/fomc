@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Create Department DTO
+ *
+ * Defines the validation schema for creating a new department.
+ * Ensures name and description are provided as non-empty strings.
+ */
 import { IsNotEmpty, IsString } from "class-validator";
 
 /**

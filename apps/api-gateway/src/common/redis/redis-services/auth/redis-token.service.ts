@@ -1,10 +1,16 @@
+/**
+ * @fileoverview Redis token service.
+ *
+ * Manages JWT authentication tokens in Redis — store with TTL,
+ * retrieve, and delete. Used by JwtStrategy and AuthService.
+ *
+ * @module api-gateway/common/redis
+ */
+
 import { Injectable } from "@nestjs/common";
 import { RedisClientService } from "../../redis.client";
 import { REDIS_TOKEN_PREFIX } from "./../../redis.constants";
 
-/**
- * RedisTokenService is responsible for managing authentication tokens in Redis. It provides methods to store, retrieve, and delete tokens using a consistent key prefix. This service abstracts the underlying Redis operations, allowing other parts of the application (e.g., authentication strategies) to interact with Redis for token management without needing to handle the details of Redis commands directly.
- */
 @Injectable()
 export class RedisTokenService {
   constructor(private readonly redisClient: RedisClientService) {}

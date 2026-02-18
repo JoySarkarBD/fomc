@@ -1,8 +1,9 @@
+/** @fileoverview Role service. Business logic for role CRUD, permission aggregation, and user-role association. @module user-service/role/role.service */
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { Model, Types } from "mongoose";
-import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
 import { Permission } from "../schemas/permission.schema";
 import { Role, RoleDocument } from "../schemas/role.schema";
 import { User } from "../schemas/user.schema";

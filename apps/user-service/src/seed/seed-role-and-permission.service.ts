@@ -1,3 +1,4 @@
+/** @fileoverview Seed service for roles and permissions. Upserts default roles and their associated permissions on module initialisation. @module user-service/seed/seed-role-and-permission.service */
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -5,8 +6,8 @@ import { Permission, PermissionName } from "../schemas/permission.schema";
 import { Role } from "../schemas/role.schema";
 
 @Injectable()
-export class SeedRollAndPermissionService {
-  private readonly logger = new Logger(SeedRollAndPermissionService.name);
+export class SeedRoleAndPermissionService {
+  private readonly logger = new Logger(SeedRoleAndPermissionService.name);
 
   constructor(
     @InjectModel(Role.name) private roleModel: Model<Role>,

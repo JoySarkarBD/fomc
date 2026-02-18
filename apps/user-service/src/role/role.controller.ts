@@ -1,8 +1,9 @@
+/** @fileoverview Role controller. Handles role-related microservice message patterns (CRUD). @module user-service/role/role.controller */
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
-import { ROLE_COMMANDS } from "../constants/role.constants";
+import { ROLE_COMMANDS } from "@shared/constants/role-command.constants";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 import { RoleService } from "./role.service";

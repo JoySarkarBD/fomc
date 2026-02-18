@@ -1,8 +1,9 @@
+/** @fileoverview User microservice bootstrap. Starts the TCP transport server. @module user-service/main */
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import config from "@shared/config/app.config";
 import "dotenv/config";
-import config from "../../config/config";
 import { UserModule } from "./user.module";
 
 /**

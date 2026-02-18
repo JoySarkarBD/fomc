@@ -1,3 +1,4 @@
+/** @fileoverview CreateRoleDto. Validation schema for role creation payloads. @module user-service/role/dto/create-role.dto */
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /**

@@ -1,15 +1,18 @@
+/**
+ * @fileoverview User gateway module.
+ *
+ * Registers a TCP client for the User micro-service and wires
+ * UserController + UserService.
+ *
+ * @module api-gateway/user
+ */
+
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import config from "../../../config/config";
+import config from "@shared/config/app.config";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 
-/**
- * User Module responsible for managing user-related functionality within the API Gateway.
- * This module imports the ClientsModule to register a microservice client for the User Service, enabling communication between the API Gateway and the User Service over TCP.
- * It provides the UserController to handle user-related HTTP requests and the UserService to perform the business logic for user operations.
- * The module also exports relevant services and modules for use in other parts of the application.
- */
 @Module({
   imports: [
     /**

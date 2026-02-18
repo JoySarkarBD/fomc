@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Role gateway service.
+ *
+ * Sends TCP commands to the User micro-service (which owns roles)
+ * and normalises the response for the API layer.
+ *
+ * @module api-gateway/role
+ */
+
 import {
   ConflictException,
   ForbiddenException,
@@ -8,20 +17,14 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { ROLE_COMMANDS } from "@shared/constants/role-command.constants";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { UpdateRoleDto } from "apps/user-service/src/role/dto/update-role.dto";
 import { firstValueFrom } from "rxjs";
-import { ROLE_COMMANDS } from "../../../user-service/src/constants/role.constants";
 import { CreateRoleDto } from "../../../user-service/src/role/dto/create-role.dto";
-import { MongoIdDto } from "../common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../common/dto/search-query.dto";
 import { buildResponse } from "../common/response.util";
 
-/**
- * Role Service
- *
- * Handles communication with the Role microservice via ClientProxy.
- * Provides methods for CRUD operations on roles.
- */
 @Injectable()
 export class RoleService {
   constructor(

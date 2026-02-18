@@ -1,7 +1,14 @@
+/**
+ * @fileoverview Workforce Microservice Bootstrap
+ *
+ * Entry point for the Workforce microservice. Initializes a TCP-based
+ * NestJS microservice for handling workforce-related operations such as
+ * attendance, departments, and tasks.
+ */
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import config from "../../config/config";
+import config from "@shared/config/app.config";
 import { WorkforceModule } from "./workforce.module";
 
 /**

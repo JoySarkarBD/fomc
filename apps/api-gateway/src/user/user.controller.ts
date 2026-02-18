@@ -1,15 +1,16 @@
+/**
+ * @fileoverview User gateway controller.
+ *
+ * Exposes user-related HTTP endpoints. Currently a stub — route
+ * handlers will be uncommented as the User micro-service API stabilises.
+ *
+ * @module api-gateway/user
+ */
+
 import { Controller, UseGuards } from "@nestjs/common";
-// import { UserRole } from "../../../user-service/src/schemas/user.schema";
-// import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { UserService } from "./user.service";
 
-/**
- * User Controller responsible for handling HTTP requests related to user operations in the API Gateway.
- * Provides endpoints for creating, retrieving, updating, and deleting users.
- * Utilizes the UserService to perform the necessary business logic for each user-related operation.
- * Includes guards and validation to ensure that incoming requests contain valid data and that only authorized users can perform certain actions.
- */
 @UseGuards(JwtAuthGuard)
 @Controller("user")
 export class UserController {

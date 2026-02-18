@@ -1,8 +1,12 @@
-export const ATTENDANCE_COMMANDS = {
-  PRESENT_ATTENDANCE: { cmd: "present_attendance" },
-  OUT_ATTENDANCE: { cmd: "out_attendance" },
-  WEEKEND_EXCHANGE: { cmd: "weekend_exchange" },
-} as const;
+/**
+ * @fileoverview Attendance Shift Timing Constants
+ *
+ * Defines the shift timing configurations for different departments.
+ * Sales has three rotating shifts (morning, evening, night) while
+ * Operations has a day/night split. A 15-minute grace period applies.
+ *
+ * Note: ATTENDANCE_COMMANDS have been moved to `@shared/constants/attendance-command.constants`.
+ */
 
 /* 
   attendance logic:-

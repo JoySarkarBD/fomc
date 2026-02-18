@@ -1,3 +1,5 @@
+/** @fileoverview User service stub. Business logic methods are currently commented out. @module user-service/user.service */
+// TODO: Uncomment and implement user service methods once DTOs and schema references are finalised.
 import {
   // ConflictException,
   // HttpException,

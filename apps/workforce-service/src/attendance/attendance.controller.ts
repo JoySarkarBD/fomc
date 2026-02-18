@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Attendance Controller
+ *
+ * Handles attendance-related microservice message patterns in the Workforce service.
+ *
+ * @todo Implement message handlers for present attendance, out attendance,
+ *       and weekend exchange once the service layer is finalized.
+ */
 import { Controller } from "@nestjs/common";
 import { AttendanceService } from "./attendance.service";
 

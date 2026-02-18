@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Seed Department & Designation Service
+ *
+ * Automatically seeds default departments (HR, Sales, Operations) and
+ * their associated designations (e.g., Software Engineer, Sales Manager)
+ * into MongoDB on module initialization via `onModuleInit`.
+ */
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";

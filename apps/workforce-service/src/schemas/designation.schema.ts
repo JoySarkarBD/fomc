@@ -1,9 +1,12 @@
+/**
+ * @fileoverview Designation Schema
+ *
+ * Mongoose schema definition for job designations (titles/positions)
+ * within the organization. Each designation is linked to a department
+ * and supports text indexing on the name field.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo } from "mongoose";
-
-/**
- * Mongoose document type for Designation.
- */
 export type DesignationDocument = Designation & Document;
 
 /**

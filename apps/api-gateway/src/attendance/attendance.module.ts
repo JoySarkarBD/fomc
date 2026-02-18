@@ -1,6 +1,15 @@
+/**
+ * @fileoverview Attendance gateway module.
+ *
+ * Registers a TCP client for the Workforce micro-service and wires
+ * AttendanceController + AttendanceService.
+ *
+ * @module api-gateway/attendance
+ */
+
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import config from "../../../config/config";
+import config from "@shared/config/app.config";
 import { AttendanceController } from "./attendance.controller";
 import { AttendanceService } from "./attendance.service";
 

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Reset-password throttle guard.
+ *
+ * Limits how often a single device can submit a password-reset
+ * using the `RESET_PASSWORD` rate-limit constants.
+ *
+ * @module api-gateway/common/throttles
+ */
+
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Request } from "express";
 import { RESET_PASSWORD } from "../../auth/constants/auth-throttle.constants";
@@ -7,9 +16,6 @@ import {
   ThrottleConfig,
 } from "../../common/throttles/base-throttle.guard";
 
-/**
- * Guard to throttle "reset password" requests based on device + email + token.
- */
 @Injectable()
 export class ResetThrottleGuard extends BaseThrottleGuard {
   constructor(redis: RedisClientService) {

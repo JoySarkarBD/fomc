@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Auth throttle constants.
+ *
+ * Rate-limit configuration for authentication-related endpoints
+ * (forgot-password, reset-password).
+ *
+ * @module api-gateway/auth/constants
+ */
+
 export const FORGOT_PASSWORD = {
   LIMIT: 1,
   TTL_SECONDS: 120, // 2 minutes

@@ -1,11 +1,16 @@
+/**
+ * @fileoverview JWT authentication strategy for the API Gateway.
+ * Resolves a UUID bearer token from Redis, verifies the real JWT,
+ * and loads the user from the User Service.
+ */
 import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import { PassportStrategy } from "@nestjs/passport";
+import { USER_COMMANDS } from "@shared/constants/user-command.constants";
 import type { Request } from "express";
 import { Strategy } from "passport-custom";
 import { firstValueFrom } from "rxjs";
-import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { jwtConfig } from "../common/jwt.config";
 import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
 

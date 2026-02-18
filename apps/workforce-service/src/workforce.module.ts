@@ -1,6 +1,13 @@
+/**
+ * @fileoverview Workforce Module
+ *
+ * Root module for the Workforce microservice. Registers Mongoose schemas,
+ * database connections, and feature modules (attendance, department, task)
+ * along with the department/designation seed module.
+ */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MongooseConnectionsModule } from "../../database/mongoose-connections.module";
+import { MongooseConnectionsModule } from "@shared/database/mongoose-connections.module";
 import { AttendanceModule } from "./attendance/attendance.module";
 import { DepartmentModule } from "./department/department.module";
 import { Attendance, AttendanceSchema } from "./schemas/attendance.schema";

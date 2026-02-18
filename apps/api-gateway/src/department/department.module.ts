@@ -1,13 +1,18 @@
+/**
+ * @fileoverview Department gateway module.
+ *
+ * Registers a TCP client for the Workforce micro-service (which owns
+ * departments) and wires DepartmentController + DepartmentService.
+ *
+ * @module api-gateway/department
+ */
+
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import config from "../../../config/config";
+import config from "@shared/config/app.config";
 import { DepartmentController } from "./department.controller";
 import { DepartmentService } from "./department.service";
 
-/**
- * Department Module responsible for handling all department-related operations, including creating, retrieving, updating, and deleting departments. It imports the DepartmentController to manage HTTP requests and the DepartmentService to perform business logic and interact with the Department microservice via ClientProxy. This module serves as a central point for managing department-related functionality within the API Gateway.
- * The DepartmentController defines endpoints for department operations, while the DepartmentService contains methods that communicate with the Department microservice to perform the necessary actions, ensuring a clean separation of concerns and maintainable code structure within the API Gateway.
- */
 @Module({
   imports: [
     /**

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Forgot-password throttle guard.
+ *
+ * Limits how often a single device can request a password-reset OTP
+ * using the `FORGOT_PASSWORD` rate-limit constants.
+ *
+ * @module api-gateway/common/throttles
+ */
+
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Request } from "express";
 import { FORGOT_PASSWORD } from "../../auth/constants/auth-throttle.constants";
@@ -7,9 +16,6 @@ import {
   ThrottleConfig,
 } from "../../common/throttles/base-throttle.guard";
 
-/**
- * Guard to throttle "forgot password" requests based on device + email.
- */
 @Injectable()
 export class ForgotThrottleGuard extends BaseThrottleGuard {
   constructor(redis: RedisClientService) {

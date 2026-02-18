@@ -1,9 +1,12 @@
+/**
+ * @fileoverview Attendance Schema
+ *
+ * Mongoose schema definition for attendance records in the workforce
+ * management system. Defines enums for attendance types (present, late,
+ * absent, etc.) and shift types for both Sales and Operations departments.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo } from "mongoose";
-
-/**
- * Mongoose document type for Attendance.
- */
 export type AttendanceDocument = Attendance & Document;
 
 /**

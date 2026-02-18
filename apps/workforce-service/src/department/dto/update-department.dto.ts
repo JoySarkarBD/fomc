@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Update Department DTO
+ *
+ * Defines the validation schema for updating an existing department.
+ * Extends CreateDepartmentDto with all fields made optional via PartialType.
+ */
 import { PartialType } from "@nestjs/mapped-types";
 import { CreateDepartmentDto } from "./create-department.dto";
 

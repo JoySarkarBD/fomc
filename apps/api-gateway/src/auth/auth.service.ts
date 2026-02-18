@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Authentication service for the API Gateway.
+ * Handles registration, login, password reset/change, and logout flows
+ * by communicating with the User Service via TCP microservice transport.
+ */
 import {
   ConflictException,
   Inject,
@@ -6,11 +11,11 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
+import config from "@shared/config/app.config";
+import { USER_COMMANDS } from "@shared/constants/user-command.constants";
 import * as bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
-import config from "../../../config/config";
-import { USER_COMMANDS } from "../../../user-service/src/constants/user.constants";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
 import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
 import { buildResponse } from "../common/response.util";

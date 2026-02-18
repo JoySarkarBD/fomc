@@ -1,20 +1,20 @@
+/**
+ * @fileoverview Global response interceptor for the API Gateway.
+ * Wraps all outgoing responses in a standardised ServiceResponse envelope.
+ */
 import {
   CallHandler,
   ExecutionContext,
   Injectable,
   NestInterceptor,
 } from "@nestjs/common";
+import { ServiceResponse } from "@shared/interfaces/response.interface";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { ServiceResponse } from "./response.interface";
 
 /**
- * ResponseInterceptor is a NestJS interceptor that transforms outgoing responses into a standardized ServiceResponse format.
- * This interceptor intercepts the response from route handlers and maps it to a consistent structure that includes metadata such as success status, message, HTTP method, endpoint, status code, timestamp, and the actual data payload.
- * The interceptor checks if the response is already in the ServiceResponse format and returns it as-is if so. Otherwise, it constructs a new ServiceResponse object based on the original response data and the HTTP status code.
- * This interceptor can be applied globally or to specific controllers/routes to ensure that all responses from the API Gateway adhere to a consistent format, improving the client experience and making it easier to handle responses on the frontend.
- * The intercept method uses the RxJS map operator to transform the response data before it is sent back to the client, allowing for flexible response formatting and ensuring that all necessary metadata is included in the response payload.
- * By using this interceptor, developers can ensure that all responses from the API Gateway are structured in a predictable way, making it easier for clients to consume and handle responses effectively while also providing useful information about the request and response context.
+ * Wraps all outgoing responses in a standardised {@link ServiceResponse} envelope.
+ * Already-wrapped responses are returned as-is.
  */
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

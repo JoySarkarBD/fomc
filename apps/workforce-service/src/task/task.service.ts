@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Task Service
+ *
+ * Business logic for task CRUD operations in the Workforce microservice.
+ *
+ * @todo Complete stub implementations with actual database operations
+ *       and business logic.
+ */
 import { Injectable } from "@nestjs/common";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Role gateway controller.
+ *
+ * Exposes CRUD endpoints for role management and delegates
+ * business logic to RoleService.
+ *
+ * @module api-gateway/role
+ */
+
 import {
   Body,
   Controller,
@@ -8,18 +17,12 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateRoleDto } from "apps/user-service/src/role/dto/create-role.dto";
 import { UpdateRoleDto } from "apps/user-service/src/role/dto/update-role.dto";
-import { MongoIdDto } from "../common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../common/dto/search-query.dto";
 import { RoleService } from "./role.service";
 
-/**
- * User Controller
- *
- * Handles HTTP requests related to role management, including creating, retrieving, updating, and deleting roles. It uses the RoleService to perform business logic and interact with the Role microservice via ClientProxy.
- * Includes guards and validation to ensure that incoming requests contain valid data and that only authorized users can perform certain actions.
- */
 @Controller("role")
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

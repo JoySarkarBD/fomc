@@ -1,3 +1,4 @@
+/** @fileoverview Permission Mongoose schema. Defines the Permission document structure, permission names enum, and properties for the MongoDB collection. @module user-service/schemas/permission.schema */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo, Types } from "mongoose";
 

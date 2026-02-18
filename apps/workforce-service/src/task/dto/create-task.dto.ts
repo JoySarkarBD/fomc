@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Create Task DTO
+ *
+ * Defines the validation schema for creating a new task. Includes custom
+ * validators for fields that accept either a MongoDB ObjectId or plain string
+ * (e.g., client, project). Validates required fields, enums, date formats,
+ * and array contents.
+ */
 import {
   IsArray,
   IsDateString,

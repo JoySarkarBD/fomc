@@ -1,3 +1,4 @@
+/** @fileoverview UpdateUserDto. Partial validation schema for user update payloads. @module user-service/dto/update-user.dto */
 import { PartialType } from "@nestjs/mapped-types";
 import { IsMongoId } from "class-validator";
 import { CreateUserDto } from "./create-user.dto";

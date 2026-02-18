@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Utility helpers for building standardised API response envelopes.
+ */
+
+/**
  * Generic response envelope used for API responses.
  *
  * @template T - Type of the data payload

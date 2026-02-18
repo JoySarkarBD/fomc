@@ -1,3 +1,4 @@
+/** @fileoverview User Mongoose schema. Defines the User document structure, properties, and indexes for the MongoDB collection. @module user-service/schemas/user.schema */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo, Types } from "mongoose";
 

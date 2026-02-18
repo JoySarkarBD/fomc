@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Seed Department & Designation Module
+ *
+ * Registers Mongoose schemas and the seed service that populates default
+ * departments (HR, Sales, Operations) and their associated designations
+ * on module initialization.
+ */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 

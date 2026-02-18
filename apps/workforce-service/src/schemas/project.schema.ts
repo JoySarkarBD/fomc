@@ -1,9 +1,12 @@
+/**
+ * @fileoverview Project Schema
+ *
+ * Mongoose schema definition for projects within the workforce management
+ * system. Tracks project lifecycle, client mood history, department transfers,
+ * work progress, reviews, and ratings with optimized indexes for common queries.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-
-/**
- * Mongoose document type for Project.
- */
 export type ProjectDocument = Project & Document;
 
 /**

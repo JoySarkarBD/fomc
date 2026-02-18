@@ -1,3 +1,4 @@
+/** @fileoverview UpdateRoleDto. Partial validation schema for role update payloads. @module user-service/role/dto/update-role.dto */
 import { PartialType } from "@nestjs/mapped-types";
 import { CreateRoleDto } from "./create-role.dto";
 

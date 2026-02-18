@@ -1,3 +1,5 @@
+/** @fileoverview User controller stub. All message-pattern handlers are currently commented out. @module user-service/user.controller */
+// TODO: Uncomment and implement user message-pattern handlers once DTOs and service methods are finalised.
 import { Controller } from "@nestjs/common";
 // import { UpdateUserMessageDto } from "./dto/update-user.dto";
 // import { Department, UserRole } from "./schemas/user.schema";

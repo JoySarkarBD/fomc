@@ -1,13 +1,15 @@
+/**
+ * @fileoverview User gateway service.
+ *
+ * Handles communication with the User micro-service via TCP ClientProxy.
+ * Route-handler methods will be uncommented as the service API stabilises.
+ *
+ * @module api-gateway/user
+ */
+
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import {} from "../../../user-service/src/schemas/user.schema";
 
-/**
- * UserService
- *
- * Handles communication with the User microservice via ClientProxy.
- * Provides methods for CRUD operations on users.
- */
 @Injectable()
 export class UserService {
   constructor(

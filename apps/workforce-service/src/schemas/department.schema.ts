@@ -1,9 +1,12 @@
+/**
+ * @fileoverview Department Schema
+ *
+ * Mongoose schema definition for departments within the organization.
+ * Supports unique uppercase names, optional descriptions, system-department
+ * flags, and text indexing for efficient searching.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo } from "mongoose";
-
-/**
- * Mongoose document type for Department.
- */
 export type DepartmentDocument = Department & Document;
 
 /**

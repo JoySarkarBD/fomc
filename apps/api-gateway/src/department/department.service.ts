@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Department gateway service.
+ *
+ * Sends TCP commands to the Workforce micro-service (which owns
+ * departments) and normalises the response for the API layer.
+ *
+ * @module api-gateway/department
+ */
+
 import {
   ConflictException,
   ForbiddenException,
@@ -10,17 +19,17 @@ import {
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 
 import { ClientProxy } from "@nestjs/microservices";
-import { DEPARTMENT_COMMANDS } from "apps/workforce-service/src/department/constants/department.constants";
+import { DEPARTMENT_COMMANDS } from "@shared/constants/department-command.constants";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { firstValueFrom } from "rxjs";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
-import { MongoIdDto } from "../common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../common/dto/search-query.dto";
 import { buildResponse } from "../common/response.util";
 
 @Injectable()
 export class DepartmentService {
   constructor(
-    @Inject("WORKFORCE_SERVICE") private readonly roleClient: ClientProxy,
+    @Inject("WORKFORCE_SERVICE") private readonly workforceClient: ClientProxy,
   ) {}
 
   /**
@@ -31,7 +40,7 @@ export class DepartmentService {
    */
   async createDepartment(data: CreateDepartmentDto) {
     const result = await firstValueFrom(
-      this.roleClient.send(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT, data),
+      this.workforceClient.send(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT, data),
     );
     if (result?.exception === "Conflict") {
       throw new HttpException(result.message, HttpStatus.CONFLICT);
@@ -47,7 +56,7 @@ export class DepartmentService {
    */
   async findDepartments(query: SearchQueryDto) {
     const result = await firstValueFrom(
-      this.roleClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENTS, query),
+      this.workforceClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENTS, query),
     );
     return buildResponse("Departments fetched successfully", result);
   }
@@ -60,7 +69,7 @@ export class DepartmentService {
    */
   async findDepartmentById(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
-      this.roleClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENT, id),
+      this.workforceClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENT, id),
     );
     if (!result) {
       throw new NotFoundException("Department not found");
@@ -77,7 +86,7 @@ export class DepartmentService {
    */
   async updateDepartmentById(id: MongoIdDto["id"], data: UpdateDepartmentDto) {
     const result = await firstValueFrom(
-      this.roleClient.send(DEPARTMENT_COMMANDS.UPDATE_DEPARTMENT, {
+      this.workforceClient.send(DEPARTMENT_COMMANDS.UPDATE_DEPARTMENT, {
         id,
         data,
       }),
@@ -97,7 +106,7 @@ export class DepartmentService {
 
   async deleteDepartmentById(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
-      this.roleClient.send(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT, id),
+      this.workforceClient.send(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT, id),
     );
     switch (result?.exception) {
       case "Conflict":

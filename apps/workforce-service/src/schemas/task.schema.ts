@@ -1,9 +1,13 @@
+/**
+ * @fileoverview Task Schema
+ *
+ * Mongoose schema definition for tasks in the workforce management system.
+ * Defines enums for task priorities (low through critical) and statuses
+ * (pending, WIP, completed, blocked, delivered), with user references for
+ * creator and assignees.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-
-/**
- * Mongoose document type for Task.
- */
 export type TaskDocument = Task & Document;
 
 /**

@@ -1,9 +1,16 @@
+/**
+ * @fileoverview Department Service
+ *
+ * Business logic for department CRUD operations in the Workforce microservice.
+ * Provides methods to create, retrieve (paginated), find by ID, update, and
+ * delete departments with safety checks for system departments and associations.
+ */
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { User } from "apps/user-service/src/schemas/user.schema";
 import { Model, Types } from "mongoose";
-import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
 import { Department, DepartmentDocument } from "../schemas/department.schema";
 import {
   Designation,

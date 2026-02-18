@@ -1,8 +1,14 @@
+/**
+ * @fileoverview Department Controller
+ *
+ * Handles all department-related microservice message patterns in the
+ * Workforce service. Supports CRUD operations on departments via TCP transport.
+ */
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { MongoIdDto } from "../../../api-gateway/src/common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../../../api-gateway/src/common/dto/search-query.dto";
-import { DEPARTMENT_COMMANDS } from "./constants/department.constants";
+import { DEPARTMENT_COMMANDS } from "@shared/constants/department-command.constants";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { DepartmentService } from "./department.service";
 import { CreateDepartmentDto } from "./dto/create-department.dto";
 import { UpdateDepartmentDto } from "./dto/update-department.dto";

@@ -1,6 +1,7 @@
+/** @fileoverview Role module. Registers Mongoose schemas, controllers, and providers for role management. @module user-service/role/role.module */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MongooseConnectionsModule } from "../../../database/mongoose-connections.module";
+import { MongooseConnectionsModule } from "@shared/database/mongoose-connections.module";
 import { Permission, PermissionSchema } from "../schemas/permission.schema";
 import { Role, RoleSchema } from "../schemas/role.schema";
 import { User, UserSchema } from "../schemas/user.schema";

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Department gateway controller.
+ *
+ * Exposes CRUD endpoints for department management and delegates
+ * business logic to DepartmentService.
+ *
+ * @module api-gateway/department
+ */
+
 import {
   Body,
   Controller,
@@ -8,18 +17,12 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
-import { MongoIdDto } from "../common/dto/mongo-id.dto";
-import { SearchQueryDto } from "../common/dto/search-query.dto";
 import { DepartmentService } from "./department.service";
 
-/**
- * Department Controller
- *
- * Handles HTTP requests related to department management, including creating, retrieving, updating, and deleting departments. It uses the DepartmentService to perform business logic and interact with the Department microservice via ClientProxy.
- * Includes guards and validation to ensure that incoming requests contain valid data and that only authorized users can perform certain actions.
- */
 @Controller("department")
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}

@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Attendance Service
+ *
+ * Business logic for attendance operations in the Workforce microservice.
+ * Handles marking attendance (present/late), shift-based validation,
+ * and interaction with the User Service via TCP.
+ *
+ * @todo Complete the `presentAttendance` method implementation and add
+ *       out-attendance and weekend-exchange logic.
+ */
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { InjectModel } from "@nestjs/mongoose";

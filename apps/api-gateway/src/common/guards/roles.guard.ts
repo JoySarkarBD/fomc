@@ -1,16 +1,16 @@
+/**
+ * @fileoverview Roles guard — RBAC placeholder.
+ *
+ * Currently returns `true` for every request. When the role system
+ * is fully wired, uncomment the body to enforce role-based access
+ * control via the `@Roles()` decorator metadata.
+ *
+ * @module api-gateway/common/guards
+ */
+
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-// import { UserRole } from "../../../../user-service/src/schemas/user.schema";
-// import { ROLES_KEY } from "../decorators/roles.decorator";
 
-/**
- * RolesGuard is a NestJS guard that implements role-based access control for protected routes in the API Gateway.
- * It uses the Reflector to retrieve the required roles metadata defined by the @Roles decorator on route handlers and checks if the authenticated user has the necessary role to access the route.
- * If the user is not authenticated or does not have the required role, the guard throws a ForbiddenException to prevent access to the route.
- * This guard can be applied to any route or controller that requires role-based access control by using the @UseGuards(RolesGuard) decorator, ensuring that only users with the appropriate roles can access those routes.
- * The canActivate method is the core of the guard, where it retrieves the required roles, checks the user's role, and determines whether to allow access or throw an exception based on the user's authentication and authorization status.
- * The guard allows for flexible access control by supporting multiple roles for a single route, enabling developers to specify which roles are allowed to access specific resources in the API Gateway.
- */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

@@ -1,14 +1,18 @@
+/**
+ * @fileoverview Reusable pagination / search query DTO.
+ *
+ * Attach to any `@Query()` parameter on a controller to enforce
+ * page number, page size, and optional text search across
+ * every listing endpoint in a consistent way.
+ *
+ * @module @shared/dto/search-query
+ */
+
 import { Type } from "class-transformer";
 import { IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 
-/**
- * Data Transfer Object for search queries with pagination and optional search key.
- * Contains fields for page number, page size, and an optional search key.
- * Validates that pageNo and pageSize are valid numbers (not NaN or Infinity) and that searchKey is a string if provided.
- * This DTO is used in various endpoints that support pagination and searching to ensure that the input data is valid and meets the necessary requirements before processing the request.
- * The validation rules defined in this DTO help maintain data integrity and ensure that pagination parameters are correctly formatted while allowing for an optional search key to filter results.
- */
 export class SearchQueryDto {
+  /** 1-based page number. */
   @Type(() => Number)
   @IsNumber(
     { allowNaN: false, allowInfinity: false },
@@ -17,6 +21,7 @@ export class SearchQueryDto {
   @Min(1, { message: "pageNo must be at least 1" })
   pageNo!: number;
 
+  /** Number of items per page (1–100). */
   @Type(() => Number)
   @IsNumber(
     { allowNaN: false, allowInfinity: false },
@@ -26,6 +31,7 @@ export class SearchQueryDto {
   @Max(100, { message: "pageSize cannot exceed 100" })
   pageSize!: number;
 
+  /** Optional free-text search term applied to relevant fields. */
   @IsString({ message: "searchKey must be a string" })
   @IsOptional()
   searchKey?: string;

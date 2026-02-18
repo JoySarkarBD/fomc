@@ -1,13 +1,12 @@
-import { Injectable, Logger } from "@nestjs/common";
-import * as nodemailer from "nodemailer";
-import config from "../../../config/config";
-
 /**
- * Mail Service responsible for sending emails within the API Gateway.
- * This service utilizes Nodemailer to send emails, such as OTPs for password resets and other authentication-related notifications.
- * It provides a method `sendMail` that accepts email options and sends an email using the configured SMTP transporter.
- * The service also includes error handling and logging to ensure that email sending operations are properly monitored and any issues are logged for troubleshooting.
+ * @fileoverview Mail service for the API Gateway.
+ * Sends transactional emails (e.g. password-reset OTPs) via Nodemailer / SMTP.
  */
+import { Injectable, Logger } from "@nestjs/common";
+import config from "@shared/config/app.config";
+import * as nodemailer from "nodemailer";
+
+/** Sends transactional emails (e.g. password-reset OTPs) via SMTP / Nodemailer. */
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);

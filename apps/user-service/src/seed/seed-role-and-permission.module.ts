@@ -1,8 +1,9 @@
+/** @fileoverview Seed module for roles and permissions. Registers the seeding service that runs on module init. @module user-service/seed/seed-role-and-permission.module */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Permission, PermissionSchema } from "../schemas/permission.schema";
 import { Role, RoleSchema } from "../schemas/role.schema";
-import { SeedRollAndPermissionService } from "./seed-role-and-permission.service";
+import { SeedRoleAndPermissionService } from "./seed-role-and-permission.service";
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { SeedRollAndPermissionService } from "./seed-role-and-permission.service
       { name: Permission.name, schema: PermissionSchema },
     ]),
   ],
-  providers: [SeedRollAndPermissionService],
-  exports: [SeedRollAndPermissionService],
+  providers: [SeedRoleAndPermissionService],
+  exports: [SeedRoleAndPermissionService],
 })
-export class SeedRollAndPermissionModule {}
+export class SeedRoleAndPermissionModule {}

@@ -1,3 +1,4 @@
+/** @fileoverview CreateUserDto. Validation schema for user creation payloads. @module user-service/dto/create-user.dto */
 import {
   IsEmail,
   IsMongoId,

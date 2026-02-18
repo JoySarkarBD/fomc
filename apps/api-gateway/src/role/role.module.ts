@@ -1,15 +1,18 @@
+/**
+ * @fileoverview Role gateway module.
+ *
+ * Registers a TCP client for the User micro-service (which owns roles)
+ * and wires RoleController + RoleService.
+ *
+ * @module api-gateway/role
+ */
+
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import config from "../../../config/config";
+import config from "@shared/config/app.config";
 import { RoleController } from "./role.controller";
 import { RoleService } from "./role.service";
 
-/**
- * Role Module responsible for managing role-related functionality within the API Gateway.
- * This module imports the ClientsModule to register a microservice client for the Role Service, enabling communication between the API Gateway and the Role Service over TCP.
- * It provides the RoleController to handle role-related HTTP requests and the RoleService to perform the business logic for role operations.
- * The module also exports relevant services and modules for use in other parts of the application.
- */
 @Module({
   imports: [
     /**

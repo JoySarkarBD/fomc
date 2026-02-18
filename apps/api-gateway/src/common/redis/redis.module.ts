@@ -1,13 +1,17 @@
+/**
+ * @fileoverview Global Redis module.
+ *
+ * Provides and exports RedisClientService and RedisTokenService
+ * application-wide. Marked `@Global()` so consumers do not need
+ * to import this module explicitly.
+ *
+ * @module api-gateway/common/redis
+ */
+
 import { Global, Module } from "@nestjs/common";
 import { RedisTokenService } from "./redis-services/auth/redis-token.service";
 import { RedisClientService } from "./redis.client";
 
-/**
- * Redis Module responsible for providing Redis-related services and functionality within the API Gateway.
- * This module encapsulates the RedisService, which manages interactions with the Redis database, such as storing and retrieving authentication tokens.
- * By defining this module, we can easily inject the RedisService into other parts of the application (e.g., authentication strategies) to utilize Redis for caching and token management.
- * The module is marked as global, allowing the RedisService to be available throughout the entire application without needing to import the RedisModule in every module that requires it.
- */
 @Global()
 @Module({
   /**

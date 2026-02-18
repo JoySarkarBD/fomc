@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Abstract base throttle guard.
+ *
+ * Provides a reusable Redis-backed rate-limiter. Concrete subclasses
+ * only need to implement `buildIdentifier()` and supply a
+ * `ThrottleConfig`.
+ *
+ * @module api-gateway/common/throttles
+ */
+
 import {
   CanActivate,
   ExecutionContext,

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Attendance gateway service.
+ *
+ * Sends TCP commands to the Workforce micro-service for attendance
+ * operations and normalises the response for the API layer.
+ *
+ * @module api-gateway/attendance
+ */
+
 import {
   HttpException,
   HttpStatus,
@@ -6,9 +15,9 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { ATTENDANCE_COMMANDS } from "@shared/constants/attendance-command.constants";
+import { AuthUser } from "@shared/interfaces/auth-user.interface";
 import { firstValueFrom } from "rxjs";
-import { ATTENDANCE_COMMANDS } from "../../../workforce-service/src/attendance/constants/attendance.constants";
-import { AuthUser } from "../common/interfaces/auth-user.interface";
 import { buildResponse } from "../common/response.util";
 
 @Injectable()

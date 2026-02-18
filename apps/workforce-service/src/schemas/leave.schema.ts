@@ -1,9 +1,12 @@
+/**
+ * @fileoverview Leave Schema
+ *
+ * Mongoose schema definition for leave requests in the workforce
+ * management system. Supports multiple leave types (sick, casual, earned,
+ * maternity, paternity, unpaid) with approval tracking.
+ */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-
-/**
- * Mongoose document type for Leave.
- */
 export type LeaveDocument = Leave & Document;
 
 /**

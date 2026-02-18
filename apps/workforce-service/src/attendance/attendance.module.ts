@@ -1,7 +1,14 @@
+/**
+ * @fileoverview Attendance Module
+ *
+ * Configures the Attendance feature module within the Workforce microservice.
+ * Registers the User Service TCP client, Mongoose schemas for attendance,
+ * and wires up the attendance controller and service.
+ */
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { MongooseModule } from "@nestjs/mongoose";
-import config from "../../../config/config";
+import config from "@shared/config/app.config";
 import { Attendance, AttendanceSchema } from "../schemas/attendance.schema";
 import { AttendanceController } from "./attendance.controller";
 import { AttendanceService } from "./attendance.service";
