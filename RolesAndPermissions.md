@@ -146,9 +146,9 @@
 ```
 SUPER ADMIN / HR
         ↓
-PROJECT MANAGER
+ PROJECT MANAGER
         ↓
-TEAM LEADER
+   TEAM LEADER
         ↓
-EMPLOYEE
+     EMPLOYEE
 ```
