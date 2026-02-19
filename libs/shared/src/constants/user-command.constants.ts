@@ -35,4 +35,9 @@ export const USER_COMMANDS = {
 
   /** Change a user's password (requires current password). */
   CHANGE_PASSWORD: { cmd: "change_password" },
+
+  GET_USERS_BY_DESIGNATION: { cmd: "get_users_by_designation" },
+
+  /* Get users count by designation */
+  GET_USERS_COUNT_BY_DESIGNATION: { cmd: "get_users_count_by_designation" },
 } as const;

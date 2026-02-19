@@ -7,12 +7,13 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 // import * as bcrypt from "bcrypt";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 // import { MongoIdDto } from "../../api-gateway/src/common/dto/mongo-id.dto";
 // import config from "../../config/config";
 // import { CreateUserDto } from "./dto/create-user.dto";
 // import { UpdateUserDto } from "./dto/update-user.dto";
 // import { UserSearchQueryDto } from "./dto/user-query.dto";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { User, UserDocument } from "./schemas/user.schema";
 
 /**
@@ -436,4 +437,12 @@ export class UserService {
   //   const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
   //   return deletedUser;
   // }
+
+  async getUsersCountByDesignation(
+    designationId: MongoIdDto["id"],
+  ): Promise<number> {
+    return await this.userModel
+      .countDocuments({ designationId: new Types.ObjectId(designationId) })
+      .exec();
+  }
 }

@@ -3,7 +3,6 @@
  *
  * Configures the Department feature module within the Workforce microservice.
  * Registers Mongoose schemas for Department, Designation and User across
- * default, PRIMARY_DB, and SECONDARY_DB connections.
  */
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";

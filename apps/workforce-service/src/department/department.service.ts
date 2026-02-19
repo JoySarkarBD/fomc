@@ -56,7 +56,7 @@ export class DepartmentService {
    * Retrieve a paginated list of departments based on the provided search query parameters.
    *
    * @param {SearchQueryDto} query - The search query parameters for filtering and pagination.
-   * @return {Promise<{ departments: any[]; total: number; totalPages: number }>} An object containing the list of departments, total count, and total pages based on the search criteria.
+   * @return {Promise<{ departments: { _id: string; name: string; description?: string; isSystem: boolean; createdBy?: string; createdAt: Date; updatedAt: Date; designationsCount: number }[]; total: number; totalPages: number }>} An object containing the list of departments, total count, and total pages based on the search criteria.
    */
   async findDepartments(query: SearchQueryDto): Promise<{
     departments: {

@@ -104,6 +104,12 @@ export class DepartmentService {
     return buildResponse("Department updated successfully", result);
   }
 
+  /**
+   * Delete a department by ID.
+   *
+   * @param {string} id - The ID of the department to be deleted.
+   * @return Promise resolving to the result of the delete operation.
+   */
   async deleteDepartmentById(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT, id),

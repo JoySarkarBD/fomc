@@ -23,7 +23,7 @@ export type DesignationDocument = Designation & Document;
 @Schema({ timestamps: true, versionKey: false, collection: "designations" })
 export class Designation extends Document {
   // Name of the designation (e.g., "Software Engineer", "Project Manager")
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, uppercase: true })
   name!: string;
 
   // Optional description of the designation

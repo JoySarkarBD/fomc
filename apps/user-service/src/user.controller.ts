@@ -3,6 +3,9 @@
 import { Controller } from "@nestjs/common";
 // import { UpdateUserMessageDto } from "./dto/update-user.dto";
 // import { Department, UserRole } from "./schemas/user.schema";
+import { MessagePattern } from "@nestjs/microservices";
+import { USER_COMMANDS } from "@shared/constants";
+import { MongoIdDto } from "@shared/dto";
 import { UserService } from "./user.service";
 
 /**
@@ -144,5 +147,9 @@ export class UserController {
   // }) {
   //   const { id, currentPassword, newPassword } = payload;
   //   return this.userService.changePassword(id, currentPassword, newPassword);
-  // }
+
+  @MessagePattern(USER_COMMANDS.GET_USERS_COUNT_BY_DESIGNATION)
+  getUsersCountByDesignation(designationId: MongoIdDto["id"]) {
+    return this.userService.getUsersCountByDesignation(designationId);
+  }
 }

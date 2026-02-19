@@ -15,6 +15,7 @@ import { AuthModule } from "./auth/auth.module";
 import { DepartmentModule } from "./department/department.module";
 import { RoleModule } from "./role/role.module";
 import { UserModule } from "./user/user.module";
+import { DesignationModule } from './designation/designation.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from "./user/user.module";
     RoleModule,
     DepartmentModule,
     AttendanceModule,
+    DesignationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
