@@ -6,6 +6,7 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
+import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 
 /**
@@ -67,18 +68,18 @@ export class UserController {
   //   return this.userService.getUser(myRole, id, myId, myDepartment);
   // }
 
-  // /**
-  //  * Create a new user.
-  //  *
-  //  * Message Pattern: { cmd: USER_COMMANDS.CREATE_USER }
-  //  *
-  //  * @param {CreateUserDto} data - Data transfer object containing user creation payload.
-  //  * @returns {Promise<any>} Newly created user.
-  //  */
-  // @MessagePattern(USER_COMMANDS.CREATE_USER)
-  // createUser(data: CreateUserDto) {
-  //   return this.userService.createUser(data);
-  // }
+  /**
+   * Create a new user.
+   *
+   * Message Pattern: { cmd: USER_COMMANDS.CREATE_USER }
+   *
+   * @param {CreateUserDto} data - Data transfer object containing user creation payload.
+   * @returns {Promise<any>} Newly created user.
+   */
+  @MessagePattern(USER_COMMANDS.CREATE_USER)
+  async createUser(data: CreateUserDto) {
+    return await this.userService.createUser(data);
+  }
 
   // /**
   //  * Update an existing user.

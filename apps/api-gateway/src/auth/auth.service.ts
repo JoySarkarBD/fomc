@@ -7,6 +7,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -88,9 +89,11 @@ export class AuthService {
       this.userClient.send(USER_COMMANDS.CREATE_USER, data),
     );
 
-    // If the email already exists, throw a ConflictException with the message from the User Service response
-    if (user?.emailExist) {
-      throw new ConflictException(user.message);
+    switch (user?.exception) {
+      case "ConflictException":
+        throw new ConflictException(user.message);
+      case "NotFoundException":
+        throw new NotFoundException(user.message);
     }
 
     // Return a success response with the created user details (excluding sensitive fields)

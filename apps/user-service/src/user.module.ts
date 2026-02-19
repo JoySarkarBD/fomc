@@ -1,8 +1,11 @@
 /** @fileoverview User module. Registers Mongoose schemas, controllers, providers, and sub-modules for the user microservice. @module user-service/user.module */
 import { Module } from "@nestjs/common";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 import { MongooseModule } from "@nestjs/mongoose";
+import config from "@shared/config/app.config";
 import { MongooseConnectionsModule } from "@shared/database/mongoose-connections.module";
 import { RoleModule } from "./role/role.module";
+import { RoleService } from "./role/role.service";
 import { Permission, PermissionSchema } from "./schemas/permission.schema";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
@@ -41,6 +44,22 @@ import { UserService } from "./user.service";
         schema: PermissionSchema,
       },
     ]),
+
+    /**
+     * Clients Module configured to register a microservice client for the Workforce Service, enabling communication between the User Service and the Workforce Service over TCP.
+     * This allows the UserController and UserService to interact with the Workforce Service for operations such as retrieving workforce information, managing workforce data, and other workforce-related functionalities, facilitating a microservices architecture where different services can communicate seamlessly.
+     */
+    ClientsModule.register([
+      {
+        name: "WORKFORCE_SERVICE",
+        transport: Transport.TCP,
+        options: {
+          host: config.WORKFORCE_SERVICE_HOST ?? "127.0.0.1",
+          port: Number(config.WORKFORCE_SERVICE_PORT ?? 3001),
+        },
+      },
+    ]),
+
     RoleModule,
     SeedRoleAndPermissionModule,
   ],
@@ -53,9 +72,9 @@ import { UserService } from "./user.service";
 
   /**
    * Providers containing business logic for user-related operations.
-   * The UserService encapsulates the core functionality for managing users,
-   * including creating, retrieving, updating, and deleting user records.
+   * The UserService encapsulates the core functionality for managing users and roles
+   * including creating, retrieving, updating, and deleting user and role records.
    */
-  providers: [UserService],
+  providers: [UserService, RoleService],
 })
 export class UserModule {}

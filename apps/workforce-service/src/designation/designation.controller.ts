@@ -70,7 +70,6 @@ export class DesignationController {
   update(
     @Payload() payload: { id: MongoIdDto["id"]; data: UpdateDesignationDto },
   ): Promise<any> {
-    console.log(payload, "payload workforce-service");
     return this.designationService.updateDesignationById(
       payload.id,
       payload.data,

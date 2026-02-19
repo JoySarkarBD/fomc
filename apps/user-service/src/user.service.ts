@@ -1,19 +1,27 @@
 /** @fileoverview User service stub. Business logic methods are currently commented out. @module user-service/user.service */
 // TODO: Uncomment and implement user service methods once DTOs and schema references are finalised.
 import {
+  Inject,
   // ConflictException,
   // HttpException,
   Injectable,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-// import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import { Model, Types } from "mongoose";
 // import { MongoIdDto } from "../../api-gateway/src/common/dto/mongo-id.dto";
 // import config from "../../config/config";
 // import { CreateUserDto } from "./dto/create-user.dto";
 // import { UpdateUserDto } from "./dto/update-user.dto";
 // import { UserSearchQueryDto } from "./dto/user-query.dto";
+import { ClientProxy } from "@nestjs/microservices";
+import config from "@shared/config/app.config";
+import { DEPARTMENT_COMMANDS } from "@shared/constants";
+import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.constants";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { firstValueFrom } from "rxjs";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { RoleService } from "./role/role.service";
 import { User, UserDocument } from "./schemas/user.schema";
 
 /**
@@ -30,7 +38,9 @@ export class UserService {
    * @param {Model<UserDocument>} userModel - Injected Mongoose model for User schema.
    */
   constructor(
+    @Inject("WORKFORCE_SERVICE") private readonly workForceClient: ClientProxy,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(RoleService) private readonly roleService: RoleService,
   ) {}
 
   // /**
@@ -261,50 +271,100 @@ export class UserService {
   //   }
   // }
 
-  // /**
-  //  * Create a new user.
-  //  *
-  //  * @param {CreateUserDto} data - DTO containing user creation data.
-  //  * @throws {ConflictException} If email already exists (duplicate key error).
-  //  * @returns {Promise<User|{emailExist: boolean, message: string}>} Newly created user document or conflict message.
-  //  */
-  // async createUser(
-  //   data: CreateUserDto,
-  // ): Promise<User | { emailExist: boolean; message: string }> {
-  //   try {
-  //     const existing = await this.userModel
-  //       .findOne({ email: data.email })
-  //       .exec();
+  /**
+   * Create a new user.
+   *
+   * @param {CreateUserDto} data - DTO containing user creation data.
+   * @throws {ConflictException} If email already exists (duplicate key error).
+   * @returns {Promise<User|{message: string, exception: string}>} Newly created user document or conflict message.
+   */
+  async createUser(
+    data: CreateUserDto,
+  ): Promise<User | { message: string; exception: string }> {
+    const existing = await this.userModel.findOne({ email: data.email }).exec();
 
-  //     // If a user with the provided email already exists, return an object indicating the email conflict instead of throwing an exception.
-  //     if (existing) {
-  //       return { emailExist: true, message: "Email already exists" };
-  //     }
+    // If a user with the provided email already exists, return an object indicating the email conflict instead of throwing an exception.
+    if (existing) {
+      return {
+        message: "Email already exists",
+        exception: "ConflictException",
+      };
+    }
 
-  //     // Hash the user's password before saving it to the database to ensure security.
-  //     const hashedPassword = await bcrypt.hash(
-  //       data.password,
-  //       config.BCRYPT_SALT_ROUNDS,
-  //     );
+    // Hash the user's password before saving it to the database to ensure security.
+    const hashedPassword = await bcrypt.hash(
+      data.password,
+      config.BCRYPT_SALT_ROUNDS,
+    );
 
-  //     // Create a new user document using the Mongoose model and save it to the database. After saving, convert the Mongoose document to a plain JavaScript object and remove the password field before returning the user data.
-  //     data.password = hashedPassword;
-  //     const createdUser = new this.userModel(data);
+    const roleExist = await this.roleService.findRoleById(data.role);
 
-  //     // Save the new user document to the database and return the user data without the password field.
-  //     const newUser = await createdUser.save();
-  //     const userObject = newUser.toObject();
-  //     delete userObject.password;
+    if (!roleExist) {
+      return {
+        message: "Role not found",
+        exception: "NotFoundException",
+      };
+    }
 
-  //     return userObject as User;
-  //   } catch (error: any) {
-  //     // MongoDB duplicate key error
-  //     if (error?.code === 11000) {
-  //       return { emailExist: true, message: "Email already exists" };
-  //     }
-  //     throw error;
-  //   }
-  // }
+    (data as any).role = new Types.ObjectId(data.role);
+
+    // Convert role, department, and designation fields from string IDs to MongoDB ObjectId instances before creating the user document. This ensures that the references to related documents in the database are stored correctly as ObjectIds.
+    data.password = hashedPassword;
+
+    // Validate department and designation references if provided, by sending messages to the Workforce service to check if the referenced department and designation exist. If they do not exist, return an object indicating the not found error instead of throwing an exception.
+    if (data.department) {
+      const departmentExist = await firstValueFrom(
+        this.workForceClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENT, {
+          id: data.department,
+        }),
+      );
+
+      if (!departmentExist) {
+        return {
+          message: "Department not found",
+          exception: "NotFoundException",
+        };
+      }
+      (data as any).department = new Types.ObjectId(data.department);
+    }
+
+    // Validate designation reference if provided, by sending a message to the Workforce service to check if the referenced designation exists. If it does not exist, return an object indicating the not found error instead of throwing an exception.
+    if (data.designation) {
+      const designationExist = await firstValueFrom(
+        this.workForceClient.send(DESIGNATION_COMMANDS.GET_DESIGNATION, {
+          id: data.designation,
+        }),
+      );
+
+      if (!designationExist) {
+        return {
+          message: "Designation not found",
+          exception: "NotFoundException",
+        };
+      }
+
+      if (
+        data.department &&
+        designationExist.departmentId.toString() !== data.department.toString()
+      ) {
+        return {
+          message: "Designation does not belong to the specified department",
+          exception: "ConflictException",
+        };
+      }
+
+      (data as any).designation = new Types.ObjectId(data.designation);
+    }
+
+    const createdUser = new this.userModel(data);
+
+    // Save the new user document to the database and return the user data without the password field.
+    const newUser = await createdUser.save();
+    const userObject = newUser.toObject();
+    delete userObject.password;
+
+    return userObject as User;
+  }
 
   // /**
   //  * Find user by email (includes password field)
