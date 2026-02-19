@@ -140,11 +140,11 @@
 # Permission Hierarchy Overview
 
 ```
-SUPER ADMIN / HR
-        ↓
- PROJECT MANAGER
-        ↓
-   TEAM LEADER
-        ↓
-     EMPLOYEE
+SUPER ADMIN / DIRECTOR
+         ↓
+  PROJECT MANAGER
+         ↓
+    TEAM LEADER
+         ↓
+      EMPLOYEE
 ```
