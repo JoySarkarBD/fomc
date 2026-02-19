@@ -366,18 +366,18 @@ export class UserService {
     return userObject as User;
   }
 
-  // /**
-  //  * Find user by email (includes password field)
-  //  *
-  //  * @param {string} email - The email of the user to find, used to query the database for a user document that matches the provided email address.
-  //  * @returns {Promise<User | null>} The user document that matches the provided email, including the password field for authentication purposes; returns null if no user is found with the given email.
-  //  */
-  // async findByEmail(email: string): Promise<User | null> {
-  //   return this.userModel
-  //     .findOne({ email })
-  //     .select("+password +otp +otpExpiry")
-  //     .exec();
-  // }
+  /**
+   * Find user by email (includes password field)
+   *
+   * @param {string} email - The email of the user to find, used to query the database for a user document that matches the provided email address.
+   * @returns {Promise<User | null>} The user document that matches the provided email, including the password field for authentication purposes; returns null if no user is found with the given email.
+   */
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel
+      .findOne({ email })
+      .select("+password +otp +otpExpiry")
+      .exec();
+  }
 
   // /**
   //  * Set OTP and expiry for a user identified by email

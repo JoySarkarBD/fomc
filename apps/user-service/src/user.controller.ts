@@ -108,14 +108,14 @@ export class UserController {
   //   return this.userService.deleteUser(id);
   // }
 
-  // /**
-  //  * Find user by email
-  //  * Message Pattern: { cmd: USER_COMMANDS.FIND_BY_EMAIL }
-  //  */
-  // @MessagePattern(USER_COMMANDS.FIND_BY_EMAIL)
-  // findByEmail(email: string) {
-  //   return this.userService.findByEmail(email);
-  // }
+  /**
+   * Find user by email
+   * Message Pattern: { cmd: USER_COMMANDS.FIND_BY_EMAIL }
+   */
+  @MessagePattern(USER_COMMANDS.FIND_BY_EMAIL)
+  findByEmail(email: string) {
+    return this.userService.findByEmail(email);
+  }
 
   // /**
   //  * Set a password reset token for a user
