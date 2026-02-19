@@ -148,6 +148,13 @@ export class UserController {
   //   const { id, currentPassword, newPassword } = payload;
   //   return this.userService.changePassword(id, currentPassword, newPassword);
 
+  /**
+   * Get users count by designation ID.
+   * Message Pattern: { cmd: USER_COMMANDS.GET_USERS_COUNT_BY_DESIGNATION }
+   *
+   * @param {MongoIdDto} payload - Object containing the designation ID.
+   * @returns {Promise<number>} Count of users with the specified designation.
+   */
   @MessagePattern(USER_COMMANDS.GET_USERS_COUNT_BY_DESIGNATION)
   getUsersCountByDesignation(designationId: MongoIdDto["id"]) {
     return this.userService.getUsersCountByDesignation(designationId);

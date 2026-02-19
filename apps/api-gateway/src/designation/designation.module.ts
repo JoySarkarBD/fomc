@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Designation gateway module.
+ *
+ * Registers a TCP client for the Workforce micro-service (which owns
+ * designations) and wires DesignationController + DesignationService.
+ *
+ * @module api-gateway/designation
+ */
+
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import config from "@shared/config/app.config";

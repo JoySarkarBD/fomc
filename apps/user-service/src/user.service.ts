@@ -438,6 +438,9 @@ export class UserService {
   //   return deletedUser;
   // }
 
+  /**
+   *
+   */
   async getUsersCountByDesignation(
     designationId: MongoIdDto["id"],
   ): Promise<number> {
