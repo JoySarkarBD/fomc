@@ -22,6 +22,7 @@ import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.cons
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { firstValueFrom } from "rxjs";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { UserSearchQueryDto } from "./dto/user-search-query.dto";
 import { RoleService } from "./role/role.service";
 import { User, UserDocument } from "./schemas/user.schema";
 
@@ -44,135 +45,102 @@ export class UserService {
     @Inject(RoleService) private readonly roleService: RoleService,
   ) {}
 
-  // /**
-  //  * Retrieve all users from the database.
-  //  *
-  //  * @param {UserRole} myRole - Role of the requesting user to apply role-based access control.
-  //  * @param {UserSearchQueryDto} query - Optional search query parameters for filtering users.
-  //  * @param {MongoIdDto["id"]} myId - ID of the requesting user.
-  //  * @param {Department} myDepartment - Department of the requesting user.
-  //  * @returns {Promise<{users: User[]; total: number; totalPages: number}>} Array of user documents with pagination info.
-  //  */
-  // async getUsers(
-  //   myRole: string,
-  //   query: UserSearchQueryDto,
-  //   myId?: MongoIdDto["id"],
-  //   myDepartment?: string,
-  // ): Promise<
-  //   | { users: User[]; total: number; totalPages: number }
-  //   | { message: string; exception: any }
-  // > {
-  //   const { pageNo, pageSize, searchKey, department, role } = query;
+  /**
+   * Retrieve all users from the database.
+   *
+   * @param {UserRole} myRole - Role of the requesting user to apply role-based access control.
+   * @param {UserSearchQueryDto} query - Optional search query parameters for filtering users.
+   * @param {MongoIdDto["id"]} myId - ID of the requesting user.
+   * @param {Department} myDepartment - Department of the requesting user.
+   * @returns {Promise<{users: User[]; total: number; totalPages: number}>} Array of user documents with pagination info.
+   */
+  async getUsers(
+    query: UserSearchQueryDto,
+  ): Promise<
+    | { users: any[]; total: number; totalPages: number }
+    | { message: string; exception: any }
+  > {
+    const { role, department, designation, pageNo, pageSize, searchKey } =
+      query;
 
-  //   // Build a dynamic filter object based on the presence of search key, department, and role in the query parameters. This allows for flexible querying of users based on different criteria.
-  //   const filter: any = {};
+    const filter: any = {};
 
-  //   // Role-based access control
-  //   switch (myRole) {
-  //     case UserRole.DIRECTOR:
-  //       // Director can see everyone - no restrictions
-  //       break;
-  //     case UserRole.HR:
-  //       // HR can see all users except DIRECTOR
-  //       filter.role = {
-  //         $in: [
-  //           UserRole.EMPLOYEE,
-  //           UserRole.TEAM_LEADER,
-  //           UserRole.PROJECT_MANAGER,
-  //           UserRole.HR,
-  //         ],
-  //       };
-  //       break;
-  //     case UserRole.PROJECT_MANAGER:
-  //     case UserRole.TEAM_LEADER:
-  //       // Managers/Leads can see only users from their department
-  //       // Cannot see HR or DIRECTOR
-  //       if (!myDepartment) {
-  //         return {
-  //           message: "Department required for this role",
-  //           exception: "HttpException",
-  //         };
-  //         // throw new HttpException(
-  //         //   "Department required for this role",
-  //         //   HttpStatus.FORBIDDEN,
-  //         // );
-  //       }
-  //       filter.department = myDepartment;
-  //       filter.role = {
-  //         $in: [
-  //           UserRole.EMPLOYEE,
-  //           UserRole.TEAM_LEADER,
-  //           UserRole.PROJECT_MANAGER,
-  //         ],
-  //       };
-  //       break;
-  //     case UserRole.EMPLOYEE:
-  //       // Employee can only see their own record
-  //       if (!myId) {
-  //         return {
-  //           message: "User ID required for this role",
-  //           exception: "HttpException",
-  //         };
-  //         // throw new HttpException(
-  //         //   "User ID required for this role",
-  //         //   HttpStatus.FORBIDDEN,
-  //         // );
-  //       }
-  //       filter._id = myId;
-  //       break;
-  //     default:
-  //       return {
-  //         message: "Invalid role",
-  //         exception: "HttpException",
-  //       };
+    if (role) filter.role = new Types.ObjectId(role);
+    if (department) filter.department = new Types.ObjectId(department);
+    if (designation) filter.designation = new Types.ObjectId(designation);
 
-  //     // throw new HttpException("Invalid role", HttpStatus.FORBIDDEN);
-  //   }
+    if (searchKey) {
+      filter.$or = [
+        { name: { $regex: searchKey, $options: "i" } },
+        { email: { $regex: searchKey, $options: "i" } },
+        { employeeId: { $regex: searchKey, $options: "i" } },
+      ];
+    }
 
-  //   // If a search key is provided, add a case-insensitive regex filter on both the name and email fields to allow searching for users by either their name or email.
-  //   if (searchKey) {
-  //     filter.$text = { $search: searchKey };
-  //   }
+    const skip = (pageNo - 1) * pageSize;
 
-  //   // Apply department and role filters from query if provided (Director and HR can use these)
-  //   if (
-  //     department &&
-  //     (myRole === UserRole.DIRECTOR || myRole === UserRole.HR)
-  //   ) {
-  //     filter.department = department;
-  //   }
-  //   if (role && (myRole === UserRole.DIRECTOR || myRole === UserRole.HR)) {
-  //     // Ensure HR cannot filter for DIRECTOR role
-  //     if (myRole === UserRole.HR && role === UserRole.DIRECTOR) {
-  //       return {
-  //         message: "HR cannot access DIRECTOR role",
-  //         exception: "HttpException",
-  //       };
+    const [users, total] = await Promise.all([
+      this.userModel
+        .find(filter)
+        .skip(skip)
+        .limit(pageSize)
+        .populate("role", "name")
+        .lean()
+        .exec(),
+      this.userModel.countDocuments(filter),
+    ]);
 
-  //       // throw new HttpException(
-  //       //   "HR cannot access DIRECTOR role",
-  //       //   HttpStatus.FORBIDDEN,
-  //       // );
-  //     }
-  //     filter.role = role;
-  //   }
+    if (!users.length) {
+      return {
+        users: [],
+        total: 0,
+        totalPages: 0,
+      };
+    }
 
-  //   // Execute the query to find users based on the constructed filter, applying pagination using skip and limit. Simultaneously, count the total number of documents that match the filter to provide pagination metadata. Finally, return the users along with total count and total pages calculated from the total count and page size.
-  //   const [users, total] = await Promise.all([
-  //     this.userModel
-  //       .find(filter)
-  //       .skip((pageNo - 1) * pageSize)
-  //       .limit(pageSize)
-  //       .exec(),
-  //     this.userModel.countDocuments(filter).exec(),
-  //   ]);
+    // Fetch all designations in parallel
+    const formattedUsers = await Promise.all(
+      users.map(async (user: any) => {
+        let designationData: any = null;
 
-  //   return {
-  //     users,
-  //     total,
-  //     totalPages: Math.ceil(total / pageSize),
-  //   };
-  // }
+        if (user.designation) {
+          designationData = await firstValueFrom(
+            this.workForceClient.send(DESIGNATION_COMMANDS.GET_DESIGNATION, {
+              id: user.designation,
+            }),
+          );
+        }
+
+        delete user.password;
+        delete user.otp;
+        delete user.otpExpiry;
+
+        return {
+          _id: user._id,
+          name: user.name,
+          employeeId: user.employeeId,
+          phoneNumber: user.phoneNumber,
+          email: user.email,
+          secondaryEmail: user.secondaryEmail ?? null,
+          role: user.role?.name || null,
+          department: designationData?.departmentName || null,
+          designation: designationData?.name || null,
+          isBlocked: user.isBlocked,
+          employmentStatus: user.employmentStatus,
+          resignedDates: user.resignedDates || [],
+          reJoiningDates: user.reJoiningDates || [],
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        };
+      }),
+    );
+
+    return {
+      users: formattedUsers,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
 
   /**
    * Create a new user.

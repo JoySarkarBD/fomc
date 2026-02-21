@@ -1,5 +1,5 @@
 /** @fileoverview User controller stub. All message-pattern handlers are currently commented out. @module user-service/user.controller */
-// TODO: Uncomment and implement user message-pattern handlers once DTOs and service methods are finalised.
+
 import { Controller } from "@nestjs/common";
 // import { UpdateUserMessageDto } from "./dto/update-user.dto";
 // import { Department, UserRole } from "./schemas/user.schema";
@@ -7,6 +7,7 @@ import { MessagePattern } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { UserSearchQueryDto } from "./dto/user-search-query.dto";
 import { UserService } from "./user.service";
 
 /**
@@ -24,30 +25,18 @@ export class UserController {
    */
   constructor(private readonly userService: UserService) {}
 
-  // /**
-  //  * Retrieve all users.
-  //  *
-  //  * Message Pattern: { cmd: USER_COMMANDS.GET_USERS }
-  //  *
-  //  * @param {UserSearchQueryDto} query - Query parameters for filtering and pagination.
-  //  * @returns {Promise<any>} List of users.
-  //  */
-  // @MessagePattern(USER_COMMANDS.GET_USERS)
-  // async getUsers(
-  //   payload: UserSearchQueryDto & {
-  //     myRole: UserRole;
-  //     myId?: string;
-  //     myDepartment?: Department;
-  //   },
-  // ) {
-  //   const { myRole, myId, myDepartment, ...query } = payload ?? {};
-  //   return await this.userService.getUsers(
-  //     myRole,
-  //     query as UserSearchQueryDto,
-  //     myId,
-  //     myDepartment,
-  //   );
-  // }
+  /**
+   * Retrieve all users.
+   *
+   * Message Pattern: { cmd: USER_COMMANDS.GET_USERS }
+   *
+   * @param {UserSearchQueryDto} query - Query parameters for filtering and pagination.
+   * @returns {Promise<any>} List of users.
+   */
+  @MessagePattern(USER_COMMANDS.GET_USERS)
+  async getUsers(payload: UserSearchQueryDto) {
+    return await this.userService.getUsers(payload);
+  }
 
   /**
    * Retrieve a single user by ID.

@@ -7,9 +7,10 @@
  * @module api-gateway/user
  */
 
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
+import { UserSearchQueryDto } from "apps/user-service/src/dto/user-search-query.dto";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
@@ -21,32 +22,29 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // /**
-  //  * Get a list of users based on query parameters for filtering and pagination.
-  //  *
-  //  * @guards RolesGuard - Ensures that only users with specific roles (Director, HR, Project Manager, Team Leader) can access this endpoint.
-  //  * @param query - Query parameters for filtering and pagination of users.
-  //  * @returns A list of users matching the query criteria.
-  //  */
-  // @UseGuards(RolesGuard)
-  // @Roles(
-  //   UserRole.DIRECTOR,
-  //   UserRole.HR,
-  //   UserRole.PROJECT_MANAGER,
-  //   UserRole.TEAM_LEADER,
-  // )
-  // @Get()
-  // async getUsers(
-  //   @GetUser() user: AuthUser,
-  //   @Query() query: UserSearchQueryDto,
-  // ) {
-  //   return await this.userService.getUsers(
-  //     user.role as UserRole,
-  //     query,
-  //     (user._id ?? user.id) as MongoIdDto["id"],
-  //     user.department,
-  //   );
-  // }
+  /**
+   * Get a list of users based on query parameters for filtering and pagination.
+   *
+   * @guards RolesGuard - Ensures that only users with specific roles can access this endpoint.
+   * @param query - Query parameters for filtering and pagination of users.
+   * @returns A list of users matching the query criteria.
+   */
+  @UseGuards(RolesGuard)
+  @Roles(
+    "SUPER ADMIN",
+    "DIRECTOR",
+    "HR",
+    "PROJECT MANAGER",
+    "TEAM LEADER",
+    "EMPLOYEE",
+  )
+  @Get()
+  async getUsers(
+    @GetUser() user: AuthUser,
+    @Query() query: UserSearchQueryDto,
+  ) {
+    return await this.userService.getUsers(query);
+  }
 
   /**
    * Get a single user by their unique identifier (ID).

@@ -11,6 +11,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
+import { UserSearchQueryDto } from "apps/user-service/src/dto/user-search-query.dto";
 import { firstValueFrom } from "rxjs";
 import { buildResponse } from "../common/response.util";
 
@@ -20,33 +21,20 @@ export class UserService {
     @Inject("USER_SERVICE") private readonly userClient: ClientProxy,
   ) {}
 
-  // /**
-  //  * Fetch all users.
-  //  *
-  //  * @returns Promise resolving to an array of users
-  //  */
-  // async getUsers(
-  //   myRole: UserRole,
-  //   query: UserSearchQueryDto,
-  //   myId?: MongoIdDto["id"],
-  //   myDepartment?: Department,
-  // ) {
-  //   const result = await firstValueFrom(
-  //     this.userClient.send(USER_COMMANDS.GET_USERS, {
-  //       ...query,
-  //       myRole,
-  //       myId,
-  //       myDepartment,
-  //     }),
-  //   );
+  /**
+   * Fetch all users.
+   *
+   * @returns Promise resolving to an array of users
+   */
+  async getUsers(query: UserSearchQueryDto) {
+    const result = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USERS, {
+        ...query,
+      }),
+    );
 
-  //   switch (result?.exception) {
-  //     case "HttpException":
-  //       throw new HttpException(result.message, HttpStatus.FORBIDDEN);
-  //   }
-
-  //   return buildResponse("Users fetched successfully", result);
-  // }
+    return buildResponse("Users fetched successfully", result);
+  }
 
   /**
    * Fetch a single user by ID.
