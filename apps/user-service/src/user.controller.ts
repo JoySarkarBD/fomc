@@ -58,15 +58,16 @@ export class UserController {
   //  * @returns {Promise<any>} User details.
   //  */
   // @MessagePattern(USER_COMMANDS.GET_USER)
-  // getUser(payload: {
-  //   id: MongoIdDto["id"];
-  //   myRole: UserRole;
-  //   myId?: MongoIdDto["id"];
-  //   myDepartment?: Department;
-  // }) {
-  //   const { id, myRole, myId, myDepartment } = payload ?? {};
-  //   return this.userService.getUser(myRole, id, myId, myDepartment);
-  // }
+  @MessagePattern(USER_COMMANDS.GET_USER)
+  getUser(payload: {
+    id: MongoIdDto["id"];
+    myRole?: string;
+    myId?: MongoIdDto["id"];
+    myDepartment?: string;
+  }) {
+    const { id, myRole, myId, myDepartment } = payload ?? {};
+    return this.userService.getUser(myRole as string, id, myId, myDepartment);
+  }
 
   /**
    * Create a new user.
@@ -117,38 +118,38 @@ export class UserController {
     return this.userService.findByEmail(email);
   }
 
-  // /**
-  //  * Set a password reset token for a user
-  //  * Message Pattern: { cmd: USER_COMMANDS.SET_RESET_PASSWORD_OTP }
-  //  */
-  // @MessagePattern(USER_COMMANDS.SET_RESET_PASSWORD_OTP)
-  // setResetPasswordOtp(payload: { email: string; otp: string; expiry: string }) {
-  //   const { email, otp, expiry } = payload;
-  //   return this.userService.setResetPasswordOtp(email, otp, new Date(expiry));
-  // }
+  /**
+   * Set a password reset token for a user
+   * Message Pattern: { cmd: USER_COMMANDS.SET_RESET_PASSWORD_OTP }
+   */
+  @MessagePattern(USER_COMMANDS.SET_RESET_PASSWORD_OTP)
+  setResetPasswordOtp(payload: { email: string; otp: string; expiry: string }) {
+    const { email, otp, expiry } = payload;
+    return this.userService.setResetPasswordOtp(email, otp, new Date(expiry));
+  }
 
-  // /**
-  //  * Reset password using token
-  //  * Message Pattern: { cmd: USER_COMMANDS.RESET_PASSWORD }
-  //  */
-  // @MessagePattern(USER_COMMANDS.RESET_PASSWORD)
-  // resetPassword(payload: { otp: string; newPassword: string }) {
-  //   return this.userService.resetPassword(payload.otp, payload.newPassword);
-  // }
+  /**
+   * Reset password using token
+   * Message Pattern: { cmd: USER_COMMANDS.RESET_PASSWORD }
+   */
+  @MessagePattern(USER_COMMANDS.RESET_PASSWORD)
+  resetPassword(payload: { otp: string; newPassword: string }) {
+    return this.userService.resetPassword(payload.otp, payload.newPassword);
+  }
 
-  // /**
-  //  * Change password given user id and current password
-  //  * Message Pattern: { cmd: USER_COMMANDS.CHANGE_PASSWORD }
-  //  */
-  // @MessagePattern(USER_COMMANDS.CHANGE_PASSWORD)
-  // changePassword(payload: {
-  //   id: MongoIdDto["id"];
-  //   currentPassword: string;
-  //   newPassword: string;
-  // }) {
-  //   const { id, currentPassword, newPassword } = payload;
-  //   return this.userService.changePassword(id, currentPassword, newPassword);
-
+  /**
+   * Change password given user id and current password
+   * Message Pattern: { cmd: USER_COMMANDS.CHANGE_PASSWORD }
+   */
+  @MessagePattern(USER_COMMANDS.CHANGE_PASSWORD)
+  changePassword(payload: {
+    id: MongoIdDto["id"];
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    const { id, currentPassword, newPassword } = payload;
+    return this.userService.changePassword(id, currentPassword, newPassword);
+  }
   /**
    * Get users count by designation ID.
    * Message Pattern: { cmd: USER_COMMANDS.GET_USERS_COUNT_BY_DESIGNATION }

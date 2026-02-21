@@ -35,7 +35,7 @@ export class DepartmentController {
    */
   @Post()
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
-    return this.departmentService.createDepartment(createDepartmentDto);
+    return await this.departmentService.createDepartment(createDepartmentDto);
   }
 
   /**
@@ -46,7 +46,7 @@ export class DepartmentController {
    */
   @Get()
   async findDepartments(@Query() query: SearchQueryDto) {
-    return this.departmentService.findDepartments(query);
+    return await this.departmentService.findDepartments(query);
   }
 
   /**
@@ -57,7 +57,7 @@ export class DepartmentController {
    */
   @Get(":id")
   async findDepartmentById(@Param() params: MongoIdDto) {
-    return this.departmentService.findDepartmentById(params.id);
+    return await this.departmentService.findDepartmentById(params.id);
   }
 
   /**
@@ -68,11 +68,11 @@ export class DepartmentController {
    * @return Promise resolving to the updated department details.
    */
   @Patch(":id")
-  updateDepartmentById(
+  async updateDepartmentById(
     @Param() params: MongoIdDto,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
   ) {
-    return this.departmentService.updateDepartmentById(
+    return await this.departmentService.updateDepartmentById(
       params.id,
       updateDepartmentDto,
     );
@@ -85,7 +85,7 @@ export class DepartmentController {
    * @return Promise resolving to the result of the delete operation.
    */
   @Delete(":id")
-  deleteDepartmentById(@Param() params: MongoIdDto) {
-    return this.departmentService.deleteDepartmentById(params.id);
+  async deleteDepartmentById(@Param() params: MongoIdDto) {
+    return await this.departmentService.deleteDepartmentById(params.id);
   }
 }

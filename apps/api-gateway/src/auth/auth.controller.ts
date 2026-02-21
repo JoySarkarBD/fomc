@@ -13,7 +13,6 @@ import {
   Controller,
   Patch,
   Post,
-  Put,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -38,34 +37,34 @@ export class AuthController {
   /** Register a new user account. */
   @Post("register")
   async register(@Body() data: CreateUserDto) {
-    return this.authService.register(data);
+    return await this.authService.register(data);
   }
 
   /** Authenticate with email & password, receive a bearer token. */
   @Post("login")
   async login(@Body() data: LoginDto) {
-    return this.authService.login(data.email, data.password);
+    return await this.authService.login(data.email, data.password);
   }
 
   /** Request a password-reset OTP (throttled per device). */
   @Post("forgot-password")
   @UseGuards(ForgotThrottleGuard)
   async forgot(@Body() data: ForgotPasswordDto) {
-    return this.authService.forgotPassword(data.email);
+    return await this.authService.forgotPassword(data.email);
   }
 
   /** Verify the OTP and set a new password (throttled per device). */
   @Patch("reset-password")
   @UseGuards(ResetThrottleGuard)
   async reset(@Body() data: ResetPasswordDto) {
-    return this.authService.resetPassword(data.otp, data.newPassword);
+    return await this.authService.resetPassword(data.otp, data.newPassword);
   }
 
   /** Change own password (requires current password). */
-  @Put("change-password")
+  @Patch("change-password")
   @UseGuards(JwtAuthGuard)
   async change(@GetUser() user: AuthUser, @Body() data: ChangePasswordDto) {
-    return this.authService.changePassword(
+    return await this.authService.changePassword(
       user._id as string,
       data.currentPassword,
       data.newPassword,
@@ -82,6 +81,6 @@ export class AuthController {
     const [type, tokenId] = headerValue.split(" ");
     if (!tokenId || type.toLowerCase() !== "bearer")
       throw new UnauthorizedException("Invalid token format");
-    return this.authService.logout(tokenId);
+    return await this.authService.logout(tokenId);
   }
 }

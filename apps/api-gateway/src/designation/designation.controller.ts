@@ -34,8 +34,10 @@ export class DesignationController {
    * @returns Promise resolving to the newly created designation.
    */
   @Post()
-  createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
-    return this.designationService.createDesignation(createDesignationDto);
+  async createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
+    return await this.designationService.createDesignation(
+      createDesignationDto,
+    );
   }
 
   /**
@@ -45,8 +47,8 @@ export class DesignationController {
    * @return Promise resolving to a list of designations matching the search criteria.
    */
   @Get()
-  findDesignations(@Query() query: SearchQueryDto) {
-    return this.designationService.findDesignations(query);
+  async findDesignations(@Query() query: SearchQueryDto) {
+    return await this.designationService.findDesignations(query);
   }
 
   /**
@@ -56,8 +58,8 @@ export class DesignationController {
    * @return Promise resolving to the designation details.
    */
   @Get(":id")
-  findDesignationById(@Param() params: MongoIdDto) {
-    return this.designationService.findDesignationById(params.id);
+  async findDesignationById(@Param() params: MongoIdDto) {
+    return await this.designationService.findDesignationById(params.id);
   }
 
   /**
@@ -68,11 +70,11 @@ export class DesignationController {
    * @return Promise resolving to the updated designation details.
    */
   @Patch(":id")
-  updateDesignationById(
+  async updateDesignationById(
     @Param() params: MongoIdDto,
     @Body() updateDesignationDto: UpdateDesignationDto,
   ) {
-    return this.designationService.updateDesignationById(
+    return await this.designationService.updateDesignationById(
       params.id,
       updateDesignationDto,
     );
@@ -85,7 +87,7 @@ export class DesignationController {
    * @return Promise resolving to a message indicating the result of the delete operation.
    */
   @Delete(":id")
-  deleteDesignationById(@Param() params: MongoIdDto) {
-    return this.designationService.deleteDesignationById(params.id);
+  async deleteDesignationById(@Param() params: MongoIdDto) {
+    return await this.designationService.deleteDesignationById(params.id);
   }
 }

@@ -7,6 +7,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -26,6 +27,7 @@ import { MailService } from "../utils/mail.service";
 export class AuthService {
   /** OTP time-to-live in minutes */
   private readonly otpTtlMinutes = 15;
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     @Inject("USER_SERVICE") private readonly userClient: ClientProxy,
@@ -129,11 +131,9 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload);
     const tokenId = randomUUID();
 
-    await this.redisTokenService.storeToken(
-      tokenId,
-      accessToken,
-      config.JWT_EXPIRES_IN ? Number(config.JWT_EXPIRES_IN) : 2592000, // Default to 30 days if not set
-    );
+    const ttl = config.JWT_EXPIRES_IN ? Number(config.JWT_EXPIRES_IN) : 2592000;
+    this.logger.debug(`Login: storing tokenId=${tokenId} ttl=${ttl}`);
+    await this.redisTokenService.storeToken(tokenId, accessToken, ttl);
 
     // Return a success response with the generated JWT token and sanitized user details
     return buildResponse("Login successful", {
@@ -188,7 +188,6 @@ export class AuthService {
         newPassword,
       }),
     );
-
     // If the result indicates that the OTP is invalid or expired, throw an UnauthorizedException with a generic message to avoid revealing specific details about the failure.
     if (!result) throw new UnauthorizedException("Invalid or expired OTP");
 

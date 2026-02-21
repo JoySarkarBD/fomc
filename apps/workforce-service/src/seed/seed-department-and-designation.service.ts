@@ -66,7 +66,7 @@ export class SeedDepartmentAndDesignationService {
       const updatedDepartment = await this.departmentModel.findOneAndUpdate(
         { name: dept.name },
         { $set: dept },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
 
       departmentMap[dept.name] = updatedDepartment;

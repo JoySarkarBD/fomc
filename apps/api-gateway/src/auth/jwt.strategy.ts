@@ -3,7 +3,7 @@
  * Resolves a UUID bearer token from Redis, verifies the real JWT,
  * and loads the user from the User Service.
  */
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import { PassportStrategy } from "@nestjs/passport";
@@ -23,6 +23,7 @@ import { RedisTokenService } from "../common/redis/redis-services/auth/redis-tok
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+  private readonly logger = new Logger(JwtStrategy.name);
   constructor(
     @Inject("USER_SERVICE") private userClient: ClientProxy,
     private readonly jwtService: JwtService,
@@ -49,24 +50,40 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
    */
   async validate(request: Request) {
     const tokenId = this.extractTokenId(request);
-    if (!tokenId) return null;
+    if (!tokenId) {
+      this.logger.debug("No token id found in Authorization header");
+      return null;
+    }
 
     const token = await this.redisTokenService.getToken(tokenId);
-    if (!token) return null;
+    if (!token) {
+      this.logger.debug(`Token not found in redis for id=${tokenId}`);
+      return null;
+    }
+
     let payload: any;
     try {
       payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConfig.secret as unknown as string,
       });
-    } catch {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      this.logger.warn(
+        `Failed to verify JWT for tokenId=${tokenId}: ${errorMessage}`,
+      );
       return null;
     }
 
     const id = payload?.sub;
-    if (!id) return null;
+    if (!id) {
+      this.logger.debug(`JWT payload missing sub for tokenId=${tokenId}`);
+      return null;
+    }
 
     try {
-      // Retrieve the user information from the User Service using the user ID from the JWT payload.
+      this.logger.debug(
+        `JWT verified, fetching user id=${id} (tokenId=${tokenId})`,
+      );
       const user = await firstValueFrom(
         this.userClient.send(USER_COMMANDS.GET_USER, {
           id,
@@ -75,16 +92,22 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
         }),
       );
 
-      // If the user is not found, return null to indicate an invalid token or user.
-      if (!user) return null;
+      if (!user) {
+        this.logger.debug(`User not found for id=${id} (tokenId=${tokenId})`);
+        return null;
+      }
 
-      // Remove sensitive fields from the user object before returning it.
       delete user.password;
       delete user.otp;
       delete user.otpExpiry;
 
+      this.logger.debug(
+        `Authentication succeeded for user id=${id} (tokenId=${tokenId})`,
+      );
       return user;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Error fetching user for id=${id}: ${errorMessage}`);
       return null;
     }
   }

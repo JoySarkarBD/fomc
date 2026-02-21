@@ -7,12 +7,18 @@
  * @module api-gateway/common/redis
  */
 
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { RedisClientService } from "../../redis.client";
 import { REDIS_TOKEN_PREFIX } from "./../../redis.constants";
 
+/**
+ * Logger-enabled Redis token service to aid debugging when tokens
+ * aren't found. Logs the Redis key used for store/get/delete.
+ */
+
 @Injectable()
 export class RedisTokenService {
+  private readonly logger = new Logger(RedisTokenService.name);
   constructor(private readonly redisClient: RedisClientService) {}
 
   /**
@@ -23,6 +29,7 @@ export class RedisTokenService {
    */
   async storeToken(tokenId: string, token: string, ttlSeconds: number) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
+    this.logger.debug(`Storing token key=${key} ttl=${ttlSeconds}s`);
     await this.redisClient.getClientAuth().set(key, token, "EX", ttlSeconds);
   }
 
@@ -33,7 +40,8 @@ export class RedisTokenService {
    */
   async getToken(tokenId: string) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
-    return this.redisClient.getClientAuth().get(key);
+    this.logger.debug(`Retrieving token key=${key}`);
+    return await this.redisClient.getClientAuth().get(key);
   }
 
   /**
@@ -42,6 +50,7 @@ export class RedisTokenService {
    */
   async deleteToken(tokenId: string) {
     const key = REDIS_TOKEN_PREFIX + tokenId;
+    this.logger.debug(`Deleting token key=${key}`);
     await this.redisClient.getClientAuth().del(key);
   }
 }

@@ -2,7 +2,7 @@
  * @fileoverview Redis client service for the API Gateway.
  * Manages dedicated Redis connections for auth tokens, sessions, and throttling.
  */
-import { Injectable, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import config from "@shared/config/app.config";
 import Redis from "ioredis";
 
@@ -12,6 +12,7 @@ import Redis from "ioredis";
  */
 @Injectable()
 export class RedisClientService implements OnModuleDestroy {
+  private readonly logger = new Logger(RedisClientService.name);
   private readonly clientAuth: Redis;
   private readonly clientSession: Redis;
   private readonly clientThrottle: Redis;
@@ -24,6 +25,10 @@ export class RedisClientService implements OnModuleDestroy {
       db: config.REDIS_DB_AUTH ? Number(config.REDIS_DB_AUTH) : undefined,
     });
 
+    this.logger.debug(
+      `Auth Redis -> host=${config.REDIS_HOST}, port=${config.REDIS_PORT}, db=${config.REDIS_DB_AUTH}`,
+    );
+
     /** Throttle-scoped Redis client. */
     this.clientThrottle = new Redis({
       host: config.REDIS_HOST ?? "127.0.0.1",
@@ -34,6 +39,10 @@ export class RedisClientService implements OnModuleDestroy {
         : undefined,
     });
 
+    this.logger.debug(
+      `Throttle Redis -> host=${config.REDIS_HOST}, port=${config.REDIS_PORT}, db=${config.REDIS_DB_THROTTLE}`,
+    );
+
     /** Session-scoped Redis client. */
     this.clientSession = new Redis({
       host: config.REDIS_HOST ?? "127.0.0.1",
@@ -41,6 +50,10 @@ export class RedisClientService implements OnModuleDestroy {
       password: config.REDIS_PASSWORD || undefined,
       db: config.REDIS_DB_SESSION ? Number(config.REDIS_DB_SESSION) : undefined,
     });
+
+    this.logger.debug(
+      `Session Redis -> host=${config.REDIS_HOST}, port=${config.REDIS_PORT}, db=${config.REDIS_DB_SESSION}`,
+    );
   }
 
   /** Returns the auth-scoped Redis client. */
