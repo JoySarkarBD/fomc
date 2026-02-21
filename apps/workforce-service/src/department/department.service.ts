@@ -141,10 +141,20 @@ export class DepartmentService {
     createdBy?: string;
     createdAt: Date;
     updatedAt: Date;
+    designations: {
+      _id: string;
+      name: string;
+      description?: string;
+      createdBy?: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
     designationsCount: number;
   } | null> {
     const result = await this.departmentModel.aggregate([
-      { $match: { _id: new Types.ObjectId(id) } },
+      {
+        $match: { _id: new Types.ObjectId(id) },
+      },
       {
         $lookup: {
           from: "designations",
@@ -167,6 +177,14 @@ export class DepartmentService {
           createdAt: 1,
           updatedAt: 1,
           designationsCount: 1,
+          designations: {
+            _id: 1,
+            name: 1,
+            description: 1,
+            createdBy: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          },
         },
       },
     ]);
