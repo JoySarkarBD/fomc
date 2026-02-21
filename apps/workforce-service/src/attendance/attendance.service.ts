@@ -98,8 +98,6 @@ export class AttendanceService {
     let shiftType: string;
     let shiftStartMinutes = 0;
 
-    console.log(user);
-
     // Fixed shift for HR
     if (user.role === "HR") {
       shiftType = ShiftTypeForOperations.DAY; // 09:00 → 18:00
