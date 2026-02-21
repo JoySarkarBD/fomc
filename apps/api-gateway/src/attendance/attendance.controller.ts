@@ -29,7 +29,7 @@ export class AttendanceController {
    */
   @Post("present")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE", "INTERN")
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   async presentAttendance(@GetUser() user: AuthUser) {
     return this.attendanceService.presentAttendance(user);
   }
