@@ -14,6 +14,7 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import config from "@shared/config/app.config";
+import { ROLE_COMMANDS } from "@shared/constants";
 import { USER_COMMANDS } from "@shared/constants/user-command.constants";
 import * as bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
@@ -21,6 +22,8 @@ import { firstValueFrom } from "rxjs";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
 import { RedisTokenService } from "../common/redis/redis-services/auth/redis-token.service";
 import { buildResponse } from "../common/response.util";
+import { DepartmentService } from "../department/department.service";
+import { DesignationService } from "../designation/designation.service";
 import { MailService } from "../utils/mail.service";
 
 @Injectable()
@@ -31,9 +34,13 @@ export class AuthService {
 
   constructor(
     @Inject("USER_SERVICE") private readonly userClient: ClientProxy,
+    @Inject("WORKFORCE_SERVICE") private readonly workforceClient: ClientProxy,
+
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly redisTokenService: RedisTokenService,
+    private readonly departmentService: DepartmentService,
+    private readonly designationService: DesignationService,
   ) {}
 
   /**
@@ -126,6 +133,27 @@ export class AuthService {
 
     // Generate a JWT token with the user's ID, email, and role as the payload, and return it along with sanitized user details in the response
     const id = user.id ?? user._id ?? null;
+
+    // Fetch the user's role, department, and designation details from the respective services to include in the response for better user context. If any of these details are not found, fallback to the original values from the user object.
+    const role = await firstValueFrom(
+      this.userClient.send(ROLE_COMMANDS.GET_ROLE, user.role),
+    );
+    user.role = role?.name ?? user.role;
+
+    // Fetch department and designation names based on their IDs to provide more meaningful information in the response. If the department or designation is not found, fallback to the original ID values from the user object.
+    const department = await this.departmentService.findDepartmentById(
+      user.department,
+    );
+
+    user.department = department?.data?.name ?? user.department;
+
+    // Fetch designation name based on its ID to provide more meaningful information in the response. If the designation is not found, fallback to the original ID value from the user object.
+    const designation = await this.designationService.findDesignationById(
+      user.designation,
+    );
+
+    user.designation = designation?.data?.name ?? user.designation;
+
     const safeUser = this.sanitizeUser(user);
     const payload = { sub: id, email: safeUser.email, role: safeUser.role };
     const accessToken = this.jwtService.sign(payload);

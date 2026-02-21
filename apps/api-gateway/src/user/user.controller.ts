@@ -7,11 +7,13 @@
  * @module api-gateway/user
  */
 
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { GetUser } from "../common/decorators/get-user.decorator";
+import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
 import { UserService } from "./user.service";
 
 @UseGuards(JwtAuthGuard)
@@ -46,30 +48,22 @@ export class UserController {
   //   );
   // }
 
-  // /**
-  //  * Get a single user by their unique identifier (ID).
-  //  *
-  //  * @guards RolesGuard - Ensures that only users with specific roles (Director, HR, Project Manager, Team Leader) can access this endpoint.
-  //  * @param {MongoIdDto} params - Object containing the user ID.
-  //  * @returns The user details corresponding to the provided ID.
-  //  */
-  // @UseGuards(RolesGuard)
-  // @Roles(
-  //   UserRole.DIRECTOR,
-  //   UserRole.HR,
-  //   UserRole.PROJECT_MANAGER,
-  //   UserRole.TEAM_LEADER,
-  // )
-  // @Get(":id")
-  // async getUser(@GetUser() user: AuthUser, @Param() params: MongoIdDto) {
-  //   const result = await this.userService.getUser(
-  //     user.role as UserRole,
-  //     params.id as MongoIdDto["id"],
-  //     (user._id ?? user.id) as MongoIdDto["id"],
-  //     user.department,
-  //   );
-  //   return result;
-  // }
+  /**
+   * Get a single user by their unique identifier (ID).
+   *
+   * @guards RolesGuard - Ensures that only users with specific roles (Director, HR, Project Manager, Team Leader) can access this endpoint.
+   * @param {MongoIdDto} params - Object containing the user ID.
+   * @returns The user details corresponding to the provided ID.
+   */
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Get(":id")
+  async getUser(@GetUser() user: AuthUser, @Param() params: MongoIdDto) {
+    const result = await this.userService.getUser(
+      (user._id ?? user.id) as MongoIdDto["id"],
+    );
+    return result;
+  }
 
   // /**
   //  * Create a new user with the provided data.

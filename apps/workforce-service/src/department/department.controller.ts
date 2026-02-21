@@ -31,8 +31,10 @@ export class DepartmentController {
    * @returns {Promise<any>} Newly created department.
    */
   @MessagePattern(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT)
-  create(@Payload() createDepartmentDto: CreateDepartmentDto): Promise<any> {
-    return this.departmentService.createDepartment(createDepartmentDto);
+  async create(
+    @Payload() createDepartmentDto: CreateDepartmentDto,
+  ): Promise<any> {
+    return await this.departmentService.createDepartment(createDepartmentDto);
   }
 
   /**
@@ -43,8 +45,8 @@ export class DepartmentController {
    * @returns {Promise<any>} List of departments matching the search criteria.
    */
   @MessagePattern(DEPARTMENT_COMMANDS.GET_DEPARTMENTS)
-  findAll(@Payload() query: SearchQueryDto): Promise<any> {
-    return this.departmentService.findDepartments(query);
+  async findAll(@Payload() query: SearchQueryDto): Promise<any> {
+    return await this.departmentService.findDepartments(query);
   }
 
   /**
@@ -55,8 +57,8 @@ export class DepartmentController {
    * @returns {Promise<any>} Department details.
    */
   @MessagePattern(DEPARTMENT_COMMANDS.GET_DEPARTMENT)
-  findOne(@Payload() id: MongoIdDto["id"]): Promise<any> {
-    return this.departmentService.findDepartmentById(id);
+  async findOne(@Payload() id: MongoIdDto["id"]): Promise<any> {
+    return await this.departmentService.findDepartmentById(id);
   }
 
   /**
@@ -68,10 +70,10 @@ export class DepartmentController {
    * @param {UpdateDepartmentDto} payload.data - The data transfer object containing the updated department information.
    */
   @MessagePattern(DEPARTMENT_COMMANDS.UPDATE_DEPARTMENT)
-  update(
+  async update(
     @Payload() payload: { id: MongoIdDto["id"]; data: UpdateDepartmentDto },
   ): Promise<any> {
-    return this.departmentService.updateDepartmentById(
+    return await this.departmentService.updateDepartmentById(
       payload.id,
       payload.data,
     );
@@ -85,7 +87,7 @@ export class DepartmentController {
    * @returns {Promise<any>} Result of the delete operation.
    */
   @MessagePattern(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT)
-  remove(@Payload() id: MongoIdDto["id"]): Promise<any> {
-    return this.departmentService.deleteDepartmentById(id);
+  async remove(@Payload() id: MongoIdDto["id"]): Promise<any> {
+    return await this.departmentService.deleteDepartmentById(id);
   }
 }
