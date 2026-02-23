@@ -30,6 +30,8 @@ import { AuthService } from "./auth.service";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
+import { RegistrationEmailConflictDto } from "./dto/registration/registration-email-conflict.dto";
+import { RegistrationRoleNotFoundDto } from "./dto/registration/registration-role-not-found.dto";
 import { RegistrationSuccessDto } from "./dto/registration/registration-success.dto";
 import { RegistrationValidationDto } from "./dto/registration/registration-validation.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
@@ -39,11 +41,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /** Register a new user account. */
-  @ApiOperation({ summary: "Register a new user account" })
+  @ApiOperation({
+    summary: "Register a new user account",
+    description: "Creates a new user account with the provided details.",
+  })
   @ApiStandardResponse(RegistrationSuccessDto, {
     status: 201,
     successDto: RegistrationSuccessDto,
+    conflictDto: RegistrationEmailConflictDto,
+    notFoundDto: RegistrationRoleNotFoundDto,
     validationDto: RegistrationValidationDto,
+    conflict: true,
+    notFound: true,
     internalServerError: true,
   })
   @Post("register")
