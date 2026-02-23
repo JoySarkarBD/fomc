@@ -19,6 +19,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { UpdateUserProfileDto } from "apps/user-service/src/dto/update-user-profile.dto";
@@ -27,12 +28,16 @@ import * as fs from "fs";
 import type { File } from "multer";
 import { diskStorage } from "multer";
 import * as path from "path";
+import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
+import { UserListSuccessDto } from "./dto/user-list-success.dto";
+import { UserSuccessDto } from "./dto/user-success.dto";
 import { UserService } from "./user.service";
 
+@ApiTags("User")
 @UseGuards(JwtAuthGuard)
 @Controller("user")
 export class UserController {
@@ -45,6 +50,18 @@ export class UserController {
    * @param query - Query parameters for filtering and pagination of users.
    * @returns A list of users matching the query criteria.
    */
+  @ApiOperation({
+    summary: "List users",
+    description: "Retrieves a list of users with optional filtering.",
+  })
+  @ApiStandardResponse(UserListSuccessDto, {
+    status: 200,
+    successDto: UserListSuccessDto,
+    isArray: true,
+    unauthorized: true,
+    forbidden: true,
+    internalServerError: true,
+  })
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Get()
@@ -62,6 +79,18 @@ export class UserController {
    * @param {MongoIdDto} params - Object containing the user ID.
    * @returns The user details corresponding to the provided ID.
    */
+  @ApiOperation({
+    summary: "Get user by ID",
+    description: "Retrieves details of a specific user.",
+  })
+  @ApiStandardResponse(UserSuccessDto, {
+    status: 200,
+    successDto: UserSuccessDto,
+    notFound: true,
+    unauthorized: true,
+    forbidden: true,
+    internalServerError: true,
+  })
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Get(":id")
@@ -72,25 +101,21 @@ export class UserController {
     return result;
   }
 
-  // /**
-  //  * Delete a user by their unique identifier (ID).
-  //  *
-  //  * @guards RolesGuard - Ensures that only users with the HR role can access this endpoint.
-  //  * @param {MongoIdDto} params - Object containing the user ID.
-  //  * @returns A success message or the details of the deleted user.
-  //  */
-  // // @UseGuards(RolesGuard)
-  // // @Roles(UserRole.HR)
-  // // @Delete(":id")
-  // // async deleteUser(@Param() params: MongoIdDto) {
-  // //   return await this.userService.deleteUser(params.id);
-  // // }
-
   /**
    * Endpoint for retrieving the profile of the currently authenticated user.
    * Utilizes the UserService to fetch the profile information based on the authenticated user's context.
    * @returns The profile information of the authenticated user.
    */
+  @ApiOperation({
+    summary: "Get my profile",
+    description: "Retrieves the profile of the authenticated user.",
+  })
+  @ApiStandardResponse(UserSuccessDto, {
+    status: 200,
+    successDto: UserSuccessDto,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Get("profile/me")
   async getProfile(@GetUser() user: AuthUser) {
     return await this.userService.getUser(
@@ -108,13 +133,17 @@ export class UserController {
    * @returns The updated profile information of the authenticated user after the update operation is performed.
    * @throws BadRequestException if neither name nor avatar is provided for update.
    */
+  @ApiOperation({
+    summary: "Update my profile",
+    description: "Updates the authenticated user's name and/or avatar.",
+  })
+  @ApiStandardResponse(UserSuccessDto, {
+    status: 200,
+    successDto: UserSuccessDto,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Patch("profile/me")
-  /**
-   * Update the authenticated user's profile, allowing changes to their name and avatar.
-   *
-   * This endpoint accepts multipart/form-data for avatar uploads and uses the FileInterceptor to handle file storage. The uploaded avatar is saved to the "uploads/avatars" directory, and the file path is stored in the user's profile. The endpoint validates that at least one profile field (name or avatar) is provided for update and returns an appropriate response based on the update operation's success or failure.
-   * @param {AuthUser} user - The currently authenticated user, injected via the GetUser decorator.
-   */
   @UseInterceptors(
     FileInterceptor("avatar", {
       storage: diskStorage({

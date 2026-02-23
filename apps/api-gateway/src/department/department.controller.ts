@@ -16,14 +16,22 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
+import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DepartmentService } from "./department.service";
+import { DepartmentListSuccessDto } from "./dto/department-list-success.dto";
+import { DepartmentSuccessDto } from "./dto/department-success.dto";
 
+@ApiTags("Department")
 @Controller("department")
+@UseGuards(JwtAuthGuard)
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
@@ -33,6 +41,17 @@ export class DepartmentController {
    * @param {CreateDepartmentDto} data - The data transfer object containing the details of the department to be created.
    * @returns Promise resolving to the newly created department.
    */
+  @ApiOperation({
+    summary: "Create department",
+    description: "Creates a new department in the organization.",
+  })
+  @ApiStandardResponse(DepartmentSuccessDto, {
+    status: 201,
+    successDto: DepartmentSuccessDto,
+    conflict: true,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Post()
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     return await this.departmentService.createDepartment(createDepartmentDto);
@@ -44,6 +63,17 @@ export class DepartmentController {
    * @param {SearchQueryDto} query - The search query parameters for filtering and pagination.
    * @return Promise resolving to a list of departments matching the search criteria.
    */
+  @ApiOperation({
+    summary: "List departments",
+    description: "Retrieves a list of departments with optional filtering.",
+  })
+  @ApiStandardResponse(DepartmentListSuccessDto, {
+    status: 200,
+    successDto: DepartmentListSuccessDto,
+    isArray: true,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Get()
   async findDepartments(@Query() query: SearchQueryDto) {
     return await this.departmentService.findDepartments(query);
@@ -55,6 +85,17 @@ export class DepartmentController {
    * @param {string} id - The ID of the department to be retrieved.
    * @return Promise resolving to the department details.
    */
+  @ApiOperation({
+    summary: "Get department by ID",
+    description: "Retrieves details of a specific department.",
+  })
+  @ApiStandardResponse(DepartmentSuccessDto, {
+    status: 200,
+    successDto: DepartmentSuccessDto,
+    notFound: true,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Get(":id")
   async findDepartmentById(@Param() params: MongoIdDto) {
     return await this.departmentService.findDepartmentById(params.id);
@@ -67,6 +108,19 @@ export class DepartmentController {
    * @param {UpdateDepartmentDto} updateDepartmentDto - The data transfer object containing the updated details of the department.
    * @return Promise resolving to the updated department details.
    */
+  @ApiOperation({
+    summary: "Update department",
+    description: "Updates an existing department's details.",
+  })
+  @ApiStandardResponse(DepartmentSuccessDto, {
+    status: 200,
+    successDto: DepartmentSuccessDto,
+    notFound: true,
+    forbidden: true,
+    conflict: true,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Patch(":id")
   async updateDepartmentById(
     @Param() params: MongoIdDto,
@@ -84,6 +138,19 @@ export class DepartmentController {
    * @param {string} id - The ID of the department to be deleted.
    * @return Promise resolving to the result of the delete operation.
    */
+  @ApiOperation({
+    summary: "Delete department",
+    description: "Deletes a department by its ID.",
+  })
+  @ApiStandardResponse(DepartmentSuccessDto, {
+    status: 200,
+    successDto: DepartmentSuccessDto,
+    notFound: true,
+    forbidden: true,
+    conflict: true,
+    unauthorized: true,
+    internalServerError: true,
+  })
   @Delete(":id")
   async deleteDepartmentById(@Param() params: MongoIdDto) {
     return await this.departmentService.deleteDepartmentById(params.id);

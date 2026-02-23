@@ -8,14 +8,19 @@
  */
 
 import { Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { AuthUser } from "@shared/interfaces";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
+import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AttendanceService } from "./attendance.service";
+import { AttendanceSuccessDto } from "./dto/attendance-success.dto";
+import { MyAttendanceSuccessDto } from "./dto/my-attendance-success.dto";
 
+@ApiTags("Attendance")
 @Controller("attendance")
 @UseGuards(JwtAuthGuard)
 export class AttendanceController {
@@ -28,6 +33,18 @@ export class AttendanceController {
    * @param user - The authenticated user for whom attendance is being marked.
    * @returns Result of the attendance marking process.
    */
+  @ApiOperation({
+    summary: "Mark attendance",
+    description: "Marks the authenticated user as present.",
+  })
+  @ApiStandardResponse(AttendanceSuccessDto, {
+    status: 201,
+    successDto: AttendanceSuccessDto,
+    unauthorized: true,
+    forbidden: true,
+    notFound: true,
+    internalServerError: true,
+  })
   @Post("present")
   @UseGuards(RolesGuard)
   @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
@@ -43,6 +60,18 @@ export class AttendanceController {
    * @param query - Optional query parameters for filtering attendance records by month and year.
    * @returns The attendance records matching the specified criteria or an error message if the retrieval fails.
    */
+  @ApiOperation({
+    summary: "Get my attendance",
+    description: "Retrieves attendance records for the authenticated user.",
+  })
+  @ApiStandardResponse(MyAttendanceSuccessDto, {
+    status: 200,
+    successDto: MyAttendanceSuccessDto,
+    isArray: true,
+    unauthorized: true,
+    forbidden: true,
+    internalServerError: true,
+  })
   @Get("my-attendance")
   @UseGuards(RolesGuard)
   @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
