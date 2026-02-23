@@ -28,18 +28,37 @@ import { ForgotThrottleGuard } from "../common/throttles/forgot-throttle.guard";
 import { ResetThrottleGuard } from "../common/throttles/reset-throttle.guard";
 import { AuthService } from "./auth.service";
 import { ChangePasswordDto } from "./dto/change-password.dto";
+import { ChangePasswordInternalErrorDto } from "./dto/change-password/change-password-internal-error.dto";
 import { ChangePasswordSuccessDto } from "./dto/change-password/change-password-success.dto";
+import { ChangePasswordThrottlerDto } from "./dto/change-password/change-password-throttler.dto";
+import { ChangePasswordUnauthorizedDto } from "./dto/change-password/change-password-unauthorized.dto";
+import { ChangePasswordValidationDto } from "./dto/change-password/change-password-validation.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ForgotPasswordInternalErrorDto } from "./dto/forgot-password/forgot-password-internal-error.dto";
 import { ForgotPasswordSuccessDto } from "./dto/forgot-password/forgot-password-success.dto";
+import { ForgotPasswordThrottlerDto } from "./dto/forgot-password/forgot-password-throttler.dto";
+import { ForgotPasswordValidationDto } from "./dto/forgot-password/forgot-password-validation.dto";
+import { ForgotPasswordXDeviceIdMissingDto } from "./dto/forgot-password/forgot-password-x-device-id-missing.dto";
 import { LoginDto } from "./dto/login.dto";
+import { LoginInternalErrorDto } from "./dto/login/login-internal-error.dto";
 import { LoginSuccessDto } from "./dto/login/login-success.dto";
+import { LoginUnauthorizedDto } from "./dto/login/login-unauthorized.dto";
+import { LoginValidationDto } from "./dto/login/login-validation.dto";
+import { LogoutInternalErrorDto } from "./dto/logout/logout-internal-error.dto";
 import { LogoutSuccessDto } from "./dto/logout/logout-success.dto";
+import { LogoutUnauthorizedDto } from "./dto/logout/logout-unauthorized.dto";
 import { RegistrationEmailConflictDto } from "./dto/registration/registration-email-conflict.dto";
+import { RegistrationInternalErrorDto } from "./dto/registration/registration-internal-error.dto";
 import { RegistrationRoleNotFoundDto } from "./dto/registration/registration-role-not-found.dto";
 import { RegistrationSuccessDto } from "./dto/registration/registration-success.dto";
 import { RegistrationValidationDto } from "./dto/registration/registration-validation.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ResetPasswordInternalErrorDto } from "./dto/reset-password/reset-password-internal-error.dto";
 import { ResetPasswordSuccessDto } from "./dto/reset-password/reset-password-success.dto";
+import { ResetPasswordThrottlerDto } from "./dto/reset-password/reset-password-throttler.dto";
+import { ResetPasswordUnauthorizedDto } from "./dto/reset-password/reset-password-unauthorized.dto";
+import { ResetPasswordValidationDto } from "./dto/reset-password/reset-password-validation.dto";
+import { ResetPasswordXDeviceIdMissingDto } from "./dto/reset-password/reset-password-x-device-id-missing.dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -54,11 +73,12 @@ export class AuthController {
   @ApiStandardResponse(RegistrationSuccessDto, {
     status: 201,
     successDto: RegistrationSuccessDto,
-    conflictDto: RegistrationEmailConflictDto,
-    notFoundDto: RegistrationRoleNotFoundDto,
     validationDto: RegistrationValidationDto,
-    conflict: true,
+    notFoundDto: RegistrationRoleNotFoundDto,
+    conflictDto: RegistrationEmailConflictDto,
+    internalServerErrorDto: RegistrationInternalErrorDto,
     notFound: true,
+    conflict: true,
     internalServerError: true,
   })
   @Post("register")
@@ -75,6 +95,9 @@ export class AuthController {
   @ApiStandardResponse(LoginSuccessDto, {
     status: 200,
     successDto: LoginSuccessDto,
+    validationDto: LoginValidationDto,
+    unauthorizedDto: LoginUnauthorizedDto,
+    internalServerErrorDto: LoginInternalErrorDto,
     unauthorized: true,
     internalServerError: true,
   })
@@ -91,6 +114,11 @@ export class AuthController {
   @ApiStandardResponse(ForgotPasswordSuccessDto, {
     status: 200,
     successDto: ForgotPasswordSuccessDto,
+    validationDto: ForgotPasswordValidationDto,
+    xDeviceIdDto: ForgotPasswordXDeviceIdMissingDto,
+    throttleDto: ForgotPasswordThrottlerDto,
+    internalServerErrorDto: ForgotPasswordInternalErrorDto,
+    xDeviceId: true,
     throttle: true,
     internalServerError: true,
   })
@@ -108,6 +136,12 @@ export class AuthController {
   @ApiStandardResponse(ResetPasswordSuccessDto, {
     status: 200,
     successDto: ResetPasswordSuccessDto,
+    validationDto: ResetPasswordValidationDto,
+    xDeviceIdDto: ResetPasswordXDeviceIdMissingDto,
+    unauthorizedDto: ResetPasswordUnauthorizedDto,
+    throttleDto: ResetPasswordThrottlerDto,
+    internalServerErrorDto: ResetPasswordInternalErrorDto,
+    xDeviceId: true,
     unauthorized: true,
     throttle: true,
     internalServerError: true,
@@ -126,7 +160,12 @@ export class AuthController {
   @ApiStandardResponse(ChangePasswordSuccessDto, {
     status: 200,
     successDto: ChangePasswordSuccessDto,
+    validationDto: ChangePasswordValidationDto,
+    unauthorizedDto: ChangePasswordUnauthorizedDto,
+    throttleDto: ChangePasswordThrottlerDto,
+    internalServerErrorDto: ChangePasswordInternalErrorDto,
     unauthorized: true,
+    throttle: true,
     internalServerError: true,
   })
   @Patch("change-password")
@@ -147,6 +186,8 @@ export class AuthController {
   @ApiStandardResponse(LogoutSuccessDto, {
     status: 200,
     successDto: LogoutSuccessDto,
+    unauthorizedDto: LogoutUnauthorizedDto,
+    internalServerErrorDto: LogoutInternalErrorDto,
     unauthorized: true,
     internalServerError: true,
   })

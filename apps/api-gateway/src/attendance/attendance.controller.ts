@@ -17,8 +17,22 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AttendanceService } from "./attendance.service";
+import { MarkAttendanceConflictDto } from "./dto/mark-attendance-conflict.dto";
+import { MarkAttendanceForbiddenDto } from "./dto/mark-attendance-forbidden.dto";
+import { MarkAttendanceInternalErrorDto } from "./dto/mark-attendance-internal-error.dto";
+import { MarkAttendanceNotFoundDto } from "./dto/mark-attendance-not-found.dto";
 import { AttendanceSuccessDto } from "./dto/attendance-success.dto";
+import { MarkAttendanceThrottlerDto } from "./dto/mark-attendance-throttler.dto";
+import { MarkAttendanceUnauthorizedDto } from "./dto/mark-attendance-unauthorized.dto";
+import { MarkAttendanceValidationDto } from "./dto/mark-attendance-validation.dto";
+import { MyAttendanceConflictDto } from "./dto/my-attendance-conflict.dto";
+import { MyAttendanceForbiddenDto } from "./dto/my-attendance-forbidden.dto";
+import { MyAttendanceInternalErrorDto } from "./dto/my-attendance-internal-error.dto";
+import { MyAttendanceNotFoundDto } from "./dto/my-attendance-not-found.dto";
 import { MyAttendanceSuccessDto } from "./dto/my-attendance-success.dto";
+import { MyAttendanceThrottlerDto } from "./dto/my-attendance-throttler.dto";
+import { MyAttendanceUnauthorizedDto } from "./dto/my-attendance-unauthorized.dto";
+import { MyAttendanceValidationDto } from "./dto/my-attendance-validation.dto";
 
 @ApiTags("Attendance")
 @Controller("attendance")
@@ -40,9 +54,18 @@ export class AttendanceController {
   @ApiStandardResponse(AttendanceSuccessDto, {
     status: 201,
     successDto: AttendanceSuccessDto,
+    validationDto: MarkAttendanceValidationDto,
+    unauthorizedDto: MarkAttendanceUnauthorizedDto,
+    forbiddenDto: MarkAttendanceForbiddenDto,
+    notFoundDto: MarkAttendanceNotFoundDto,
+    conflictDto: MarkAttendanceConflictDto,
+    throttleDto: MarkAttendanceThrottlerDto,
+    internalServerErrorDto: MarkAttendanceInternalErrorDto,
     unauthorized: true,
     forbidden: true,
     notFound: true,
+    conflict: true,
+    throttle: true,
     internalServerError: true,
   })
   @Post("present")
@@ -67,9 +90,19 @@ export class AttendanceController {
   @ApiStandardResponse(MyAttendanceSuccessDto, {
     status: 200,
     successDto: MyAttendanceSuccessDto,
+    validationDto: MyAttendanceValidationDto,
+    unauthorizedDto: MyAttendanceUnauthorizedDto,
+    forbiddenDto: MyAttendanceForbiddenDto,
+    notFoundDto: MyAttendanceNotFoundDto,
+    conflictDto: MyAttendanceConflictDto,
+    throttleDto: MyAttendanceThrottlerDto,
+    internalServerErrorDto: MyAttendanceInternalErrorDto,
     isArray: true,
     unauthorized: true,
     forbidden: true,
+    notFound: true,
+    conflict: true,
+    throttle: true,
     internalServerError: true,
   })
   @Get("my-attendance")

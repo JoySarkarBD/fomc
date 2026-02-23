@@ -26,6 +26,10 @@ import { UpdateDepartmentDto } from "../../../workforce-service/src/department/d
 import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DepartmentService } from "./department.service";
+import { CreateDepartmentConflictDto } from "./dto/create-department-conflict.dto";
+import { CreateDepartmentInternalErrorDto } from "./dto/create-department-internal-error.dto";
+import { CreateDepartmentUnauthorizedDto } from "./dto/create-department-unauthorized.dto";
+import { CreateDepartmentValidationDto } from "./dto/create-department-validation.dto";
 import { DepartmentListSuccessDto } from "./dto/department-list-success.dto";
 import { DepartmentSuccessDto } from "./dto/department-success.dto";
 
@@ -48,8 +52,12 @@ export class DepartmentController {
   @ApiStandardResponse(DepartmentSuccessDto, {
     status: 201,
     successDto: DepartmentSuccessDto,
-    conflict: true,
+    validationDto: CreateDepartmentValidationDto,
+    unauthorizedDto: CreateDepartmentUnauthorizedDto,
+    conflictDto: CreateDepartmentConflictDto,
+    internalServerErrorDto: CreateDepartmentInternalErrorDto,
     unauthorized: true,
+    conflict: true,
     internalServerError: true,
   })
   @Post()

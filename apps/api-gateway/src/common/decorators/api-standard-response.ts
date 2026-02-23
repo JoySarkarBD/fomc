@@ -32,13 +32,16 @@ interface ApiStandardOptions {
   notFoundDto?: Type<any>;
   conflictDto?: Type<any>;
   throttleDto?: Type<any>;
+  xDeviceIdDto?: Type<any>;
   internalServerErrorDto?: Type<any>;
 
+  // Flags to enable specific responses
   unauthorized?: boolean;
   forbidden?: boolean;
   notFound?: boolean;
   conflict?: boolean;
   internalServerError?: boolean;
+  xDeviceId?: boolean; // X-Device-ID header error
   throttle?: boolean;
 }
 
@@ -55,9 +58,10 @@ export function ApiStandardResponse<TModel extends Type<any>>(
   const ForbiddenDto = options?.forbiddenDto ?? CustomForbiddenDto;
   const NotFoundDto = options?.notFoundDto ?? CustomNotFoundDto;
   const ConflictDto = options?.conflictDto ?? CustomConflictDto;
-  const ThrottlerDto = options?.throttleDto ?? CustomTooManyRequestsDto;
+  const ThrottleDto = options?.throttleDto ?? CustomTooManyRequestsDto;
   const InternalErrorDto =
     options?.internalServerErrorDto ?? CustomInternalServerErrorDto;
+  const XDeviceIdDto = options?.xDeviceIdDto ?? undefined;
 
   const dataSchema = isArray
     ? { type: "array", items: { $ref: getSchemaPath(model) } }
@@ -74,15 +78,16 @@ export function ApiStandardResponse<TModel extends Type<any>>(
       ValidationDto,
       ForbiddenDto,
       ConflictDto,
-      ThrottlerDto,
+      ThrottleDto,
       InternalErrorDto,
+      ...(XDeviceIdDto ? [XDeviceIdDto] : []),
       ...(UnauthorizedDto ? [UnauthorizedDto] : []),
       ...(NotFoundDto ? [NotFoundDto] : []),
       model,
     ),
   );
 
-  // Success response
+  // ✅ Success response
   decorators.push(
     ApiResponse({
       status,
@@ -100,10 +105,24 @@ export function ApiStandardResponse<TModel extends Type<any>>(
     }),
   );
 
-  // Validation 400
-  decorators.push(ApiBadRequestResponse({ type: ValidationDto }));
+  // ✅ Validation 400 + X-Device-ID missing combined
+  if (options?.xDeviceId && XDeviceIdDto) {
+    decorators.push(
+      ApiBadRequestResponse({
+        schema: {
+          oneOf: [
+            { $ref: getSchemaPath(ValidationDto) },
+            { $ref: getSchemaPath(XDeviceIdDto) },
+          ],
+        },
+        description: "Validation error or missing x-device-id header",
+      }),
+    );
+  } else {
+    decorators.push(ApiBadRequestResponse({ type: ValidationDto }));
+  }
 
-  // Unauthorized 401
+  // ✅ Unauthorized 401
   if (options?.unauthorized) {
     decorators.push(
       ApiUnauthorizedResponse({
@@ -113,7 +132,7 @@ export function ApiStandardResponse<TModel extends Type<any>>(
     );
   }
 
-  // Forbidden 403
+  // ✅ Forbidden 403
   if (options?.forbidden) {
     decorators.push(
       ApiForbiddenResponse({
@@ -123,7 +142,7 @@ export function ApiStandardResponse<TModel extends Type<any>>(
     );
   }
 
-  // Not Found 404
+  // ✅ Not Found 404
   if (options?.notFound) {
     decorators.push(
       ApiNotFoundResponse({
@@ -133,7 +152,7 @@ export function ApiStandardResponse<TModel extends Type<any>>(
     );
   }
 
-  // Conflict 409
+  // ✅ Conflict 409
   if (options?.conflict) {
     decorators.push(
       ApiConflictResponse({
@@ -143,22 +162,22 @@ export function ApiStandardResponse<TModel extends Type<any>>(
     );
   }
 
-  // Internal Server Error 500
+  // ✅ Throttler 429
+  if (options?.throttle) {
+    decorators.push(
+      ApiTooManyRequestsResponse({
+        type: ThrottleDto,
+        description: "Too many requests",
+      }),
+    );
+  }
+
+  // ✅ Internal Server Error 500
   if (options?.internalServerError) {
     decorators.push(
       ApiInternalServerErrorResponse({
         type: InternalErrorDto,
         description: "Internal server error",
-      }),
-    );
-  }
-
-  // Throttler 429
-  if (options?.throttle) {
-    decorators.push(
-      ApiTooManyRequestsResponse({
-        type: ThrottlerDto,
-        description: "Too many requests",
       }),
     );
   }

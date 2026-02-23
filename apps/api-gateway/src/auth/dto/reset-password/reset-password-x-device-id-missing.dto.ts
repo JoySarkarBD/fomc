@@ -2,11 +2,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { CustomInternalServerErrorDto } from "apps/api-gateway/src/common/dto/custom-internal-server-error.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
-export class ResetPasswordInternalErrorDto extends CustomInternalServerErrorDto {
+export class ResetPasswordXDeviceIdMissingDto extends CustomInternalServerErrorDto {
   @ApiProperty({ example: false })
   declare success: boolean;
 
-  @ApiProperty({ example: "Internal server error" })
+  @ApiProperty({ example: "X-Device-ID is missing in the request headers" })
   declare message: string;
 
   @ApiProperty({ example: Methods.POST })
@@ -21,8 +21,6 @@ export class ResetPasswordInternalErrorDto extends CustomInternalServerErrorDto 
   @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
   declare timestamp: string;
 
-  @ApiProperty({
-    example: "An unexpected error occurred during reset password",
-  })
+  @ApiProperty({ example: "X-Device-ID is missing in the request headers" })
   declare error: string;
 }
