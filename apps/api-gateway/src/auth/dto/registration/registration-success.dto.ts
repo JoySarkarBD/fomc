@@ -3,9 +3,6 @@ import { SuccessResponseDto } from "apps/api-gateway/src/common/dto/success-resp
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class RegistrationSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: false })
-  declare success: boolean;
-
   @ApiProperty({ example: "User registered successfully" })
   declare message: string;
 
@@ -14,12 +11,6 @@ export class RegistrationSuccessDto extends SuccessResponseDto<any> {
 
   @ApiProperty({ example: "api/auth/register" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 201 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiResponseProperty({
     type: String,

@@ -3,9 +3,6 @@ import { CustomNotFoundDto } from "apps/api-gateway/src/common/dto/custom-not-fo
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class RegistrationRoleNotFoundDto extends CustomNotFoundDto {
-  @ApiProperty({ example: false })
-  declare success: boolean;
-
   @ApiProperty({ example: "Role not found" })
   declare message: string;
 
@@ -14,12 +11,6 @@ export class RegistrationRoleNotFoundDto extends CustomNotFoundDto {
 
   @ApiProperty({ example: "api/auth/register" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 404 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-22T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({ example: "Role not found error details" })
   declare error: string;

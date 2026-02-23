@@ -3,9 +3,6 @@ import { SuccessResponseDto } from "apps/api-gateway/src/common/dto/success-resp
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class DepartmentListSuccessDto extends SuccessResponseDto<any[]> {
-  @ApiProperty({ example: true })
-  declare success: boolean;
-
   @ApiProperty({ example: "Departments fetched successfully" })
   declare message: string;
 
@@ -14,12 +11,6 @@ export class DepartmentListSuccessDto extends SuccessResponseDto<any[]> {
 
   @ApiProperty({ example: "api/department" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 200 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({
     example: [

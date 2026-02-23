@@ -3,9 +3,6 @@ import { SuccessResponseDto } from "apps/api-gateway/src/common/dto/success-resp
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class UsersListSuccessDto extends SuccessResponseDto<any[]> {
-  @ApiProperty({ example: true })
-  declare success: boolean;
-
   @ApiProperty({ example: "Users fetched successfully" })
   declare message: string;
 
@@ -17,12 +14,6 @@ export class UsersListSuccessDto extends SuccessResponseDto<any[]> {
       "api/user?pageNo=1&pageSize=10&searchKey=John?role=department=designation=",
   })
   declare endpoint: string;
-
-  @ApiProperty({ example: 200 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({
     example: [
@@ -47,9 +38,6 @@ export class UsersListSuccessDto extends SuccessResponseDto<any[]> {
 }
 
 export class UserSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: true })
-  declare success: boolean;
-
   @ApiProperty({ example: "User operation successful" })
   declare message: string;
 
@@ -58,12 +46,6 @@ export class UserSuccessDto extends SuccessResponseDto<any> {
 
   @ApiProperty({ example: "api/user/:id" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 200 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({
     example: {
@@ -86,9 +68,6 @@ export class UserSuccessDto extends SuccessResponseDto<any> {
 }
 
 export class UserProfileSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: true })
-  declare success: boolean;
-
   @ApiProperty({ example: "User profile fetched successfully" })
   declare message: string;
 
@@ -97,12 +76,6 @@ export class UserProfileSuccessDto extends SuccessResponseDto<any> {
 
   @ApiProperty({ example: "api/user/profile/me" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 200 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({
     example: {
@@ -125,9 +98,6 @@ export class UserProfileSuccessDto extends SuccessResponseDto<any> {
 }
 
 export class UserProfileUpdateSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: true })
-  declare success: boolean;
-
   @ApiProperty({ example: "User profile updated successfully" })
   declare message: string;
 
@@ -136,12 +106,6 @@ export class UserProfileUpdateSuccessDto extends SuccessResponseDto<any> {
 
   @ApiProperty({ example: "api/user/profile/me" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 200 })
-  declare statusCode: number;
-
-  @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
-  declare timestamp: string;
 
   @ApiProperty({
     example: {
