@@ -4,7 +4,8 @@
  * Defines the validation schema for creating a new department.
  * Ensures name and description are provided as non-empty strings.
  */
-import { IsNotEmpty, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /**
  * Data Transfer Object for creating a new department in the workforce service.
@@ -13,11 +14,21 @@ import { IsNotEmpty, IsString } from "class-validator";
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid department information is accepted when creating new departments through the workforce service.
  */
 export class CreateDepartmentDto {
+  @ApiProperty({
+    required: true,
+    description: "The name of the department",
+    example: "Human Resources",
+  })
   @IsString({ message: "Department name must be a string" })
   @IsNotEmpty({ message: "Name is required" })
   name!: string;
 
+  @ApiProperty({
+    required: true,
+    description: "A brief description of the department",
+    example: "Handles employee relations, recruitment, and benefits.",
+  })
+  @IsOptional()
   @IsString({ message: "Department description must be a string" })
-  @IsNotEmpty({ message: "Description is required" })
-  description!: string;
+  description?: string;
 }

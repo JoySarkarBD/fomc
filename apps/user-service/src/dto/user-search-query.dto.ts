@@ -1,4 +1,5 @@
 /** @fileoverview UserSearchQueryDto. Validation schema for user search query parameters in the API Gateway. @module user-service/dto/user-search-query.dto*/
+import { ApiProperty } from "@nestjs/swagger";
 import { SearchQueryDto } from "@shared/dto";
 import { Transform } from "class-transformer";
 import {
@@ -17,6 +18,10 @@ import {
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid query parameters are accepted when searching for users through the API Gateway.
  */
 export class UserSearchQueryDto extends SearchQueryDto {
+  @ApiProperty({
+    description: "Filter users by role IDs (comma-separated or array)",
+    example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+  })
   @IsOptional()
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === "") return undefined;
@@ -38,6 +43,10 @@ export class UserSearchQueryDto extends SearchQueryDto {
   })
   role?: string[] | null;
 
+  @ApiProperty({
+    description: "Filter users by department IDs (comma-separated or array)",
+    example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+  })
   @IsOptional()
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === "") return undefined;
@@ -62,6 +71,10 @@ export class UserSearchQueryDto extends SearchQueryDto {
   })
   department?: string[] | null;
 
+  @ApiProperty({
+    description: "Filter users by designation IDs (comma-separated or array)",
+    example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+  })
   @IsOptional()
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === "") return undefined;

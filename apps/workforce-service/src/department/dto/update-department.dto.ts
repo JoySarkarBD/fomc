@@ -4,7 +4,7 @@
  * Defines the validation schema for updating an existing department.
  * Extends CreateDepartmentDto with all fields made optional via PartialType.
  */
-import { PartialType } from "@nestjs/mapped-types";
+import { ApiExtraModels, PartialType } from "@nestjs/swagger";
 import { CreateDepartmentDto } from "./create-department.dto";
 
 /**
@@ -13,4 +13,5 @@ import { CreateDepartmentDto } from "./create-department.dto";
  * The UpdateDepartmentDto is used in the department service to handle update department requests and ensure that the provided data meets the required format before processing the request to update an existing department in the system.
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid department information is accepted when updating departments through the workforce service.
  */
+@ApiExtraModels(CreateDepartmentDto)
 export class UpdateDepartmentDto extends PartialType(CreateDepartmentDto) {}

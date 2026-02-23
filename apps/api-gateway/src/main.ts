@@ -11,6 +11,7 @@
 
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import config from "@shared/config/app.config";
 import "dotenv/config";
 import express from "express";
@@ -34,12 +35,26 @@ import { ResponseInterceptor } from "./common/response.interceptor";
  */
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+
+  // Set global route prefix to "api"
   app.setGlobalPrefix("api");
+
+  // Apply security headers
   app.use(helmet());
+
+  // Enable HTTP request logging
   app.use(morgan("dev"));
+
+  // Serve static files from the "uploads" directory at both "/uploads" and "/api/uploads"
   const uploadsRoot = path.join(process.cwd(), "uploads");
+
+  // Ensure the uploads directory exists
   app.use("/uploads", express.static(uploadsRoot));
+
+  // Also serve uploads at the API route for client access
   app.use("/api/uploads", express.static(uploadsRoot));
+
+  // Register global validation pipe with strict options
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -48,12 +63,38 @@ async function bootstrap(): Promise<void> {
       exceptionFactory: (errors) => errors,
     }),
   );
+
+  // Register global response interceptor and HTTP exception filter
   app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // Register global HTTP exception filter
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Swagger config
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("OMS - SWAGGER API")
+    .setDescription(
+      "API documentation for the Order Management System (OMS) - FB International BD",
+    )
+    .setVersion("1.0")
+    .build();
+
+  // Create document
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  // ✅ Serve Swagger UI at /api
+  SwaggerModule.setup("api-doc", app, document);
+
+  // ✅ Optional: serve raw JSON at /api-json
+  app.getHttpAdapter().get("/api-json", (req, res) => {
+    res.setHeader("Content-Type", "application/json"); // ✅ important res.send(document);
+    res.send(document); // use send, not json (sometimes works better for $ref parser)
+  });
 
   const port = Number(config.PORT ?? 3000);
   await app.listen(port, () => {
     console.log(`🚀 API Gateway is running at http://localhost:${port}/api`);
+    console.log(`📖 Swagger UI available at http://localhost:${port}/api-doc`);
   });
 }
 

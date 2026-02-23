@@ -1,5 +1,5 @@
 /** @fileoverview UpdateRoleDto. Partial validation schema for role update payloads. @module user-service/role/dto/update-role.dto */
-import { PartialType } from "@nestjs/mapped-types";
+import { ApiExtraModels, PartialType } from "@nestjs/swagger";
 import { CreateRoleDto } from "./create-role.dto";
 
 /**
@@ -8,4 +8,5 @@ import { CreateRoleDto } from "./create-role.dto";
  * The UpdateRoleDto is used in the role service to handle update role requests and ensure that the provided data meets the required format before processing the request to update an existing role in the system.
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid role information is accepted when updating roles through the user service.
  */
+@ApiExtraModels(CreateRoleDto)
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {}

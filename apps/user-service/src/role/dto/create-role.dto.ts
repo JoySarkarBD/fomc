@@ -1,4 +1,5 @@
 /** @fileoverview CreateRoleDto. Validation schema for role creation payloads. @module user-service/role/dto/create-role.dto */
+import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /**
@@ -8,10 +9,19 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator";
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid role information is accepted when creating new roles through the user service.
  */
 export class CreateRoleDto {
+  @ApiProperty({
+    required: true,
+    description: "The name of the role",
+    example: "Admin",
+  })
   @IsNotEmpty()
   @IsString({ message: "Role name must be a string" })
   name!: string;
 
+  @ApiProperty({
+    description: "A brief description of the role",
+    example: "Role with full administrative privileges.",
+  })
   @IsOptional()
   @IsString({ message: "Description must be a string" })
   description?: string;

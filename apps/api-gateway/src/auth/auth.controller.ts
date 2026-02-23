@@ -17,9 +17,11 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
+import { ApiOperation } from "@nestjs/swagger";
 import type { AuthUser } from "@shared/interfaces/auth-user.interface";
 import type { Request } from "express";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
+import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { ForgotThrottleGuard } from "../common/throttles/forgot-throttle.guard";
@@ -28,6 +30,8 @@ import { AuthService } from "./auth.service";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
+import { RegistrationSuccessDto } from "./dto/registration/registration-success.dto";
+import { RegistrationValidationDto } from "./dto/registration/registration-validation.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Controller("auth")
@@ -35,6 +39,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /** Register a new user account. */
+  @ApiOperation({ summary: "Register a new user account" })
+  @ApiStandardResponse(RegistrationSuccessDto, {
+    status: 201,
+    successDto: RegistrationSuccessDto,
+    validationDto: RegistrationValidationDto,
+    internalServerError: true,
+  })
   @Post("register")
   async register(@Body() data: CreateUserDto) {
     return await this.authService.register(data);

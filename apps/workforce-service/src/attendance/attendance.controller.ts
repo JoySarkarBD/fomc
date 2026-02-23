@@ -43,7 +43,7 @@ export class AttendanceController {
 
   @MessagePattern(ATTENDANCE_COMMANDS.OUT_ATTENDANCE)
   async outAttendance(payload: AuthUser) {
-    return await this.attendanceService.outAttendance(outAttendanceDto);
+    // return await this.attendanceService.outAttendance(outAttendanceDto);
   }
 
   /**
