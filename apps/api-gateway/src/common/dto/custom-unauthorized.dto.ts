@@ -5,7 +5,7 @@ export class CustomUnauthorizedDto {
   @ApiProperty({ example: false })
   success!: boolean;
 
-  @ApiProperty({ example: "Invalid or expired OTP" })
+  @ApiProperty({ example: "Invalid credentials" })
   message!: string;
 
   @ApiProperty({ example: Methods.POST })
@@ -20,6 +20,6 @@ export class CustomUnauthorizedDto {
   @ApiProperty({ example: "2026-02-22T12:00:00.000Z" })
   timestamp!: string;
 
-  @ApiProperty({ example: "Unauthorized error details" })
+  @ApiProperty({ example: "Invalid or expired token" })
   error!: string;
 }

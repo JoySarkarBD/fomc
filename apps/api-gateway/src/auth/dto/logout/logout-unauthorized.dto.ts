@@ -8,7 +8,4 @@ export class LogoutUnauthorizedDto extends CustomUnauthorizedDto {
 
   @ApiProperty({ example: "api/auth/logout" })
   declare endpoint: string;
-
-  @ApiProperty({ example: "Invalid or expired token" })
-  declare error: string;
 }
