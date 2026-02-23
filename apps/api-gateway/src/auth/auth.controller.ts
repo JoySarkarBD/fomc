@@ -56,7 +56,6 @@ import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ResetPasswordInternalErrorDto } from "./dto/reset-password/reset-password-internal-error.dto";
 import { ResetPasswordSuccessDto } from "./dto/reset-password/reset-password-success.dto";
 import { ResetPasswordThrottlerDto } from "./dto/reset-password/reset-password-throttler.dto";
-import { ResetPasswordUnauthorizedDto } from "./dto/reset-password/reset-password-unauthorized.dto";
 import { ResetPasswordValidationDto } from "./dto/reset-password/reset-password-validation.dto";
 import { ResetPasswordXDeviceIdMissingDto } from "./dto/reset-password/reset-password-x-device-id-missing.dto";
 
@@ -141,7 +140,6 @@ export class AuthController {
     successDto: ResetPasswordSuccessDto,
     validationDto: ResetPasswordValidationDto,
     xDeviceIdDto: ResetPasswordXDeviceIdMissingDto,
-    unauthorizedDto: ResetPasswordUnauthorizedDto,
     throttleDto: ResetPasswordThrottlerDto,
     internalServerErrorDto: ResetPasswordInternalErrorDto,
     validation: true,

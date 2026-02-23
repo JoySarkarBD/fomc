@@ -8,7 +8,4 @@ export class ChangePasswordUnauthorizedDto extends CustomUnauthorizedDto {
 
   @ApiProperty({ example: "api/auth/change-password" })
   declare endpoint: string;
-
-  @ApiProperty({ example: "Invalid or expired token" })
-  declare error: string;
 }

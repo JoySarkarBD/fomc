@@ -5,7 +5,7 @@ export class CustomUnauthorizedDto {
   @ApiProperty({ example: false })
   success!: boolean;
 
-  @ApiProperty({ example: "Unauthorized error" })
+  @ApiProperty({ example: "Invalid or expired OTP" })
   message!: string;
 
   @ApiProperty({ example: Methods.POST })
