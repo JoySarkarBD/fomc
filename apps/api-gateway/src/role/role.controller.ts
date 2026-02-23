@@ -25,6 +25,10 @@ import { UpdateRoleDto } from "apps/user-service/src/role/dto/update-role.dto";
 import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import {
+  RoleCreateConflictDto,
+  RoleUpdateConflictDto,
+} from "./dto/role-conflict.dto";
+import {
   RoleCreateForbiddenDto,
   RoleDeleteForbiddenDto,
   RoleGetByIdForbiddenDto,
@@ -88,10 +92,12 @@ export class RoleController {
     validationDto: RoleCreateValidationDto,
     unauthorizedDto: RoleCreateUnauthorizedDto,
     forbiddenDto: RoleCreateForbiddenDto,
+    conflictDto: RoleCreateConflictDto,
     internalServerErrorDto: RoleCreateInternalErrorDto,
     validation: true,
     unauthorized: true,
     forbidden: true,
+    conflict: true,
     internalServerError: true,
   })
   @Post()
@@ -173,11 +179,13 @@ export class RoleController {
     unauthorizedDto: RoleUpdateUnauthorizedDto,
     forbiddenDto: RoleUpdateForbiddenDto,
     notFoundDto: RoleUpdateByIdNotFoundDto,
+    conflictDto: RoleUpdateConflictDto,
     internalServerErrorDto: RoleUpdateInternalErrorDto,
     validation: true,
     notFound: true,
     unauthorized: true,
     forbidden: true,
+    conflict: true,
     internalServerError: true,
   })
   @Patch(":id")

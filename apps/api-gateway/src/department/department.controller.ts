@@ -26,12 +26,48 @@ import { UpdateDepartmentDto } from "../../../workforce-service/src/department/d
 import { ApiStandardResponse } from "../common/decorators/api-standard-response";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DepartmentService } from "./department.service";
-import { CreateDepartmentConflictDto } from "./dto/create-department-conflict.dto";
-import { CreateDepartmentInternalErrorDto } from "./dto/create-department-internal-error.dto";
-import { CreateDepartmentUnauthorizedDto } from "./dto/create-department-unauthorized.dto";
-import { CreateDepartmentValidationDto } from "./dto/create-department-validation.dto";
-import { DepartmentListSuccessDto } from "./dto/department-list-success.dto";
-import { DepartmentSuccessDto } from "./dto/department-success.dto";
+import {
+  DepartmentCreateConflictDto,
+  DepartmentUpdateConflictDto,
+} from "./dto/department-conflict.dto";
+import {
+  DepartmentDeleteForbiddenDto,
+  DepartmentGetByIdForbiddenDto,
+  DepartmentsForbiddenDto,
+  DepartmentUpdateForbiddenDto,
+} from "./dto/department-forbidden.dto";
+import {
+  DepartmentCreateInternalErrorDto,
+  DepartmentDeleteInternalErrorDto,
+  DepartmentInternalErrorDto,
+  DepartmentUpdateInternalErrorDto,
+} from "./dto/department-internal-error.dto";
+import {
+  DepartmentDeleteByIdNotFoundDto,
+  DepartmentNotFoundDto,
+  DepartmentUpdateByIdNotFoundDto,
+} from "./dto/department-not-found.dto";
+import {
+  DepartmentByIdSuccessDto,
+  DepartmentCreateSuccessDto,
+  DepartmentDeleteSuccessDto,
+  DepartmentPatchSuccessDto,
+  DepartmentsListSuccessDto,
+} from "./dto/department-success.dto";
+import {
+  DepartmentCreateUnauthorizedDto,
+  DepartmentDeleteUnauthorizedDto,
+  DepartmentGetByIdUnauthorizedDto,
+  DepartmentsUnauthorizedDto,
+  DepartmentUpdateUnauthorizedDto,
+} from "./dto/department-unauthorized.dto";
+import {
+  DepartmentCreateValidationDto,
+  DepartmentDeleteValidationDto,
+  DepartmentGetByIdValidationDto,
+  DepartmentsValidationDto,
+  DepartmentUpdateValidationDto,
+} from "./dto/department-validation.dto";
 
 @ApiTags("Department")
 @Controller("department")
@@ -49,13 +85,13 @@ export class DepartmentController {
     summary: "Create department",
     description: "Creates a new department in the organization.",
   })
-  @ApiStandardResponse(DepartmentSuccessDto, {
+  @ApiStandardResponse(DepartmentCreateSuccessDto, {
     status: 201,
-    successDto: DepartmentSuccessDto,
-    validationDto: CreateDepartmentValidationDto,
-    unauthorizedDto: CreateDepartmentUnauthorizedDto,
-    conflictDto: CreateDepartmentConflictDto,
-    internalServerErrorDto: CreateDepartmentInternalErrorDto,
+    successDto: DepartmentCreateSuccessDto,
+    validationDto: DepartmentCreateValidationDto,
+    unauthorizedDto: DepartmentCreateUnauthorizedDto,
+    conflictDto: DepartmentCreateConflictDto,
+    internalServerErrorDto: DepartmentCreateInternalErrorDto,
     unauthorized: true,
     conflict: true,
     internalServerError: true,
@@ -75,11 +111,17 @@ export class DepartmentController {
     summary: "List departments",
     description: "Retrieves a list of departments with optional filtering.",
   })
-  @ApiStandardResponse(DepartmentListSuccessDto, {
+  @ApiStandardResponse(DepartmentsListSuccessDto, {
     status: 200,
-    successDto: DepartmentListSuccessDto,
+    successDto: DepartmentsListSuccessDto,
+    unauthorizedDto: DepartmentsUnauthorizedDto,
+    forbiddenDto: DepartmentsForbiddenDto,
+    internalServerErrorDto: DepartmentInternalErrorDto,
+    validationDto: DepartmentsValidationDto,
+    validation: true,
     isArray: true,
     unauthorized: true,
+    forbidden: true,
     internalServerError: true,
   })
   @Get()
@@ -97,11 +139,18 @@ export class DepartmentController {
     summary: "Get department by ID",
     description: "Retrieves details of a specific department.",
   })
-  @ApiStandardResponse(DepartmentSuccessDto, {
+  @ApiStandardResponse(DepartmentByIdSuccessDto, {
     status: 200,
-    successDto: DepartmentSuccessDto,
+    successDto: DepartmentByIdSuccessDto,
+    validationDto: DepartmentGetByIdValidationDto,
+    unauthorizedDto: DepartmentGetByIdUnauthorizedDto,
+    forbiddenDto: DepartmentGetByIdForbiddenDto,
+    notFoundDto: DepartmentNotFoundDto,
+    internalServerErrorDto: DepartmentInternalErrorDto,
+    validation: true,
     notFound: true,
     unauthorized: true,
+    forbidden: true,
     internalServerError: true,
   })
   @Get(":id")
@@ -120,13 +169,20 @@ export class DepartmentController {
     summary: "Update department",
     description: "Updates an existing department's details.",
   })
-  @ApiStandardResponse(DepartmentSuccessDto, {
+  @ApiStandardResponse(DepartmentPatchSuccessDto, {
     status: 200,
-    successDto: DepartmentSuccessDto,
+    successDto: DepartmentPatchSuccessDto,
+    validationDto: DepartmentUpdateValidationDto,
+    unauthorizedDto: DepartmentUpdateUnauthorizedDto,
+    forbiddenDto: DepartmentUpdateForbiddenDto,
+    notFoundDto: DepartmentUpdateByIdNotFoundDto,
+    conflictDto: DepartmentUpdateConflictDto,
+    internalServerErrorDto: DepartmentUpdateInternalErrorDto,
+    validation: true,
     notFound: true,
-    forbidden: true,
-    conflict: true,
     unauthorized: true,
+    conflict: true,
+    forbidden: true,
     internalServerError: true,
   })
   @Patch(":id")
@@ -150,13 +206,18 @@ export class DepartmentController {
     summary: "Delete department",
     description: "Deletes a department by its ID.",
   })
-  @ApiStandardResponse(DepartmentSuccessDto, {
+  @ApiStandardResponse(DepartmentDeleteSuccessDto, {
     status: 200,
-    successDto: DepartmentSuccessDto,
+    successDto: DepartmentDeleteSuccessDto,
+    validationDto: DepartmentDeleteValidationDto,
+    unauthorizedDto: DepartmentDeleteUnauthorizedDto,
+    forbiddenDto: DepartmentDeleteForbiddenDto,
+    notFoundDto: DepartmentDeleteByIdNotFoundDto,
+    internalServerErrorDto: DepartmentDeleteInternalErrorDto,
+    validation: true,
     notFound: true,
-    forbidden: true,
-    conflict: true,
     unauthorized: true,
+    forbidden: true,
     internalServerError: true,
   })
   @Delete(":id")
