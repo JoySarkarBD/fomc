@@ -23,51 +23,52 @@ import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
-import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DepartmentService } from "./department.service";
 import {
   DepartmentCreateConflictDto,
   DepartmentUpdateConflictDto,
-} from "./dto/department-conflict.dto";
+} from "./dto/error/department-conflict.dto";
 import {
   DepartmentDeleteForbiddenDto,
   DepartmentGetByIdForbiddenDto,
   DepartmentsForbiddenDto,
   DepartmentUpdateForbiddenDto,
-} from "./dto/department-forbidden.dto";
+} from "./dto/error/department-forbidden.dto";
 import {
   DepartmentCreateInternalErrorDto,
   DepartmentDeleteInternalErrorDto,
   DepartmentInternalErrorDto,
   DepartmentUpdateInternalErrorDto,
-} from "./dto/department-internal-error.dto";
+} from "./dto/error/department-internal-error.dto";
 import {
   DepartmentDeleteByIdNotFoundDto,
   DepartmentNotFoundDto,
   DepartmentUpdateByIdNotFoundDto,
-} from "./dto/department-not-found.dto";
-import {
-  DepartmentByIdSuccessDto,
-  DepartmentCreateSuccessDto,
-  DepartmentDeleteSuccessDto,
-  DepartmentPatchSuccessDto,
-  DepartmentsListSuccessDto,
-} from "./dto/department-success.dto";
+} from "./dto/error/department-not-found.dto";
 import {
   DepartmentCreateUnauthorizedDto,
   DepartmentDeleteUnauthorizedDto,
   DepartmentGetByIdUnauthorizedDto,
   DepartmentsUnauthorizedDto,
   DepartmentUpdateUnauthorizedDto,
-} from "./dto/department-unauthorized.dto";
+} from "./dto/error/department-unauthorized.dto";
 import {
   DepartmentCreateValidationDto,
   DepartmentDeleteValidationDto,
   DepartmentGetByIdValidationDto,
   DepartmentsValidationDto,
   DepartmentUpdateValidationDto,
-} from "./dto/department-validation.dto";
+} from "./dto/error/department-validation.dto";
+import {
+  DepartmentByIdSuccessDto,
+  DepartmentCreateSuccessDto,
+  DepartmentDeleteSuccessDto,
+  DepartmentPatchSuccessDto,
+  DepartmentsListSuccessDto,
+} from "./dto/success/department-success.dto";
 
 @ApiTags("Department")
 @Controller("department")
@@ -85,16 +86,12 @@ export class DepartmentController {
     summary: "Create department",
     description: "Creates a new department in the organization.",
   })
-  @ApiStandardResponse(DepartmentCreateSuccessDto, {
-    status: 201,
-    successDto: DepartmentCreateSuccessDto,
-    validationDto: DepartmentCreateValidationDto,
-    unauthorizedDto: DepartmentCreateUnauthorizedDto,
-    conflictDto: DepartmentCreateConflictDto,
-    internalServerErrorDto: DepartmentCreateInternalErrorDto,
-    unauthorized: true,
-    conflict: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DepartmentCreateSuccessDto, 201)
+  @ApiErrorResponses({
+    validation: DepartmentCreateValidationDto,
+    unauthorized: DepartmentCreateUnauthorizedDto,
+    conflict: DepartmentCreateConflictDto,
+    internal: DepartmentCreateInternalErrorDto,
   })
   @Post()
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -111,18 +108,12 @@ export class DepartmentController {
     summary: "List departments",
     description: "Retrieves a list of departments with optional filtering.",
   })
-  @ApiStandardResponse(DepartmentsListSuccessDto, {
-    status: 200,
-    successDto: DepartmentsListSuccessDto,
-    unauthorizedDto: DepartmentsUnauthorizedDto,
-    forbiddenDto: DepartmentsForbiddenDto,
-    internalServerErrorDto: DepartmentInternalErrorDto,
-    validationDto: DepartmentsValidationDto,
-    validation: true,
-    isArray: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DepartmentsListSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: DepartmentsValidationDto,
+    unauthorized: DepartmentsUnauthorizedDto,
+    forbidden: DepartmentsForbiddenDto,
+    internal: DepartmentInternalErrorDto,
   })
   @Get()
   async findDepartments(@Query() query: SearchQueryDto) {
@@ -139,19 +130,13 @@ export class DepartmentController {
     summary: "Get department by ID",
     description: "Retrieves details of a specific department.",
   })
-  @ApiStandardResponse(DepartmentByIdSuccessDto, {
-    status: 200,
-    successDto: DepartmentByIdSuccessDto,
-    validationDto: DepartmentGetByIdValidationDto,
-    unauthorizedDto: DepartmentGetByIdUnauthorizedDto,
-    forbiddenDto: DepartmentGetByIdForbiddenDto,
-    notFoundDto: DepartmentNotFoundDto,
-    internalServerErrorDto: DepartmentInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DepartmentByIdSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: DepartmentGetByIdValidationDto,
+    unauthorized: DepartmentGetByIdUnauthorizedDto,
+    forbidden: DepartmentGetByIdForbiddenDto,
+    notFound: DepartmentNotFoundDto,
+    internal: DepartmentInternalErrorDto,
   })
   @Get(":id")
   async findDepartmentById(@Param() params: MongoIdDto) {
@@ -169,21 +154,14 @@ export class DepartmentController {
     summary: "Update department",
     description: "Updates an existing department's details.",
   })
-  @ApiStandardResponse(DepartmentPatchSuccessDto, {
-    status: 200,
-    successDto: DepartmentPatchSuccessDto,
-    validationDto: DepartmentUpdateValidationDto,
-    unauthorizedDto: DepartmentUpdateUnauthorizedDto,
-    forbiddenDto: DepartmentUpdateForbiddenDto,
-    notFoundDto: DepartmentUpdateByIdNotFoundDto,
-    conflictDto: DepartmentUpdateConflictDto,
-    internalServerErrorDto: DepartmentUpdateInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    conflict: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DepartmentPatchSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: DepartmentUpdateValidationDto,
+    unauthorized: DepartmentUpdateUnauthorizedDto,
+    forbidden: DepartmentUpdateForbiddenDto,
+    notFound: DepartmentUpdateByIdNotFoundDto,
+    conflict: DepartmentUpdateConflictDto,
+    internal: DepartmentUpdateInternalErrorDto,
   })
   @Patch(":id")
   async updateDepartmentById(
@@ -206,19 +184,13 @@ export class DepartmentController {
     summary: "Delete department",
     description: "Deletes a department by its ID.",
   })
-  @ApiStandardResponse(DepartmentDeleteSuccessDto, {
-    status: 200,
-    successDto: DepartmentDeleteSuccessDto,
-    validationDto: DepartmentDeleteValidationDto,
-    unauthorizedDto: DepartmentDeleteUnauthorizedDto,
-    forbiddenDto: DepartmentDeleteForbiddenDto,
-    notFoundDto: DepartmentDeleteByIdNotFoundDto,
-    internalServerErrorDto: DepartmentDeleteInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DepartmentDeleteSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: DepartmentDeleteValidationDto,
+    unauthorized: DepartmentDeleteUnauthorizedDto,
+    forbidden: DepartmentDeleteForbiddenDto,
+    notFound: DepartmentDeleteByIdNotFoundDto,
+    internal: DepartmentDeleteInternalErrorDto,
   })
   @Delete(":id")
   async deleteDepartmentById(@Param() params: MongoIdDto) {

@@ -19,7 +19,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { UpdateUserProfileDto } from "apps/user-service/src/dto/update-user-profile.dto";
@@ -28,36 +28,40 @@ import * as fs from "fs";
 import type { File } from "multer";
 import { diskStorage } from "multer";
 import * as path from "path";
-import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { UserForbiddenDto, UsersForbiddenDto } from "./dto/user-forbidden.dto";
+import {
+  UserForbiddenDto,
+  UsersForbiddenDto,
+} from "./dto/error/user-forbidden.dto";
 import {
   UpdateUserProfileInternalErrorDto,
   UserInternalErrorDto,
   UserProfileInternalErrorDto,
   UsersInternalErrorDto,
-} from "./dto/user-internal-error.dto";
-import { UserNotFoundDto } from "./dto/user-not-found.dto";
-import {
-  UserProfileSuccessDto,
-  UserProfileUpdateSuccessDto,
-  UsersListSuccessDto,
-  UserSuccessDto,
-} from "./dto/user-success.dto";
+} from "./dto/error/user-internal-error.dto";
+import { UserNotFoundDto } from "./dto/error/user-not-found.dto";
 import {
   UpdateUserProfileUnauthorizedDto,
   UserProfileUnauthorizedDto,
   UsersUnauthorizedDto,
   UserUnauthorizedDto,
-} from "./dto/user-unauthorized.dto";
+} from "./dto/error/user-unauthorized.dto";
 import {
   UserProfileUpdateValidationDto,
   UsersValidationDto,
   UserValidationDto,
-} from "./dto/user-validation.dto";
+} from "./dto/error/user-validation.dto";
+import {
+  UserProfileSuccessDto,
+  UserProfileUpdateSuccessDto,
+  UsersListSuccessDto,
+  UserSuccessDto,
+} from "./dto/success/user-success.dto";
 import { UserService } from "./user.service";
 
 @ApiTags("User")
@@ -77,18 +81,18 @@ export class UserController {
     summary: "List users",
     description: "Retrieves a list of users with optional filtering.",
   })
-  @ApiStandardResponse(UsersListSuccessDto, {
-    status: 200,
-    successDto: UsersListSuccessDto,
-    unauthorizedDto: UsersUnauthorizedDto,
-    forbiddenDto: UsersForbiddenDto,
-    internalServerErrorDto: UsersInternalErrorDto,
-    validationDto: UsersValidationDto,
-    validation: true,
-    isArray: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(UsersListSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: UsersValidationDto,
+    unauthorized: UsersUnauthorizedDto,
+    forbidden: UsersForbiddenDto,
+    internal: UsersInternalErrorDto,
   })
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
@@ -108,19 +112,19 @@ export class UserController {
     summary: "Get user by ID",
     description: "Retrieves details of a specific user.",
   })
-  @ApiStandardResponse(UserSuccessDto, {
-    status: 200,
-    successDto: UserSuccessDto,
-    unauthorizedDto: UserUnauthorizedDto,
-    forbiddenDto: UserForbiddenDto,
-    internalServerErrorDto: UserInternalErrorDto,
-    validationDto: UserValidationDto,
-    notFoundDto: UserNotFoundDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(UserSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: UserValidationDto,
+    unauthorized: UserUnauthorizedDto,
+    forbidden: UserForbiddenDto,
+    internal: UserInternalErrorDto,
+    notFound: UserNotFoundDto,
   })
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
@@ -141,13 +145,16 @@ export class UserController {
     summary: "Get my profile",
     description: "Retrieves the profile of the authenticated user.",
   })
-  @ApiStandardResponse(UserProfileSuccessDto, {
-    status: 200,
-    successDto: UserProfileSuccessDto,
-    unauthorizedDto: UserProfileUnauthorizedDto,
-    internalServerErrorDto: UserProfileInternalErrorDto,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(UserProfileSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: UserProfileUnauthorizedDto,
+    internal: UserProfileInternalErrorDto,
   })
   @Get("profile/me")
   async getProfile(@GetUser() user: AuthUser) {
@@ -170,15 +177,17 @@ export class UserController {
     summary: "Update my profile",
     description: "Updates the authenticated user's name and/or avatar.",
   })
-  @ApiStandardResponse(UserProfileUpdateSuccessDto, {
-    status: 200,
-    successDto: UserProfileUpdateSuccessDto,
-    validationDto: UserProfileUpdateValidationDto,
-    unauthorizedDto: UpdateUserProfileUnauthorizedDto,
-    internalServerErrorDto: UpdateUserProfileInternalErrorDto,
-    validation: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(UserProfileUpdateSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: UserProfileUpdateValidationDto,
+    unauthorized: UpdateUserProfileUnauthorizedDto,
+    internal: UpdateUserProfileInternalErrorDto,
   })
   @Patch("profile/me")
   @UseInterceptors(

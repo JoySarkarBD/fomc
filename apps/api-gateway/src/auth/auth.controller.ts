@@ -17,47 +17,46 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { AuthUser } from "@shared/interfaces/auth-user.interface";
 import type { Request } from "express";
 import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
-import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { ForgotThrottleGuard } from "../common/throttles/forgot-throttle.guard";
 import { ResetThrottleGuard } from "../common/throttles/reset-throttle.guard";
 import { AuthService } from "./auth.service";
-import { ChangePasswordDto } from "./dto/change-password.dto";
-import { ChangePasswordInternalErrorDto } from "./dto/change-password/change-password-internal-error.dto";
-import { ChangePasswordSuccessDto } from "./dto/change-password/change-password-success.dto";
-import { ChangePasswordThrottlerDto } from "./dto/change-password/change-password-throttler.dto";
-import { ChangePasswordUnauthorizedDto } from "./dto/change-password/change-password-unauthorized.dto";
-import { ChangePasswordValidationDto } from "./dto/change-password/change-password-validation.dto";
-import { ForgotPasswordDto } from "./dto/forgot-password.dto";
-import { ForgotPasswordInternalErrorDto } from "./dto/forgot-password/forgot-password-internal-error.dto";
-import { ForgotPasswordSuccessDto } from "./dto/forgot-password/forgot-password-success.dto";
-import { ForgotPasswordThrottlerDto } from "./dto/forgot-password/forgot-password-throttler.dto";
-import { ForgotPasswordValidationDto } from "./dto/forgot-password/forgot-password-validation.dto";
-import { ForgotPasswordXDeviceIdMissingDto } from "./dto/forgot-password/forgot-password-x-device-id-missing.dto";
-import { LoginDto } from "./dto/login.dto";
-import { LoginInternalErrorDto } from "./dto/login/login-internal-error.dto";
-import { LoginSuccessDto } from "./dto/login/login-success.dto";
-import { LoginUnauthorizedDto } from "./dto/login/login-unauthorized.dto";
-import { LoginValidationDto } from "./dto/login/login-validation.dto";
-import { LogoutInternalErrorDto } from "./dto/logout/logout-internal-error.dto";
-import { LogoutSuccessDto } from "./dto/logout/logout-success.dto";
-import { LogoutUnauthorizedDto } from "./dto/logout/logout-unauthorized.dto";
-import { RegistrationEmailConflictDto } from "./dto/registration/registration-email-conflict.dto";
-import { RegistrationInternalErrorDto } from "./dto/registration/registration-internal-error.dto";
-import { RegistrationRoleNotFoundDto } from "./dto/registration/registration-role-not-found.dto";
-import { RegistrationSuccessDto } from "./dto/registration/registration-success.dto";
-import { RegistrationValidationDto } from "./dto/registration/registration-validation.dto";
-import { ResetPasswordDto } from "./dto/reset-password.dto";
-import { ResetPasswordInternalErrorDto } from "./dto/reset-password/reset-password-internal-error.dto";
-import { ResetPasswordSuccessDto } from "./dto/reset-password/reset-password-success.dto";
-import { ResetPasswordThrottlerDto } from "./dto/reset-password/reset-password-throttler.dto";
-import { ResetPasswordValidationDto } from "./dto/reset-password/reset-password-validation.dto";
-import { ResetPasswordXDeviceIdMissingDto } from "./dto/reset-password/reset-password-x-device-id-missing.dto";
+import { ChangePasswordDto } from "./dto/change-password/change-password.dto";
+import { ChangePasswordInternalErrorDto } from "./dto/change-password/error/change-password-internal-error.dto";
+import { ChangePasswordThrottlerDto } from "./dto/change-password/error/change-password-throttler.dto";
+import { ChangePasswordUnauthorizedDto } from "./dto/change-password/error/change-password-unauthorized.dto";
+import { ChangePasswordValidationDto } from "./dto/change-password/error/change-password-validation.dto";
+import { ChangePasswordSuccessDto } from "./dto/change-password/success/change-password-success.dto";
+import { ForgotPasswordInternalErrorDto } from "./dto/forgot-password/error/forgot-password-internal-error.dto";
+import { ForgotPasswordThrottlerDto } from "./dto/forgot-password/error/forgot-password-throttler.dto";
+import { ForgotPasswordValidationDto } from "./dto/forgot-password/error/forgot-password-validation.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password/forgot-password.dto";
+import { ForgotPasswordSuccessDto } from "./dto/forgot-password/success/forgot-password-success.dto";
+import { LoginInternalErrorDto } from "./dto/login/error/login-internal-error.dto";
+import { LoginUnauthorizedDto } from "./dto/login/error/login-unauthorized.dto";
+import { LoginValidationDto } from "./dto/login/error/login-validation.dto";
+import { LoginDto } from "./dto/login/login.dto";
+import { LoginSuccessDto } from "./dto/login/success/login-success.dto";
+import { LogoutInternalErrorDto } from "./dto/logout/error/logout-internal-error.dto";
+import { LogoutUnauthorizedDto } from "./dto/logout/error/logout-unauthorized.dto";
+import { LogoutSuccessDto } from "./dto/logout/success/logout-success.dto";
+import { RegistrationEmailConflictDto } from "./dto/registration/error/registration-email-conflict.dto";
+import { RegistrationInternalErrorDto } from "./dto/registration/error/registration-internal-error.dto";
+import { RegistrationRoleNotFoundDto } from "./dto/registration/error/registration-role-not-found.dto";
+import { RegistrationValidationDto } from "./dto/registration/error/registration-validation.dto";
+import { RegistrationSuccessDto } from "./dto/registration/success/registration-success.dto";
+import { ResetPasswordInternalErrorDto } from "./dto/reset-password/error/reset-password-internal-error.dto";
+import { ResetPasswordSuccessDto } from "./dto/reset-password/error/reset-password-success.dto";
+import { ResetPasswordThrottlerDto } from "./dto/reset-password/error/reset-password-throttler.dto";
+import { ResetPasswordValidationDto } from "./dto/reset-password/error/reset-password-validation.dto";
+import { ResetPasswordDto } from "./dto/reset-password/reset-password.dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -69,17 +68,12 @@ export class AuthController {
     summary: "Register a new user account",
     description: "Creates a new user account with the provided details.",
   })
-  @ApiStandardResponse(RegistrationSuccessDto, {
-    status: 201,
-    successDto: RegistrationSuccessDto,
-    validationDto: RegistrationValidationDto,
-    notFoundDto: RegistrationRoleNotFoundDto,
-    conflictDto: RegistrationEmailConflictDto,
-    internalServerErrorDto: RegistrationInternalErrorDto,
-    validation: true,
-    notFound: true,
-    conflict: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RegistrationSuccessDto, 201)
+  @ApiErrorResponses({
+    validation: RegistrationValidationDto,
+    notFound: RegistrationRoleNotFoundDto,
+    conflict: RegistrationEmailConflictDto,
+    internal: RegistrationInternalErrorDto,
   })
   @Post("register")
   async register(@Body() data: CreateUserDto) {
@@ -92,15 +86,11 @@ export class AuthController {
     description:
       "Authenticates a user with email and password, returning a JWT token.",
   })
-  @ApiStandardResponse(LoginSuccessDto, {
-    status: 200,
-    successDto: LoginSuccessDto,
-    validationDto: LoginValidationDto,
-    unauthorizedDto: LoginUnauthorizedDto,
-    internalServerErrorDto: LoginInternalErrorDto,
-    validation: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(LoginSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: LoginValidationDto,
+    unauthorized: LoginUnauthorizedDto,
+    internal: LoginInternalErrorDto,
   })
   @Post("login")
   async login(@Body() data: LoginDto) {
@@ -112,17 +102,17 @@ export class AuthController {
     summary: "Forgot password",
     description: "Sends a password reset OTP to the user's email.",
   })
-  @ApiStandardResponse(ForgotPasswordSuccessDto, {
-    status: 200,
-    successDto: ForgotPasswordSuccessDto,
-    validationDto: ForgotPasswordValidationDto,
-    xDeviceIdDto: ForgotPasswordXDeviceIdMissingDto,
-    throttleDto: ForgotPasswordThrottlerDto,
-    internalServerErrorDto: ForgotPasswordInternalErrorDto,
-    validation: true,
-    xDeviceId: true,
-    throttle: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "x-device-id",
+    description: "Unique identifier for the client's device (for throttling).",
+    required: true,
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  })
+  @ApiSuccessResponse(ForgotPasswordSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: ForgotPasswordValidationDto,
+    throttle: ForgotPasswordThrottlerDto,
+    internal: ForgotPasswordInternalErrorDto,
   })
   @Post("forgot-password")
   @UseGuards(ForgotThrottleGuard)
@@ -135,18 +125,17 @@ export class AuthController {
     summary: "Reset password",
     description: "Resets the user's password using a valid OTP.",
   })
-  @ApiStandardResponse(ResetPasswordSuccessDto, {
-    status: 200,
-    successDto: ResetPasswordSuccessDto,
-    validationDto: ResetPasswordValidationDto,
-    xDeviceIdDto: ResetPasswordXDeviceIdMissingDto,
-    throttleDto: ResetPasswordThrottlerDto,
-    internalServerErrorDto: ResetPasswordInternalErrorDto,
-    validation: true,
-    xDeviceId: true,
-    unauthorized: true,
-    throttle: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "x-device-id",
+    description: "Unique identifier for the client's device (for throttling).",
+    required: true,
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  })
+  @ApiSuccessResponse(ResetPasswordSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: ResetPasswordValidationDto,
+    throttle: ResetPasswordThrottlerDto,
+    internal: ResetPasswordInternalErrorDto,
   })
   @Patch("reset-password")
   @UseGuards(ResetThrottleGuard)
@@ -159,17 +148,18 @@ export class AuthController {
     summary: "Change password",
     description: "Changes the authenticated user's password.",
   })
-  @ApiStandardResponse(ChangePasswordSuccessDto, {
-    status: 200,
-    successDto: ChangePasswordSuccessDto,
-    validationDto: ChangePasswordValidationDto,
-    unauthorizedDto: ChangePasswordUnauthorizedDto,
-    throttleDto: ChangePasswordThrottlerDto,
-    internalServerErrorDto: ChangePasswordInternalErrorDto,
-    validation: true,
-    unauthorized: true,
-    throttle: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(ChangePasswordSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: ChangePasswordValidationDto,
+    unauthorized: ChangePasswordUnauthorizedDto,
+    throttle: ChangePasswordThrottlerDto,
+    internal: ChangePasswordInternalErrorDto,
   })
   @Patch("change-password")
   @UseGuards(JwtAuthGuard)
@@ -186,13 +176,16 @@ export class AuthController {
     summary: "User logout",
     description: "Invalidates the current authentication token.",
   })
-  @ApiStandardResponse(LogoutSuccessDto, {
-    status: 200,
-    successDto: LogoutSuccessDto,
-    unauthorizedDto: LogoutUnauthorizedDto,
-    internalServerErrorDto: LogoutInternalErrorDto,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
+  @ApiSuccessResponse(LogoutSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: LogoutUnauthorizedDto,
+    internal: LogoutInternalErrorDto,
   })
   @Post("logout")
   @UseGuards(JwtAuthGuard)

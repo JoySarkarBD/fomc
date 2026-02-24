@@ -22,52 +22,53 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import { CreateRoleDto } from "apps/user-service/src/role/dto/create-role.dto";
 import { UpdateRoleDto } from "apps/user-service/src/role/dto/update-role.dto";
-import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import {
   RoleCreateConflictDto,
   RoleUpdateConflictDto,
-} from "./dto/role-conflict.dto";
+} from "./dto/error/role-conflict.dto";
 import {
   RoleCreateForbiddenDto,
   RoleDeleteForbiddenDto,
   RoleGetByIdForbiddenDto,
   RolesForbiddenDto,
   RoleUpdateForbiddenDto,
-} from "./dto/role-forbidden.dto";
+} from "./dto/error/role-forbidden.dto";
 import {
   RoleCreateInternalErrorDto,
   RoleDeleteInternalErrorDto,
   RoleInternalErrorDto,
   RolesInternalErrorDto,
   RoleUpdateInternalErrorDto,
-} from "./dto/role-internal-error.dto";
+} from "./dto/error/role-internal-error.dto";
 import {
   RoleDeleteByIdNotFoundDto,
   RoleNotFoundDto,
   RoleUpdateByIdNotFoundDto,
-} from "./dto/role-not-found.dto";
-import {
-  RoleByIdSuccessDto,
-  RoleCreateSuccessDto,
-  RoleDeleteSuccessDto,
-  RolePatchSuccessDto,
-  RolesListSuccessDto,
-} from "./dto/role-success.dto";
+} from "./dto/error/role-not-found.dto";
 import {
   RoleCreateUnauthorizedDto,
   RoleDeleteUnauthorizedDto,
   RoleGetByIdUnauthorizedDto,
   RolesUnauthorizedDto,
   RoleUpdateUnauthorizedDto,
-} from "./dto/role-unauthorized.dto";
+} from "./dto/error/role-unauthorized.dto";
 import {
   RoleCreateValidationDto,
   RoleDeleteValidationDto,
   RoleGetByIdValidationDto,
   RolesValidationDto,
   RoleUpdateValidationDto,
-} from "./dto/role-validation.dto";
+} from "./dto/error/role-validation.dto";
+import {
+  RoleByIdSuccessDto,
+  RoleCreateSuccessDto,
+  RoleDeleteSuccessDto,
+  RolePatchSuccessDto,
+  RolesListSuccessDto,
+} from "./dto/success/role-success.dto";
 import { RoleService } from "./role.service";
 
 @ApiTags("Role")
@@ -86,19 +87,13 @@ export class RoleController {
     summary: "Create role",
     description: "Creates a new user role in the system.",
   })
-  @ApiStandardResponse(RoleCreateSuccessDto, {
-    status: 201,
-    successDto: RoleCreateSuccessDto,
-    validationDto: RoleCreateValidationDto,
-    unauthorizedDto: RoleCreateUnauthorizedDto,
-    forbiddenDto: RoleCreateForbiddenDto,
-    conflictDto: RoleCreateConflictDto,
-    internalServerErrorDto: RoleCreateInternalErrorDto,
-    validation: true,
-    unauthorized: true,
-    forbidden: true,
-    conflict: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RoleCreateSuccessDto, 201)
+  @ApiErrorResponses({
+    validation: RoleCreateValidationDto,
+    unauthorized: RoleCreateUnauthorizedDto,
+    forbidden: RoleCreateForbiddenDto,
+    conflict: RoleCreateConflictDto,
+    internal: RoleCreateInternalErrorDto,
   })
   @Post()
   async createRole(@Body() data: CreateRoleDto) {
@@ -115,18 +110,12 @@ export class RoleController {
     summary: "List roles",
     description: "Retrieves a list of user roles with optional filtering.",
   })
-  @ApiStandardResponse(RolesListSuccessDto, {
-    status: 200,
-    successDto: RolesListSuccessDto,
-    unauthorizedDto: RolesUnauthorizedDto,
-    forbiddenDto: RolesForbiddenDto,
-    internalServerErrorDto: RolesInternalErrorDto,
-    validationDto: RolesValidationDto,
-    validation: true,
-    isArray: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RolesListSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: RolesValidationDto,
+    unauthorized: RolesUnauthorizedDto,
+    forbidden: RolesForbiddenDto,
+    internal: RolesInternalErrorDto,
   })
   @Get()
   async findRoles(@Query() query: SearchQueryDto) {
@@ -143,19 +132,13 @@ export class RoleController {
     summary: "Get role by ID",
     description: "Retrieves details of a specific user role.",
   })
-  @ApiStandardResponse(RoleByIdSuccessDto, {
-    status: 200,
-    successDto: RoleByIdSuccessDto,
-    validationDto: RoleGetByIdValidationDto,
-    unauthorizedDto: RoleGetByIdUnauthorizedDto,
-    forbiddenDto: RoleGetByIdForbiddenDto,
-    notFoundDto: RoleNotFoundDto,
-    internalServerErrorDto: RoleInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RoleByIdSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: RoleGetByIdValidationDto,
+    unauthorized: RoleGetByIdUnauthorizedDto,
+    forbidden: RoleGetByIdForbiddenDto,
+    notFound: RoleNotFoundDto,
+    internal: RoleInternalErrorDto,
   })
   @Get(":id")
   async findRoleById(@Param() params: MongoIdDto) {
@@ -172,21 +155,14 @@ export class RoleController {
     summary: "Update role",
     description: "Updates an existing user role's details.",
   })
-  @ApiStandardResponse(RolePatchSuccessDto, {
-    status: 200,
-    successDto: RolePatchSuccessDto,
-    validationDto: RoleUpdateValidationDto,
-    unauthorizedDto: RoleUpdateUnauthorizedDto,
-    forbiddenDto: RoleUpdateForbiddenDto,
-    notFoundDto: RoleUpdateByIdNotFoundDto,
-    conflictDto: RoleUpdateConflictDto,
-    internalServerErrorDto: RoleUpdateInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    conflict: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RolePatchSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: RoleUpdateValidationDto,
+    unauthorized: RoleUpdateUnauthorizedDto,
+    forbidden: RoleUpdateForbiddenDto,
+    notFound: RoleUpdateByIdNotFoundDto,
+    conflict: RoleUpdateConflictDto,
+    internal: RoleUpdateInternalErrorDto,
   })
   @Patch(":id")
   async updateRoleById(
@@ -206,19 +182,13 @@ export class RoleController {
     summary: "Delete role",
     description: "Deletes a user role by its ID.",
   })
-  @ApiStandardResponse(RoleDeleteSuccessDto, {
-    status: 200,
-    successDto: RoleDeleteSuccessDto,
-    validationDto: RoleDeleteValidationDto,
-    unauthorizedDto: RoleDeleteUnauthorizedDto,
-    forbiddenDto: RoleDeleteForbiddenDto,
-    notFoundDto: RoleDeleteByIdNotFoundDto,
-    internalServerErrorDto: RoleDeleteInternalErrorDto,
-    validation: true,
-    notFound: true,
-    unauthorized: true,
-    forbidden: true,
-    internalServerError: true,
+  @ApiSuccessResponse(RoleDeleteSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: RoleDeleteValidationDto,
+    unauthorized: RoleDeleteUnauthorizedDto,
+    forbidden: RoleDeleteForbiddenDto,
+    notFound: RoleDeleteByIdNotFoundDto,
+    internal: RoleDeleteInternalErrorDto,
   })
   @Delete(":id")
   async deleteRoleById(@Param() params: MongoIdDto) {

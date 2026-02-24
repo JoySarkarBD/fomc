@@ -23,7 +23,8 @@ import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDesignationDto } from "apps/workforce-service/src/designation/dto/create-designation.dto";
 import { UpdateDesignationDto } from "apps/workforce-service/src/designation/dto/update-designation.dto";
-import { ApiStandardResponse } from "../common/decorators/api-standard-response";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DesignationService } from "./designation.service";
 import { DesignationListSuccessDto } from "./dto/designation-list-success.dto";
@@ -45,12 +46,10 @@ export class DesignationController {
     summary: "Create designation",
     description: "Creates a new job designation in the organization.",
   })
-  @ApiStandardResponse(DesignationSuccessDto, {
-    status: 201,
-    successDto: DesignationSuccessDto,
-    conflict: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationSuccessDto, 201)
+  @ApiErrorResponses({
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Post()
   async createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
@@ -70,12 +69,10 @@ export class DesignationController {
     description:
       "Retrieves a list of job designations with optional filtering.",
   })
-  @ApiStandardResponse(DesignationListSuccessDto, {
-    status: 200,
-    successDto: DesignationListSuccessDto,
-    isArray: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationListSuccessDto, 200)
+  @ApiErrorResponses({
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Get()
   async findDesignations(@Query() query: SearchQueryDto) {
@@ -92,12 +89,11 @@ export class DesignationController {
     summary: "Get designation by ID",
     description: "Retrieves details of a specific job designation.",
   })
-  @ApiStandardResponse(DesignationSuccessDto, {
-    status: 200,
-    successDto: DesignationSuccessDto,
-    notFound: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationSuccessDto, 200)
+  @ApiErrorResponses({
+    // notFound: CustomNotFoundDto,
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Get(":id")
   async findDepartmentById(@Param() params: MongoIdDto) {
@@ -115,13 +111,12 @@ export class DesignationController {
     summary: "Update designation",
     description: "Updates an existing job designation's details.",
   })
-  @ApiStandardResponse(DesignationSuccessDto, {
-    status: 200,
-    successDto: DesignationSuccessDto,
-    notFound: true,
-    conflict: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationSuccessDto, 200)
+  @ApiErrorResponses({
+    // notFound: CustomNotFoundDto,
+    // conflict: CustomConflictDto,
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Patch(":id")
   async updateDesignationById(
@@ -144,12 +139,10 @@ export class DesignationController {
     summary: "Batch get designations",
     description: "Retrieves multiple designations by their IDs.",
   })
-  @ApiStandardResponse(DesignationListSuccessDto, {
-    status: 200,
-    successDto: DesignationListSuccessDto,
-    isArray: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationListSuccessDto, 200)
+  @ApiErrorResponses({
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Get("batch")
   async findDesignationsByIds(@Query("ids") ids: string | string[]) {
@@ -167,12 +160,11 @@ export class DesignationController {
     summary: "Delete designation",
     description: "Deletes a job designation by its ID.",
   })
-  @ApiStandardResponse(DesignationSuccessDto, {
-    status: 200,
-    successDto: DesignationSuccessDto,
-    notFound: true,
-    unauthorized: true,
-    internalServerError: true,
+  @ApiSuccessResponse(DesignationSuccessDto, 200)
+  @ApiErrorResponses({
+    // notFound: CustomNotFoundDto,
+    // unauthorized: CustomUnauthorizedDto,
+    // internal: CustomInternalServerErrorDto,
   })
   @Delete(":id")
   async deleteDesignationById(@Param() params: MongoIdDto) {

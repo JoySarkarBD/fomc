@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { CustomConflictDto } from "../../common/dto/custom-conflict.dto";
-import { Methods } from "../../common/enum/methods.enum";
+import { CustomConflictDto } from "../../../common/dto/custom-conflict.dto";
+import { Methods } from "../../../common/enum/methods.enum";
 
 export class RoleCreateConflictDto extends CustomConflictDto {
   @ApiProperty({ example: "Role with the same name already exists" })
