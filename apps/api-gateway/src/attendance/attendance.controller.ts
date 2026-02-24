@@ -8,7 +8,7 @@
  */
 
 import { Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { AuthUser } from "@shared/interfaces";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
@@ -18,22 +18,18 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AttendanceService } from "./attendance.service";
-import { AttendanceSuccessDto } from "./dto/attendance-success.dto";
-import { MarkAttendanceConflictDto } from "./dto/mark-attendance-conflict.dto";
-import { MarkAttendanceForbiddenDto } from "./dto/mark-attendance-forbidden.dto";
-import { MarkAttendanceInternalErrorDto } from "./dto/mark-attendance-internal-error.dto";
-import { MarkAttendanceNotFoundDto } from "./dto/mark-attendance-not-found.dto";
-import { MarkAttendanceThrottlerDto } from "./dto/mark-attendance-throttler.dto";
-import { MarkAttendanceUnauthorizedDto } from "./dto/mark-attendance-unauthorized.dto";
-import { MarkAttendanceValidationDto } from "./dto/mark-attendance-validation.dto";
-import { MyAttendanceConflictDto } from "./dto/my-attendance-conflict.dto";
-import { MyAttendanceForbiddenDto } from "./dto/my-attendance-forbidden.dto";
-import { MyAttendanceInternalErrorDto } from "./dto/my-attendance-internal-error.dto";
-import { MyAttendanceNotFoundDto } from "./dto/my-attendance-not-found.dto";
-import { MyAttendanceSuccessDto } from "./dto/my-attendance-success.dto";
-import { MyAttendanceThrottlerDto } from "./dto/my-attendance-throttler.dto";
-import { MyAttendanceUnauthorizedDto } from "./dto/my-attendance-unauthorized.dto";
-import { MyAttendanceValidationDto } from "./dto/my-attendance-validation.dto";
+import { MarkAttendanceConflictDto } from "./dto/error/attendance/mark-attendance/mark-attendance-conflict.dto";
+import { MarkAttendanceForbiddenDto } from "./dto/error/attendance/mark-attendance/mark-attendance-forbidden.dto";
+import { MarkAttendanceInternalErrorDto } from "./dto/error/attendance/mark-attendance/mark-attendance-internal-error.dto";
+import { MarkAttendanceNotFoundDto } from "./dto/error/attendance/mark-attendance/mark-attendance-not-found.dto";
+import { MarkAttendanceUnauthorizedDto } from "./dto/error/attendance/mark-attendance/mark-attendance-unauthorized.dto";
+import { MyAttendanceConflictDto } from "./dto/error/attendance/my-attendance/my-attendance-conflict.dto";
+import { MyAttendanceForbiddenDto } from "./dto/error/attendance/my-attendance/my-attendance-forbidden.dto";
+import { MyAttendanceInternalErrorDto } from "./dto/error/attendance/my-attendance/my-attendance-internal-error.dto";
+import { MyAttendanceSuccessDto } from "./dto/error/attendance/my-attendance/my-attendance-success.dto";
+import { MyAttendanceUnauthorizedDto } from "./dto/error/attendance/my-attendance/my-attendance-unauthorized.dto";
+import { MyAttendanceValidationDto } from "./dto/error/attendance/my-attendance/my-attendance-validation.dto";
+import { AttendanceSuccessDto } from "./dto/success/attendance-success.dto";
 
 @ApiTags("Attendance")
 @Controller("attendance")
@@ -52,14 +48,18 @@ export class AttendanceController {
     summary: "Mark attendance",
     description: "Marks the authenticated user as present.",
   })
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
   @ApiSuccessResponse(AttendanceSuccessDto, 201)
   @ApiErrorResponses({
-    validation: MarkAttendanceValidationDto,
     unauthorized: MarkAttendanceUnauthorizedDto,
     forbidden: MarkAttendanceForbiddenDto,
     notFound: MarkAttendanceNotFoundDto,
     conflict: MarkAttendanceConflictDto,
-    throttle: MarkAttendanceThrottlerDto,
     internal: MarkAttendanceInternalErrorDto,
   })
   @Post("present")
@@ -81,14 +81,18 @@ export class AttendanceController {
     summary: "Get my attendance",
     description: "Retrieves attendance records for the authenticated user.",
   })
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token for authentication",
+    required: true,
+    example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  })
   @ApiSuccessResponse(MyAttendanceSuccessDto, 200)
   @ApiErrorResponses({
     validation: MyAttendanceValidationDto,
     unauthorized: MyAttendanceUnauthorizedDto,
     forbidden: MyAttendanceForbiddenDto,
-    notFound: MyAttendanceNotFoundDto,
     conflict: MyAttendanceConflictDto,
-    throttle: MyAttendanceThrottlerDto,
     internal: MyAttendanceInternalErrorDto,
   })
   @Get("my-attendance")
