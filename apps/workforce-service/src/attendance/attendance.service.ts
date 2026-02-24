@@ -12,6 +12,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { InjectModel } from "@nestjs/mongoose";
 import { USER_COMMANDS } from "@shared/constants/user-command.constants";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { AuthUser } from "@shared/interfaces/auth-user.interface";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
@@ -32,7 +33,6 @@ import { GetAttendanceDto } from "./dto/get-attendance.dto";
 
   if the user marks attendance within 15 minutes of shift timing, then it will be marked as present, otherwise it will be marked as late
 */
-
 @Injectable()
 export class AttendanceService {
   constructor(
@@ -234,6 +234,48 @@ export class AttendanceService {
       const endDate = new Date(currentYear, month, 0, 23, 59, 59, 999);
       filter.date = { $gte: startDate, $lte: endDate };
     }
+    // Filter by year only
+    else if (year) {
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+      filter.date = { $gte: startDate, $lte: endDate };
+    }
+
+    return await this.attendanceModel.find(filter).sort({ date: 1 });
+  }
+
+  /**
+   * Retrieves the attendance records for a specific user based on optional month and year filters.
+   *
+   * @param userId - The unique identifier of the user whose attendance records are being retrieved.
+   * @param query - Optional query parameters for filtering attendance records by month and year.
+   * @return A promise that resolves to an array of attendance records matching the specified criteria for the given user, or an object containing a message and exception if there was an error during retrieval.
+   */
+  async getSpecificUserAttendance(
+    userId: MongoIdDto["id"],
+    query: GetAttendanceDto,
+  ) {
+    const { month /* 1-12 */, year /* 1900999*/ } = query;
+
+    const filter: any = {
+      user: new Types.ObjectId(userId),
+    };
+
+    // Filter by month and year if provided
+    if (month && year) {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+      filter.date = { $gte: startDate, $lte: endDate };
+    }
+
+    // Filter by month only
+    else if (month) {
+      const currentYear = new Date().getFullYear();
+      const startDate = new Date(currentYear, month - 1, 1);
+      const endDate = new Date(currentYear, month, 0, 23, 59, 59, 999);
+      filter.date = { $gte: startDate, $lte: endDate };
+    }
+
     // Filter by year only
     else if (year) {
       const startDate = new Date(year, 0, 1);

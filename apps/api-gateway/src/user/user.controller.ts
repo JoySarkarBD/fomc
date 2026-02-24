@@ -23,6 +23,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
@@ -87,6 +88,24 @@ export class UserController {
     description: "Retrieves a list of users with optional filtering.",
   })
   @ApiBearerAuth("authorization")
+  @ApiQuery({
+    name: "pageNo",
+    required: true,
+    type: Number,
+    description: "Page number, starts from 1",
+  })
+  @ApiQuery({
+    name: "pageSize",
+    required: true,
+    type: Number,
+    description: "Items per page",
+  })
+  @ApiQuery({
+    name: "search",
+    required: false,
+    type: String,
+    description: "Search keyword",
+  })
   @ApiSuccessResponse(UsersListSuccessDto, 200)
   @ApiErrorResponses({
     validation: UsersValidationDto,

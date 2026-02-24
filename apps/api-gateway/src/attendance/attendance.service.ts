@@ -85,4 +85,25 @@ export class AttendanceService {
 
     return buildResponse("Attendance marked as out", result);
   }
+
+  /**
+   * Retrieves attendance records for a specific user based on optional month and year filters.
+   *
+   * @param userId - The ID of the user whose attendance records are being retrieved.
+   * @param query - Optional query parameters for filtering attendance records by month and year.
+   * @return A promise that resolves to an array of attendance records for the specified user matching the specified criteria, or an object containing a message and exception if there was an error during retrieval.
+   */
+  async getSpecificUserAttendance(userId: string, query: GetAttendanceDto) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(
+        ATTENDANCE_COMMANDS.GET_SPECIFIC_USER_ATTENDANCE,
+        {
+          userId,
+          query,
+        },
+      ),
+    );
+
+    return buildResponse("Attendance retrieved", result);
+  }
 }

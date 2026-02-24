@@ -7,8 +7,15 @@
  * @module api-gateway/attendance
  */
 
-import { Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from "@nestjs/swagger";
+import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
@@ -31,9 +38,14 @@ import { MyAttendanceInternalErrorDto } from "./dto/error/attendance/my-attendan
 import { MyAttendanceSuccessDto } from "./dto/error/attendance/my-attendance/my-attendance-success.dto";
 import { MyAttendanceUnauthorizedDto } from "./dto/error/attendance/my-attendance/my-attendance-unauthorized.dto";
 import { MyAttendanceValidationDto } from "./dto/error/attendance/my-attendance/my-attendance-validation.dto";
+import { SingleUserAttendanceForbiddenDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-forbidden.dto";
+import { SingleUserAttendanceInternalErrorDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-internal-error.dto";
+import { SingleUserAttendanceUnauthorizedDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-unauthorized.dto";
+import { SingleUserAttendanceValidationDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-validation.dto";
 import {
   MarkAttendanceSuccessDto,
   MarkOutAttendanceSuccessDto,
+  SingleUserAttendanceSuccessDto,
 } from "./dto/success/attendance-success.dto";
 
 @ApiTags("Attendance")
@@ -81,6 +93,16 @@ export class AttendanceController {
     description: "Retrieves attendance records for the authenticated user.",
   })
   @ApiBearerAuth("authorization")
+  @ApiQuery({
+    name: "month",
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: "year",
+    required: true,
+    type: Number,
+  })
   @ApiSuccessResponse(MyAttendanceSuccessDto, 200)
   @ApiErrorResponses({
     validation: MyAttendanceValidationDto,
@@ -125,25 +147,55 @@ export class AttendanceController {
     return this.attendanceService.outAttendance(user);
   }
 
-  // @ApiOperation({
-  //   summary: "Get team attendance list",
-  //   description: "Retrieves attendance records for team members.",
-  // })
-  // @ApiBearerAuth("authorization")
-  // @ApiSuccessResponse(AttendanceListSuccessDto, 200, true)
-  // @ApiErrorResponses({
-  //   unauthorized: AttendanceListUnauthorizedDto,
-  //   forbidden: AttendanceListForbiddenDto,
-  //   validation: AttendanceListValidationDto,
-  //   internal: AttendanceListInternalErrorDto,
-  // })
-  // @Get()
-  // @UseGuards(RolesGuard)
-  // @Roles("HR", "PROJECT MANAGER")
-  // async getAttendanceList(
-  //   @GetUser() user: AuthUser,
-  //   @Query() query: GetAttendanceDto,
-  // ) {
-  //   return this.attendanceService.getAttendanceList(user, query);
-  // }
+  /**
+   * Retrieves attendance records for a specific user based on optional month and year filters.
+   *
+   * @guards RolesGuard - Ensures that only users with specific roles can access this endpoint.
+   * @param userId - The ID of the user whose attendance records are being retrieved.
+   * @param query - Optional query parameters for filtering attendance records by month and year.
+   * @returns The attendance records for the specified user matching the specified criteria or an error message if the retrieval fails.
+   * @remarks This endpoint allows HR, Project Managers, and Team Leaders to retrieve attendance records for a specific user. It checks if the authenticated user has the necessary roles to access this information and then retrieves the attendance records based on the provided user ID and optional filters for month and year.
+   */
+  @ApiOperation({
+    summary:
+      "Get specific user attendance records - HR, PROJECT MANAGER, TEAM LEADER only",
+    description: "Retrieves attendance records for a specific user.",
+  })
+  @ApiBearerAuth("authorization")
+  @ApiParam({
+    name: "userId",
+    description:
+      "The ID of the user whose attendance records are being retrieved",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "month",
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: "year",
+    required: true,
+    type: Number,
+  })
+  @ApiSuccessResponse(SingleUserAttendanceSuccessDto, 200)
+  @ApiErrorResponses({
+    validation: SingleUserAttendanceValidationDto,
+    unauthorized: SingleUserAttendanceUnauthorizedDto,
+    forbidden: SingleUserAttendanceForbiddenDto,
+    internal: SingleUserAttendanceInternalErrorDto,
+  })
+  @Get("user-attendance/:userId")
+  @UseGuards(RolesGuard)
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
+  async getSpecificUserAttendance(
+    @Param("userId") userId: MongoIdDto["id"],
+    @Query() query: GetAttendanceDto,
+  ) {
+    return await this.attendanceService.getSpecificUserAttendance(
+      userId,
+      query,
+    );
+  }
 }

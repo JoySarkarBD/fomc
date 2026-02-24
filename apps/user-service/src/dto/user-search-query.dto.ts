@@ -21,6 +21,7 @@ export class UserSearchQueryDto extends SearchQueryDto {
   @ApiProperty({
     description: "Filter users by role IDs (comma-separated or array)",
     example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -46,6 +47,7 @@ export class UserSearchQueryDto extends SearchQueryDto {
   @ApiProperty({
     description: "Filter users by department IDs (comma-separated or array)",
     example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -74,6 +76,7 @@ export class UserSearchQueryDto extends SearchQueryDto {
   @ApiProperty({
     description: "Filter users by designation IDs (comma-separated or array)",
     example: "60c72b2f9b1d8e5a5c8f9e7d,60c72b2f9b1d8e5a5c8f9e7e",
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
