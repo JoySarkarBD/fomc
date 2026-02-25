@@ -40,15 +40,20 @@ export class AttendanceByAuthorityDto {
   userId!: string;
 
   @ApiProperty({
-    required: true,
-    description: "The type of attendance to mark for the user",
-    example: AttendanceInType.PRESENT,
-    enum: AttendanceInType,
+    required: false,
+    description: "The check-in time for the attendance record (optional)",
+    example: "2024-05-01T08:00:00.000Z",
   })
-  @IsEnum(AttendanceInType, {
-    message: "inType must be a valid AttendanceInType",
+  @IsDateString({}, { message: "Date must be a valid UTC date string" })
+  checkInTime?: Date;
+
+  @ApiProperty({
+    required: false,
+    description: "The check-out time for the attendance record (optional)",
+    example: "2024-05-01T17:00:00.000Z",
   })
-  inType!: AttendanceInType;
+  @IsDateString({}, { message: "Date must be a valid UTC date string" })
+  checkOutTime?: Date;
 
   @ApiProperty({
     required: false,
@@ -59,6 +64,17 @@ export class AttendanceByAuthorityDto {
   @IsOptional()
   @IsDateString({}, { message: "Date must be a valid UTC date string" })
   date?: string;
+
+  @ApiProperty({
+    required: true,
+    description: "The type of attendance to mark for the user",
+    example: AttendanceInType.PRESENT,
+    enum: AttendanceInType,
+  })
+  @IsEnum(AttendanceInType, {
+    message: "inType must be a valid AttendanceInType",
+  })
+  inType!: AttendanceInType;
 
   @IsOptional()
   @IsEnum(

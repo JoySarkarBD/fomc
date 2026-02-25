@@ -20,12 +20,20 @@ export class MarkAsAuthorityValidationDto extends ValidationErrorResponseDto {
         message: "userId must be a valid MongoDB ObjectId - param required",
       },
       {
-        field: "inType",
-        message: "inType must be a valid inType value",
+        field: "checkInTime",
+        message: "checkInTime must be a valid UTC date string",
+      },
+      {
+        field: "checkOutTime",
+        message: "checkOutTime must be a valid UTC date string",
       },
       {
         field: "date",
         message: "date must be a valid UTC date string",
+      },
+      {
+        field: "inType",
+        message: "inType must be a valid inType value",
       },
       {
         field: "shiftType",

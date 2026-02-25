@@ -337,11 +337,16 @@ export class AttendanceService {
    * @param attendanceDetails - An object containing the details of the attendance to be marked, including the attendance type (e.g., present, late, absent), optional date (defaults to today if not provided), optional shift type, and optional late status.
    * @return A promise that resolves to the created or updated attendance record if successfully marked, or an object containing a message and exception if there was an error during the marking process.
    */
-  async markAttendanceAsAuthority(
-    userId: UserIdDto["userId"],
-    attendanceDetails: AttendanceByAuthorityDto,
-  ) {
-    const { inType, date, shiftType, isLate } = attendanceDetails;
+  async markAttendanceAsAuthority(attendanceDetails: AttendanceByAuthorityDto) {
+    const {
+      inType,
+      date,
+      shiftType,
+      isLate,
+      userId,
+      checkInTime,
+      checkOutTime,
+    } = attendanceDetails;
 
     // Current BD Time
     const nowUTC = new Date();
@@ -365,6 +370,12 @@ export class AttendanceService {
       existingAttendance.inType = inType;
       existingAttendance.shiftType = shiftType;
       existingAttendance.isLate = isLate;
+      if (checkInTime) {
+        existingAttendance.checkInTime = checkInTime;
+      }
+      if (checkOutTime) {
+        existingAttendance.checkOutTime = checkOutTime;
+      }
       return await existingAttendance.save();
     }
 
@@ -375,6 +386,8 @@ export class AttendanceService {
       inType,
       shiftType,
       isLate,
+      checkInTime: checkInTime ?? bdNow,
+      checkOutTime: checkOutTime ?? null,
     });
 
     return await attendance.save();
