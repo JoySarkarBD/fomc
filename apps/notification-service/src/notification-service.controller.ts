@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
-import { MessagePattern } from "@nestjs/microservices";
+import { MessagePattern, Payload } from "@nestjs/microservices";
 import { NOTIFICATION_COMMANDS } from "@shared/constants";
+import { CreateNotificationDto } from "./dto/create-notification.dto";
 import { NotificationServiceService } from "./notification-service.service";
 
 @Controller()
@@ -10,8 +11,10 @@ export class NotificationServiceController {
   ) {}
 
   @MessagePattern(NOTIFICATION_COMMANDS.CREATE_NOTIFICATION)
-  createNotification(data: any) {
-    return this.notificationServiceService.createNotification(data);
+  createNotification(@Payload() createNotification: CreateNotificationDto) {
+    return this.notificationServiceService.createNotification(
+      createNotification,
+    );
   }
 
   @MessagePattern(NOTIFICATION_COMMANDS.GET_USER_NOTIFICATIONS)

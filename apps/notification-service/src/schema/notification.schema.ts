@@ -27,8 +27,11 @@ export enum NotificationType {
 export class Notification extends Document {
   // Receiver (who will see this notification)
 
-  @Prop({ type: Types.ObjectId, required: true, ref: "User" })
-  receiver!: mongo.ObjectId;
+  @Prop({
+    type: Types.ObjectId,
+    required: true,
+  })
+  receiver!: mongo.ObjectId[];
 
   // Optional Sender (admin / manager / system)
 
@@ -65,10 +68,6 @@ export class Notification extends Document {
   // Read status
   @Prop({ default: false })
   isRead!: boolean;
-
-  // Soft delete (optional future use)
-  @Prop({ default: false })
-  isDeleted!: boolean;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
