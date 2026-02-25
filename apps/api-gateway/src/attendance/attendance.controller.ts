@@ -212,7 +212,7 @@ export class AttendanceController {
   })
   @Get("user-attendance/:userId")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
   async getSpecificUserAttendance(
     @Param() params: UserIdDto,
     @Query() query: GetAttendanceDto,
@@ -262,7 +262,7 @@ export class AttendanceController {
   })
   @Patch("weekend-exchange/:userId")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
   async exchangeWeekend(
     @Param() params: UserIdDto,
     @Body() body: WeekendExchangeDto,
