@@ -18,11 +18,12 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import { CreateRoleDto } from "apps/user-service/src/role/dto/create-role.dto";
 import { UpdateRoleDto } from "apps/user-service/src/role/dto/update-role.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import {
@@ -86,6 +87,7 @@ export class RoleController {
     summary: "Create role",
     description: "Creates a new user role in the system.",
   })
+  @ApiBearerAuth("authorization")
   @ApiSuccessResponse(RoleCreateSuccessDto, 201)
   @ApiErrorResponses({
     validation: RoleCreateValidationDto,
@@ -132,11 +134,14 @@ export class RoleController {
     summary: "Get role by ID",
     description: "Retrieves details of a specific user role.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(RoleByIdSuccessDto, 200)
   @ApiErrorResponses({
@@ -161,11 +166,15 @@ export class RoleController {
     summary: "Update role",
     description: "Updates an existing user role's details.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiBearerAuth("authorization")
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(RolePatchSuccessDto, 200)
   @ApiErrorResponses({
@@ -195,11 +204,15 @@ export class RoleController {
     summary: "Delete role",
     description: "Deletes a user role by its ID.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiBearerAuth("authorization")
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(RoleDeleteSuccessDto, 200)
   @ApiErrorResponses({

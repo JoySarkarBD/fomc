@@ -22,7 +22,6 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
@@ -35,6 +34,7 @@ import type { File } from "multer";
 import { diskStorage } from "multer";
 import * as path from "path";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
@@ -131,11 +131,14 @@ export class UserController {
     summary: "Get user by ID",
     description: "Retrieves details of a specific user.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiBearerAuth("authorization")
   @ApiSuccessResponse(UserSuccessDto, 200)

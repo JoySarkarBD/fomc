@@ -102,7 +102,6 @@ export class AuthController {
     summary: "Forgot password",
     description: "Sends a password reset OTP to the user's email.",
   })
-  @ApiBearerAuth("authorization")
   @ApiSuccessResponse(ForgotPasswordSuccessDto, 200)
   @ApiErrorResponses({
     validation: ForgotPasswordValidationDto,
@@ -120,7 +119,6 @@ export class AuthController {
     summary: "Reset password",
     description: "Resets the user's password using a valid OTP.",
   })
-  @ApiBearerAuth("authorization")
   @ApiSuccessResponse(ResetPasswordSuccessDto, 200)
   @ApiErrorResponses({
     validation: ResetPasswordValidationDto,

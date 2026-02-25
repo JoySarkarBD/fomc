@@ -18,12 +18,13 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDesignationDto } from "apps/workforce-service/src/designation/dto/create-designation.dto";
 import { UpdateDesignationDto } from "apps/workforce-service/src/designation/dto/update-designation.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DesignationService } from "./designation.service";
@@ -89,11 +90,14 @@ export class DesignationController {
     summary: "Get designation by ID",
     description: "Retrieves details of a specific job designation.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DesignationSuccessDto, 200)
   @ApiErrorResponses({
@@ -117,11 +121,14 @@ export class DesignationController {
     summary: "Update designation",
     description: "Updates an existing job designation's details.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DesignationSuccessDto, 200)
   @ApiErrorResponses({
@@ -173,11 +180,14 @@ export class DesignationController {
     summary: "Delete designation",
     description: "Deletes a job designation by its ID.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DesignationSuccessDto, 200)
   @ApiErrorResponses({

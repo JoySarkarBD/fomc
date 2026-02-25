@@ -18,12 +18,13 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDepartmentDto } from "../../../workforce-service/src/department/dto/create-department.dto";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department/dto/update-department.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DepartmentService } from "./department.service";
@@ -85,6 +86,7 @@ export class DepartmentController {
     summary: "Create department",
     description: "Creates a new department in the organization.",
   })
+  @ApiBearerAuth("authorization")
   @ApiSuccessResponse(DepartmentCreateSuccessDto, 201)
   @ApiErrorResponses({
     validation: DepartmentCreateValidationDto,
@@ -130,11 +132,14 @@ export class DepartmentController {
     summary: "Get department by ID",
     description: "Retrieves details of a specific department.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DepartmentByIdSuccessDto, 200)
   @ApiErrorResponses({
@@ -160,11 +165,15 @@ export class DepartmentController {
     summary: "Update department",
     description: "Updates an existing department's details.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiBearerAuth("authorization")
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DepartmentPatchSuccessDto, 200)
   @ApiErrorResponses({
@@ -197,11 +206,15 @@ export class DepartmentController {
     summary: "Delete department",
     description: "Deletes a department by its ID.",
   })
-  @ApiParam({
-    name: "id",
-    type: String,
-    required: true,
-    example: "65f1b2c3d4e5f67890123456",
+  @ApiBearerAuth("authorization")
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the department to retrieve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiSuccessResponse(DepartmentDeleteSuccessDto, 200)
   @ApiErrorResponses({

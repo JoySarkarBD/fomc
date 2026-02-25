@@ -17,19 +17,13 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
 import { WeekendExchangeDto } from "apps/api-gateway/src/attendance/weekend-exchange.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
@@ -110,15 +104,21 @@ export class AttendanceController {
     description: "Retrieves attendance records for the authenticated user.",
   })
   @ApiBearerAuth("authorization")
-  @ApiQuery({
-    name: "month",
-    required: true,
-    type: Number,
-  })
-  @ApiQuery({
-    name: "year",
-    required: true,
-    type: Number,
+  @ApiRequestDetails({
+    queries: [
+      {
+        name: "month",
+        required: true,
+        type: Number,
+        example: 8,
+      },
+      {
+        name: "year",
+        required: true,
+        type: Number,
+        example: 2026,
+      },
+    ],
   })
   @ApiSuccessResponse(MyAttendanceSuccessDto, 200)
   @ApiErrorResponses({
@@ -179,22 +179,29 @@ export class AttendanceController {
     description: "Retrieves attendance records for a specific user.",
   })
   @ApiBearerAuth("authorization")
-  @ApiParam({
-    name: "userId",
-    description:
-      "The ID of the user whose attendance records are being retrieved",
-    required: true,
-    type: String,
-  })
-  @ApiQuery({
-    name: "month",
-    required: true,
-    type: Number,
-  })
-  @ApiQuery({
-    name: "year",
-    required: true,
-    type: Number,
+  @ApiRequestDetails({
+    params: {
+      name: "userId",
+      description:
+        "The ID of the user whose attendance records are being retrieved",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
+    queries: [
+      {
+        name: "month",
+        required: true,
+        type: Number,
+        example: 8,
+      },
+      {
+        name: "year",
+        required: true,
+        type: Number,
+        example: 2026,
+      },
+    ],
   })
   @ApiSuccessResponse(SingleUserAttendanceSuccessDto, 200)
   @ApiErrorResponses({
@@ -231,12 +238,15 @@ export class AttendanceController {
       "Allows the authenticated user to exchange their weekend off with another user.",
   })
   @ApiBearerAuth("authorization")
-  @ApiParam({
-    name: "userId",
-    description:
-      "The ID of the user with whom the authenticated user wants to exchange their weekend off",
-    required: true,
-    type: String,
+  @ApiRequestDetails({
+    params: {
+      name: "userId",
+      description:
+        "The ID of the user with whom the authenticated user wants to exchange their weekend off",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
   })
   @ApiBody({
     description: "The weekend off values to be set for the user",
