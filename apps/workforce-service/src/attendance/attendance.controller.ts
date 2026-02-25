@@ -14,6 +14,7 @@ import type { AuthUser } from "@shared/interfaces";
 import { AttendanceService } from "./attendance.service";
 import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
+import { WeekendExchangeByAuthorityDto } from "./dto/weekend-exchange-by-authority.dto";
 
 /**
  * Attendance Controller
@@ -109,6 +110,27 @@ export class AttendanceController {
     return await this.attendanceService.markAttendanceAsAuthority(
       payload.userId,
       payload.attendanceDetails,
+    );
+  }
+
+  /**
+   * Swaps a weekend day with a working day on behalf of an authority (e.g., manager) by updating the user's weekend off days to the specified values.
+   *
+   * Message Pattern: { cmd: ATTENDANCE_COMMANDS.WEEKEND_EXCHANGE_BY_AUTHORITY }
+   *
+   * @param {Object} payload - The payload containing the userId and new weekend off days.
+   * @param {string} payload.userId - The unique identifier of the user whose weekend off days are being updated.
+   * @param {string[]} payload.weekEndExchange - An array of strings representing the new weekend off days to be set for the user (e.g., ["Saturday", "Sunday"]).
+   * @returns {Promise<any>} A promise that resolves to the updated user record with the new weekend off days if the update is successful, or an object containing a message and exception if there was an error during the update process.
+   */
+  @MessagePattern(ATTENDANCE_COMMANDS.WEEKEND_EXCHANGE_BY_AUTHORITY)
+  async weekendExchangeByAuthority(payload: {
+    userId: UserIdDto["userId"];
+    weekEndExchange: WeekendExchangeByAuthorityDto;
+  }) {
+    return await this.attendanceService.weekendExchangeByAuthority(
+      payload.userId,
+      payload.weekEndExchange,
     );
   }
 }

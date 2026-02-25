@@ -2,12 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { CustomInternalServerErrorDto } from "apps/api-gateway/src/common/dto/custom-internal-server-error.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
-export class MarkAttendanceAsAuthorityInternalErrorDto extends CustomInternalServerErrorDto {
+export class MarkWeekendExchangeAsAuthorityInternalErrorDto extends CustomInternalServerErrorDto {
   @ApiProperty({ example: Methods.POST })
   declare method: Methods.POST;
 
   @ApiProperty({
-    example: "api/attendance/mark-attendance-by-authority/:userId",
+    example: "api/attendance/weekend-exchange-by-authority/:userId",
   })
   declare endpoint: string;
 }

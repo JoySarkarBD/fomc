@@ -2,12 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { CustomForbiddenDto } from "apps/api-gateway/src/common/dto/custom-forbidden.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
-export class MarkAttendanceAsAuthorityForbiddenDto extends CustomForbiddenDto {
+export class MarkWeekendExchangeAsAuthorityForbiddenDto extends CustomForbiddenDto {
   @ApiProperty({ example: Methods.POST })
   declare method: Methods.POST;
 
   @ApiProperty({
-    example: "api/attendance/mark-attendance-by-authority/:userId",
+    example: "api/attendance/weekend-exchange-by-authority/:userId",
   })
   declare endpoint: string;
 

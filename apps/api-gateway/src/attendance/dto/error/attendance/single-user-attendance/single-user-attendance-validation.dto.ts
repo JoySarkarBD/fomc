@@ -9,7 +9,7 @@ export class SingleUserAttendanceValidationDto extends ValidationErrorResponseDt
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
-  @ApiProperty({ example: "api/attendance/my-attendance/:userId" })
+  @ApiProperty({ example: "api/attendance/user-attendance/:userId" })
   declare endpoint: string;
 
   @ApiProperty({

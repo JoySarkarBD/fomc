@@ -29,6 +29,7 @@ import {
 } from "../schemas/weekend-exchange.schema";
 import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
+import { WeekendExchangeByAuthorityDto } from "./dto/weekend-exchange-by-authority.dto";
 
 /* 
   attendance logic:-
@@ -210,6 +211,23 @@ export class AttendanceService {
   async outAttendance(user: AuthUser) {
     const userId = (user.id ?? user._id) as string;
 
+    // Fetch user from user-service
+    const userExist = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id: userId,
+        myRole: user.role,
+        myId: userId,
+        myDepartment: user.department,
+      }),
+    );
+
+    if (userExist.exception) {
+      return {
+        message: userExist.message,
+        exception: userExist.exception,
+      };
+    }
+
     // Current BD Time
     const nowUTC = new Date();
     const bdNow = new Date(
@@ -348,6 +366,22 @@ export class AttendanceService {
     const { inType, date, shiftType, isLate, checkInTime, checkOutTime } =
       attendanceDetails;
 
+    const userExist = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id: userId,
+        myRole: "MANAGER",
+        myId: userId,
+        myDepartment: "OPERATIONS",
+      }),
+    );
+
+    if (userExist.exception) {
+      return {
+        message: userExist.message,
+        exception: userExist.exception,
+      };
+    }
+
     // Current BD Time
     const nowUTC = new Date();
     const bdNow = new Date(
@@ -391,5 +425,59 @@ export class AttendanceService {
     });
 
     return await attendance.save();
+  }
+
+  /**
+   * Marks the weekend exchange for a user on behalf of an authority (e.g., manager) by creating a weekend exchange record with the provided original weekend date and new off date. Validates that the user exists and that there are no existing exchanges for the same original weekend date before creating the new exchange record.
+   *
+   * @param userId - The unique identifier of the user for whom the weekend exchange is being marked.
+   * @param weekEndExchange - An object containing the original weekend date to be exchanged and the new off date after exchange.
+   * @return A promise that resolves to the created weekend exchange record if successfully marked, or an object containing a message and exception if there was an error during the marking process (e.g., user not found, existing exchange for the original weekend date).
+   */
+  async weekendExchangeByAuthority(
+    userId: UserIdDto["userId"],
+    weekEndExchange: WeekendExchangeByAuthorityDto,
+  ) {
+    const { originalWeekendDate, newOffDate } = weekEndExchange;
+
+    // Check if user exists
+    const userExist = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id: userId,
+        myRole: "MANAGER",
+        myId: userId,
+        myDepartment: "OPERATIONS",
+      }),
+    );
+
+    if (userExist.exception) {
+      return {
+        message: userExist.message,
+        exception: userExist.exception,
+      };
+    }
+
+    // Check if an exchange already exists for the original weekend date
+    const existingExchange = await this.weekendExchangeModel.findOne({
+      user: new Types.ObjectId(userId),
+      originalWeekendDate,
+    });
+
+    if (existingExchange) {
+      return {
+        message: "An exchange already exists for the original weekend date",
+        exception: "HttpException",
+      };
+    }
+
+    // Create new weekend exchange record
+    const exchange = new this.weekendExchangeModel({
+      user: new Types.ObjectId(userId),
+      originalWeekendDate,
+      newOffDate,
+      exchangedBy: new Types.ObjectId(userId), // Assuming the manager is performing the exchange on behalf of the user
+    });
+
+    return await exchange.save();
   }
 }

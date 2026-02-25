@@ -5,11 +5,13 @@ import {
 } from "apps/api-gateway/src/common/dto/validation-error.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
-export class MarkAsAuthorityValidationDto extends ValidationErrorResponseDto {
+export class MarkAttendanceAsAuthorityValidationDto extends ValidationErrorResponseDto {
   @ApiProperty({ example: Methods.PATCH })
   declare method: Methods.PATCH;
 
-  @ApiProperty({ example: "api/attendance/mark-attendance-by-authority" })
+  @ApiProperty({
+    example: "api/attendance/mark-attendance-by-authority/:userId",
+  })
   declare endpoint: string;
 
   @ApiProperty({

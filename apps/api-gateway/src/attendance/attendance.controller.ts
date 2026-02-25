@@ -22,6 +22,7 @@ import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
 import { AttendanceByAuthorityDto } from "apps/workforce-service/src/attendance/dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
+import { WeekendExchangeByAuthorityDto } from "apps/workforce-service/src/attendance/dto/weekend-exchange-by-authority.dto";
 import { UpdateByAuthorityWeekendSetDto } from "../../../workforce-service/src/attendance/dto/update-weekend-by-authority.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
@@ -31,10 +32,11 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AttendanceService } from "./attendance.service";
-import { MarkAsAuthorityForbiddenDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-forbidden.dto";
-import { MarkAsAuthorityInternalErrorDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-internal-error.dto";
-import { MarkAsAuthorityUnauthorizedDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-unauthorized.dto";
-import { MarkAsAuthorityValidationDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-validation.dto";
+import { MarkAttendanceAsAuthorityForbiddenDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-forbidden.dto";
+import { MarkAttendanceAsAuthorityInternalErrorDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-internal-error.dto";
+import { MarkAttendanceAsAuthorityNotFoundDtoDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-not-found.dto";
+import { MarkAttendanceAsAuthorityUnauthorizedDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-unauthorized.dto";
+import { MarkAttendanceAsAuthorityValidationDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-validation.dto";
 import { MarkAttendanceForbiddenDto } from "./dto/error/attendance/mark-attendance/mark-attendance-forbidden.dto";
 import { MarkAttendanceInternalErrorDto } from "./dto/error/attendance/mark-attendance/mark-attendance-internal-error.dto";
 import { MarkAttendanceNotFoundDto } from "./dto/error/attendance/mark-attendance/mark-attendance-not-found.dto";
@@ -43,6 +45,11 @@ import { MarkOutAttendanceForbiddenDto } from "./dto/error/attendance/mark-out-a
 import { MarkOutAttendanceInternalErrorDto } from "./dto/error/attendance/mark-out-attendance/mark-out-attendance-internal-error.dto";
 import { MarkOutAttendanceNotFoundDto } from "./dto/error/attendance/mark-out-attendance/mark-out-attendance-not-found.dto";
 import { MarkOutAttendanceUnauthorizedDto } from "./dto/error/attendance/mark-out-attendance/mark-out-attendance-unauthorized.dto";
+import { MarkWeekendExchangeAsAuthorityForbiddenDto } from "./dto/error/attendance/mark-weekend-as-authority/mark-weekend-exchange-as-authority-forbidden.dto";
+import { MarkWeekendExchangeAsAuthorityInternalErrorDto } from "./dto/error/attendance/mark-weekend-as-authority/mark-weekend-exchange-as-authority-internal-error.dto";
+import { MarkWeekendExchangeAsAuthorityNotFoundDto } from "./dto/error/attendance/mark-weekend-as-authority/mark-weekend-exchange-as-authority-not-found.dto";
+import { MarkWeekendExchangeAsAuthorityUnauthorizedDto } from "./dto/error/attendance/mark-weekend-as-authority/mark-weekend-exchange-as-authority-unauthorized.dto";
+import { MarkWeekendExchangeAsAuthorityValidationDto } from "./dto/error/attendance/mark-weekend-as-authority/mark-weekend-exchange-as-validation.dto";
 import { MyAttendanceForbiddenDto } from "./dto/error/attendance/my-attendance/my-attendance-forbidden.dto";
 import { MyAttendanceInternalErrorDto } from "./dto/error/attendance/my-attendance/my-attendance-internal-error.dto";
 import { MyAttendanceSuccessDto } from "./dto/error/attendance/my-attendance/my-attendance-success.dto";
@@ -50,6 +57,7 @@ import { MyAttendanceUnauthorizedDto } from "./dto/error/attendance/my-attendanc
 import { MyAttendanceValidationDto } from "./dto/error/attendance/my-attendance/my-attendance-validation.dto";
 import { SingleUserAttendanceForbiddenDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-forbidden.dto";
 import { SingleUserAttendanceInternalErrorDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-internal-error.dto";
+import { SingleUserAttendanceNotFoundDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-not-found.dto";
 import { SingleUserAttendanceUnauthorizedDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-unauthorized.dto";
 import { SingleUserAttendanceValidationDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-validation.dto";
 import { UpdateByAuthorityWeekendSetForbiddenDto } from "./dto/error/attendance/update-weekend/update-weekend-forbidden.dto";
@@ -61,6 +69,7 @@ import {
   MarkAttendanceAsAuthoritySuccessDto,
   MarkAttendanceSuccessDto,
   MarkOutAttendanceSuccessDto,
+  MarkWeekendExchangeByAuthoritySuccessDto,
   SingleUserAttendanceSuccessDto,
   UpdateByAuthorityWeekendSetSuccessDto,
 } from "./dto/success/attendance-success.dto";
@@ -212,6 +221,7 @@ export class AttendanceController {
   @ApiSuccessResponse(SingleUserAttendanceSuccessDto, 200)
   @ApiErrorResponses({
     validation: SingleUserAttendanceValidationDto,
+    notFound: SingleUserAttendanceNotFoundDto,
     unauthorized: SingleUserAttendanceUnauthorizedDto,
     forbidden: SingleUserAttendanceForbiddenDto,
     internal: SingleUserAttendanceInternalErrorDto,
@@ -298,12 +308,23 @@ export class AttendanceController {
     description: "The details of the attendance to be marked",
     type: AttendanceByAuthorityDto,
   })
+  @ApiRequestDetails({
+    params: {
+      name: "userId",
+      description:
+        "The ID of the user for whom the attendance is being marked by the authority",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
+  })
   @ApiSuccessResponse(MarkAttendanceAsAuthoritySuccessDto, 200)
   @ApiErrorResponses({
-    unauthorized: MarkAsAuthorityUnauthorizedDto,
-    validation: MarkAsAuthorityValidationDto,
-    forbidden: MarkAsAuthorityForbiddenDto,
-    internal: MarkAsAuthorityInternalErrorDto,
+    unauthorized: MarkAttendanceAsAuthorityUnauthorizedDto,
+    notFound: MarkAttendanceAsAuthorityNotFoundDtoDto,
+    validation: MarkAttendanceAsAuthorityValidationDto,
+    forbidden: MarkAttendanceAsAuthorityForbiddenDto,
+    internal: MarkAttendanceAsAuthorityInternalErrorDto,
   })
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
@@ -318,8 +339,53 @@ export class AttendanceController {
     );
   }
 
-  // @Patch("weekend-exchange-by-authority")
-  // async weekendExchangeByAuthority() {
-  //   return await this.attendanceService.weekendExchangeByAuthority();
-  // }
+  /**
+   * Marks the weekend exchange for a user on behalf of an authority (e.g., manager) by sending a command to the Workforce micro-service to create a weekend exchange record with the provided original weekend date and new off date. Validates that the user exists and that there are no existing exchanges for the same original weekend date before creating the new exchange record.
+   *
+   * Message Pattern: { cmd: ATTENDANCE_COMMANDS.WEEKEND_EXCHANGE_BY_AUTHORITY }
+   *
+   * @param weekEndExchange - An object containing the original weekend date to be exchanged and the new off date after exchange.
+   * @return A promise that resolves to a success message if the weekend exchange was marked successfully, or an object containing a message and exception if there was an error during the marking process (e.g., user not found, existing exchange for the original weekend date).
+   * @remarks This endpoint allows an authority (e.g., manager) to mark the weekend exchange for a user by providing the necessary details in the request body. The service will handle the logic to create the weekend exchange record based on the provided information and return the appropriate response.
+   */
+  @ApiOperation({
+    summary: "Weekend exchange by authority",
+    description:
+      "Allows an authority (e.g., manager) to mark the weekend exchange for a user by providing the original weekend date and new off date in the request body.",
+  })
+  @ApiBearerAuth("authorization")
+  @ApiBody({
+    description: "The details of the weekend exchange to be marked",
+    type: WeekendExchangeByAuthorityDto,
+  })
+  @ApiRequestDetails({
+    params: {
+      name: "userId",
+      description:
+        "The ID of the user for whom the weekend exchange is being marked by the authority",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
+  })
+  @ApiSuccessResponse(MarkWeekendExchangeByAuthoritySuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: MarkWeekendExchangeAsAuthorityUnauthorizedDto,
+    notFound: MarkWeekendExchangeAsAuthorityNotFoundDto,
+    validation: MarkWeekendExchangeAsAuthorityValidationDto,
+    forbidden: MarkWeekendExchangeAsAuthorityForbiddenDto,
+    internal: MarkWeekendExchangeAsAuthorityInternalErrorDto,
+  })
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Patch("weekend-exchange-by-authority/:userId")
+  async weekendExchangeByAuthority(
+    @Param() params: UserIdDto,
+    @Body() body: WeekendExchangeByAuthorityDto,
+  ) {
+    return await this.attendanceService.weekendExchangeByAuthority(
+      params.userId,
+      body,
+    );
+  }
 }

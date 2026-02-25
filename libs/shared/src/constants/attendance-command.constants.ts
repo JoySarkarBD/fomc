@@ -25,4 +25,7 @@ export const ATTENDANCE_COMMANDS = {
 
   /** Mark attendance for a user on behalf of an authority (e.g., manager). */
   MARK_ATTENDANCE_BY_AUTHORITY: { cmd: "mark_attendance_by_authority" },
+
+  /** Swap a weekend day with a working day on behalf of an authority (e.g., manager). */
+  WEEKEND_EXCHANGE_BY_AUTHORITY: { cmd: "weekend_exchange_by_authority" },
 } as const;

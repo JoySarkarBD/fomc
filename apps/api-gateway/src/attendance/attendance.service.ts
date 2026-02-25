@@ -21,8 +21,9 @@ import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import { AuthUser } from "@shared/interfaces/auth-user.interface";
 import { AttendanceByAuthorityDto } from "apps/workforce-service/src/attendance/dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
+import { UpdateByAuthorityWeekendSetDto } from "apps/workforce-service/src/attendance/dto/update-weekend-by-authority.dto";
+import { WeekendExchangeByAuthorityDto } from "apps/workforce-service/src/attendance/dto/weekend-exchange-by-authority.dto";
 import { firstValueFrom } from "rxjs";
-import { WeekendSetDto } from "../../../workforce-service/src/attendance/dto/update-weekend-by-authority.dto";
 import { buildResponse } from "../common/response.util";
 
 @Injectable()
@@ -124,7 +125,7 @@ export class AttendanceService {
    */
   async UpdateWeekendOff(
     userId: UserIdDto["userId"],
-    weekEndOff: WeekendSetDto["weekEndOff"],
+    weekEndOff: UpdateByAuthorityWeekendSetDto["weekEndOff"],
   ) {
     const result = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.UPDATE_WEEKEND_OFF, {
@@ -162,6 +163,44 @@ export class AttendanceService {
       ),
     );
 
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+      case "HttpException":
+        throw new HttpException(result.message, HttpStatus.FORBIDDEN);
+    }
+
     return buildResponse("Attendance marked by authority", result);
+  }
+
+  /**
+   * Marks the weekend exchange for a user on behalf of an authority (e.g., manager) by sending a command to the Workforce micro-service to create a weekend exchange record with the provided original weekend date and new off date. Validates that the user exists and that there are no existing exchanges for the same original weekend date before creating the new exchange record.
+   *
+   * @param userId - The unique identifier of the user for whom the weekend exchange is being marked.
+   * @param weekEndExchange - An object containing the original weekend date to be exchanged and the new off date after exchange.
+   * @return A promise that resolves to a success message if the weekend exchange was marked successfully, or an object containing a message and exception if there was an error during the marking process (e.g., user not found, existing exchange for the original weekend date).
+   */
+  async weekendExchangeByAuthority(
+    userId: UserIdDto["userId"],
+    weekEndExchange: WeekendExchangeByAuthorityDto,
+  ) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(
+        ATTENDANCE_COMMANDS.WEEKEND_EXCHANGE_BY_AUTHORITY,
+        {
+          userId,
+          weekEndExchange,
+        },
+      ),
+    );
+
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+      case "HttpException":
+        throw new HttpException(result.message, HttpStatus.FORBIDDEN);
+    }
+
+    return buildResponse("Weekend exchange marked by authority", result);
   }
 }
