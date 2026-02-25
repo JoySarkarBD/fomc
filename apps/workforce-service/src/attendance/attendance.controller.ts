@@ -12,6 +12,7 @@ import { ATTENDANCE_COMMANDS } from "@shared/constants";
 import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
 import { AttendanceService } from "./attendance.service";
+import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
 
 /**
@@ -87,6 +88,27 @@ export class AttendanceController {
     return await this.attendanceService.getSpecificUserAttendance(
       payload.userId,
       payload.query,
+    );
+  }
+
+  /**
+   * Marks attendance for a user on behalf of an authority (e.g., manager) by creating or updating an attendance record for a specific date with the provided attendance type and shift type.
+   *
+   * Message Pattern: { cmd: ATTENDANCE_COMMANDS.MARK_ATTENDANCE_BY_AUTHORITY }
+   *
+   * @param {Object} payload - The payload containing the userId and attendance details.
+   * @param {string} userId - The unique identifier of the user for whom attendance is being marked.
+   * @param {AttendanceByAuthorityDto} payload - An object containing the details of the attendance to be marked, including the attendance type (e.g., present, late, absent), optional date (defaults to today if not provided), optional shift type, and optional late status.
+   * @return {Promise<any>} A promise that resolves to the created or updated attendance record if successfully marked, or an object containing a message and exception if there was an error during the marking process.
+   */
+  @MessagePattern(ATTENDANCE_COMMANDS.MARK_ATTENDANCE_BY_AUTHORITY)
+  async markAttendanceAsAuthority(payload: {
+    userId: UserIdDto["userId"];
+    payload: AttendanceByAuthorityDto;
+  }) {
+    return await this.attendanceService.markAttendanceAsAuthority(
+      payload.userId,
+      payload.payload,
     );
   }
 }

@@ -166,3 +166,34 @@ export class WeekendExchangeSuccessDto extends SuccessResponseDto<any> {
   })
   declare data: any;
 }
+
+export class MarkAttendanceAsAuthoritySuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Attendance marked by authority" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({
+    example: "api/attendance/mark-attendance-by-authority",
+  })
+  declare endpoint: string;
+
+  @ApiProperty({
+    example: [
+      {
+        user: "6996d5319754977e5498ebaf",
+        checkInTime: "2026-02-23T09:05:00.000Z",
+        checkOutTime: "2026-02-23T17:00:00.000Z",
+        date: "2026-02-23T00:00:00.000Z",
+        inType: "PRESENT",
+        shiftType: "DAY",
+        isLate: false,
+        _id: "6996d5319754977e5498ebc1",
+        createdAt: "2026-02-23T09:05:00.000Z",
+        updatedAt: "2026-02-23T17:00:00.000Z",
+      },
+    ],
+  })
+  declare data: any[];
+}

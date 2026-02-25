@@ -22,4 +22,7 @@ export const ATTENDANCE_COMMANDS = {
 
   /** Retrieve attendance records for a specific user, optionally filtered by month and year. */
   GET_SPECIFIC_USER_ATTENDANCE: { cmd: "get_specific_user_attendance" },
+
+  /** Mark attendance for a user on behalf of an authority (e.g., manager). */
+  MARK_ATTENDANCE_BY_AUTHORITY: { cmd: "mark_attendance_by_authority" },
 } as const;

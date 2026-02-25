@@ -20,6 +20,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
+import { AttendanceByAuthorityDto } from "apps/workforce-service/src/attendance/dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
@@ -29,6 +30,10 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AttendanceService } from "./attendance.service";
+import { MarkAsAuthorityForbiddenDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-forbidden.dto";
+import { MarkAsAuthorityInternalErrorDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-internal-error.dto";
+import { MarkAsAuthorityUnauthorizedDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-unauthorized.dto";
+import { MarkAsAuthorityValidationDto } from "./dto/error/attendance/mark-as-authority/mark-as-authority-validation.dto";
 import { MarkAttendanceForbiddenDto } from "./dto/error/attendance/mark-attendance/mark-attendance-forbidden.dto";
 import { MarkAttendanceInternalErrorDto } from "./dto/error/attendance/mark-attendance/mark-attendance-internal-error.dto";
 import { MarkAttendanceNotFoundDto } from "./dto/error/attendance/mark-attendance/mark-attendance-not-found.dto";
@@ -52,6 +57,7 @@ import { UpdateWeekendNotFoundDto } from "./dto/error/attendance/update-weekend/
 import { UpdateWeekendUnauthorizedDto } from "./dto/error/attendance/update-weekend/update-weekend-unauthorized.dto";
 import { UpdateWeekendValidationDto } from "./dto/error/attendance/update-weekend/update-weekend-validation.dto";
 import {
+  MarkAttendanceAsAuthoritySuccessDto,
   MarkAttendanceSuccessDto,
   MarkOutAttendanceSuccessDto,
   SingleUserAttendanceSuccessDto,
@@ -86,7 +92,7 @@ export class AttendanceController {
   })
   @Post("present")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   async presentAttendance(@GetUser() user: AuthUser) {
     return this.attendanceService.presentAttendance(user);
   }
@@ -129,7 +135,7 @@ export class AttendanceController {
   })
   @Get("my-attendance")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   async getMyAttendance(
     @GetUser() user: AuthUser,
     @Query() query: GetAttendanceDto,
@@ -159,7 +165,7 @@ export class AttendanceController {
   })
   @Post("out")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   async outAttendance(@GetUser() user: AuthUser) {
     return this.attendanceService.outAttendance(user);
   }
@@ -212,7 +218,7 @@ export class AttendanceController {
   })
   @Get("user-attendance/:userId")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
   async getSpecificUserAttendance(
     @Param() params: UserIdDto,
     @Query() query: GetAttendanceDto,
@@ -261,7 +267,7 @@ export class AttendanceController {
     internal: UpdateWeekendInternalErrorDto,
   })
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Patch("update-weekend-off/:userId")
   async UpdateWeekendOff(
     @Param() params: UserIdDto,
@@ -270,6 +276,44 @@ export class AttendanceController {
     return await this.attendanceService.UpdateWeekendOff(
       params.userId,
       body.weekEndOff,
+    );
+  }
+
+  /**
+   * Marks attendance for a user on behalf of an authority (e.g., manager) by creating or updating an attendance record for a specific date with the provided attendance type and shift type.
+   *
+   * Message Pattern: { cmd: ATTENDANCE_COMMANDS.MARK_ATTENDANCE_BY_AUTHORITY }
+   *
+   * @param attendanceDetails - An object containing the details of the attendance to be marked, including the user ID for whom attendance is being marked, the attendance type (e.g., present, late, absent), optional date (defaults to today if not provided), optional shift type, and optional late status.
+   * @return A promise that resolves to the created or updated attendance record if successfully marked, or an object containing a message and exception if there was an error during the marking process.
+   * @remarks This endpoint allows an authority (e.g., manager) to mark attendance for a user by providing the necessary details in the request body. The service will handle the logic to create or update the attendance record based on the provided information and return the appropriate response.
+   */
+  @ApiOperation({
+    summary: "Mark attendance by authority",
+    description:
+      "Allows an authority (e.g., manager) to mark attendance for a user by providing the necessary details in the request body.",
+  })
+  @ApiBearerAuth("authorization")
+  @ApiBody({
+    description: "The details of the attendance to be marked",
+    type: AttendanceByAuthorityDto,
+  })
+  @ApiSuccessResponse(MarkAttendanceAsAuthoritySuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: MarkAsAuthorityUnauthorizedDto,
+    validation: MarkAsAuthorityValidationDto,
+    forbidden: MarkAsAuthorityForbiddenDto,
+    internal: MarkAsAuthorityInternalErrorDto,
+  })
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Patch("mark-attendance-by-authority")
+  async markAttendanceByAuthority(
+    @Body() attendanceDetails: AttendanceByAuthorityDto,
+  ) {
+    return await this.attendanceService.markAttendanceAsAuthority(
+      attendanceDetails.userId,
+      attendanceDetails,
     );
   }
 }

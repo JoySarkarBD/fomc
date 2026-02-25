@@ -24,6 +24,7 @@ import {
   ShiftTypeForSales,
 } from "../schemas/attendance.schema";
 import { WeekendExchangeDocument } from "../schemas/weekend-exchange.schema";
+import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
 
 /* 
@@ -327,5 +328,55 @@ export class AttendanceService {
     }
 
     return await this.attendanceModel.find(filter).sort({ date: 1 });
+  }
+
+  /**
+   * Marks the attendance of a user on behalf of an authority (e.g., manager) by creating or updating an attendance record for a specific date with the provided attendance type and shift type.
+   *
+   * @param userId - The unique identifier of the user for whom attendance is being marked.
+   * @param attendanceDetails - An object containing the details of the attendance to be marked, including the attendance type (e.g., present, late, absent), optional date (defaults to today if not provided), optional shift type, and optional late status.
+   * @return A promise that resolves to the created or updated attendance record if successfully marked, or an object containing a message and exception if there was an error during the marking process.
+   */
+  async markAttendanceAsAuthority(
+    userId: UserIdDto["userId"],
+    attendanceDetails: AttendanceByAuthorityDto,
+  ) {
+    const { inType, date, shiftType, isLate } = attendanceDetails;
+
+    // Current BD Time
+    const nowUTC = new Date();
+    const bdNow = new Date(
+      nowUTC.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
+    );
+
+    // If date is not provided, use today's date
+    const attendanceDate = date
+      ? new Date(date)
+      : new Date(bdNow.getFullYear(), bdNow.getMonth(), bdNow.getDate());
+
+    // Check if attendance already exists for the given date
+    const existingAttendance = await this.attendanceModel.findOne({
+      user: new Types.ObjectId(userId),
+      date: attendanceDate,
+    });
+
+    if (existingAttendance) {
+      // Update existing attendance
+      existingAttendance.inType = inType;
+      existingAttendance.shiftType = shiftType;
+      existingAttendance.isLate = isLate;
+      return await existingAttendance.save();
+    }
+
+    // Create new attendance record
+    const attendance = new this.attendanceModel({
+      user: new Types.ObjectId(userId),
+      date: attendanceDate,
+      inType,
+      shiftType,
+      isLate,
+    });
+
+    return await attendance.save();
   }
 }
