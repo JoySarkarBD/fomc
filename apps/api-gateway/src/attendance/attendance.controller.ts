@@ -7,16 +7,27 @@
  * @module api-gateway/attendance
  */
 
-import { Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
-import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
+import { WeekendExchangeDto } from "apps/api-gateway/src/attendance/weekend-exchange.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
@@ -42,10 +53,16 @@ import { SingleUserAttendanceForbiddenDto } from "./dto/error/attendance/single-
 import { SingleUserAttendanceInternalErrorDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-internal-error.dto";
 import { SingleUserAttendanceUnauthorizedDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-unauthorized.dto";
 import { SingleUserAttendanceValidationDto } from "./dto/error/attendance/single-user-attendance/single-user-attendance-validation.dto";
+import { WeekendExchangeForbiddenDto } from "./dto/error/attendance/weekend-exchange/weekend-exchange-forbidden.dto";
+import { WeekendExchangeInternalErrorDto } from "./dto/error/attendance/weekend-exchange/weekend-exchange-internal-error.dto";
+import { WeekendExchangeNotFoundDto } from "./dto/error/attendance/weekend-exchange/weekend-exchange-not-found.dto";
+import { WeekendExchangeUnauthorizedDto } from "./dto/error/attendance/weekend-exchange/weekend-exchange-unauthorized.dto";
+import { WeekendExchangeValidationDto } from "./dto/error/attendance/weekend-exchange/weekend-exchange-validation.dto";
 import {
   MarkAttendanceSuccessDto,
   MarkOutAttendanceSuccessDto,
   SingleUserAttendanceSuccessDto,
+  WeekendExchangeSuccessDto,
 } from "./dto/success/attendance-success.dto";
 
 @ApiTags("Attendance")
@@ -188,14 +205,61 @@ export class AttendanceController {
   })
   @Get("user-attendance/:userId")
   @UseGuards(RolesGuard)
-  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   async getSpecificUserAttendance(
-    @Param("userId") userId: MongoIdDto["id"],
+    @Param() params: UserIdDto,
     @Query() query: GetAttendanceDto,
   ) {
     return await this.attendanceService.getSpecificUserAttendance(
-      userId,
+      params.userId,
       query,
+    );
+  }
+
+  /**
+   * Allows the authenticated user to exchange their weekend off with another user.
+   *
+   * @guards RolesGuard - Ensures that only users with specific roles can access this endpoint.
+   * @param user - The authenticated user who wants to exchange their weekend off.
+   * @param userId - The ID of the user with whom the authenticated user wants to exchange their weekend off.
+   * @returns Result of the weekend off exchange process.
+   * @remarks This endpoint allows users to exchange their weekend off with another user. It checks if the authenticated user has the necessary roles to access this functionality and then processes the exchange based on the provided user ID of the other user. The service will handle the logic to ensure that the exchange is valid and update the respective records for both users accordingly.
+   */
+  @ApiOperation({
+    summary: "Exchange weekend off",
+    description:
+      "Allows the authenticated user to exchange their weekend off with another user.",
+  })
+  @ApiBearerAuth("authorization")
+  @ApiParam({
+    name: "userId",
+    description:
+      "The ID of the user with whom the authenticated user wants to exchange their weekend off",
+    required: true,
+    type: String,
+  })
+  @ApiBody({
+    description: "The weekend off values to be set for the user",
+    type: WeekendExchangeDto,
+  })
+  @ApiSuccessResponse(WeekendExchangeSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: WeekendExchangeUnauthorizedDto,
+    validation: WeekendExchangeValidationDto,
+    notFound: WeekendExchangeNotFoundDto,
+    forbidden: WeekendExchangeForbiddenDto,
+    internal: WeekendExchangeInternalErrorDto,
+  })
+  @Patch("weekend-exchange/:userId")
+  @UseGuards(RolesGuard)
+  @Roles("HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  async exchangeWeekend(
+    @Param() params: UserIdDto,
+    @Body() body: WeekendExchangeDto,
+  ) {
+    return await this.attendanceService.exchangeWeekend(
+      params.userId,
+      body.weekEndOff,
     );
   }
 }

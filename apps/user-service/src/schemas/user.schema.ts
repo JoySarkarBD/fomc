@@ -2,6 +2,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo, Types } from "mongoose";
 
+export enum WeekEndOff {
+  SUNDAY = "SUNDAY",
+  SATURDAY = "SATURDAY",
+  MONDAY = "MONDAY",
+  TUESDAY = "TUESDAY",
+  WEDNESDAY = "WEDNESDAY",
+  THURSDAY = "THURSDAY",
+  FRIDAY = "FRIDAY",
+}
+
 /**
  * Mongoose document type for User.
  */
@@ -76,6 +86,9 @@ export class User extends Document {
   // Blocked status of the user (active/inactive)
   @Prop({ type: Boolean, default: false })
   isBlocked!: boolean;
+
+  @Prop({ type: [String], enum: WeekEndOff, default: null })
+  weekEndOff?: WeekEndOff[] | null;
 
   // Employment status (active/inactive)
   @Prop({ type: Boolean, default: true })

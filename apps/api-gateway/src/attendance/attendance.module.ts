@@ -25,6 +25,16 @@ import { AttendanceService } from "./attendance.service";
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: "USER_SERVICE",
+        transport: Transport.TCP,
+        options: {
+          host: config.USER_SERVICE_HOST ?? "127.0.0.1",
+          port: Number(config.USER_SERVICE_PORT ?? 3001),
+        },
+      },
+    ]),
   ],
   controllers: [AttendanceController],
   providers: [AttendanceService],

@@ -6,9 +6,11 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
+import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
 import { UserSearchQueryDto } from "./dto/user-search-query.dto";
+import { WeekEndOff } from "./schemas/user.schema";
 import { UserService } from "./user.service";
 
 /**
@@ -103,7 +105,14 @@ export class UserController {
 
   /**
    * Set a password reset token for a user
+   *
    * Message Pattern: { cmd: USER_COMMANDS.SET_RESET_PASSWORD_OTP }
+   *
+   * @param {Object} payload - Object containing the user's email, OTP, and expiry time.
+   * @param {string} payload.email - The email address of the user.
+   * @param {string} payload.otp - The one-time password (OTP) to be set for password reset.
+   * @param {string} payload.expiry - The expiry time for the OTP in ISO string format.
+   * @returns {Promise<any>} Result of setting the OTP, typically indicating success or failure.
    */
   @MessagePattern(USER_COMMANDS.SET_RESET_PASSWORD_OTP)
   async setResetPasswordOtp(payload: {
@@ -121,7 +130,13 @@ export class UserController {
 
   /**
    * Reset password using token
+   *
    * Message Pattern: { cmd: USER_COMMANDS.RESET_PASSWORD }
+   *
+   * @param {Object} payload - Object containing the OTP and the new password.
+   * @param {string} payload.otp - The one-time password (OTP) provided by the user for password reset.
+   * @param {string} payload.newPassword - The new password that the user wants to set.
+   * @returns {Promise<any>} Result of the password reset operation, typically indicating success or failure.
    */
   @MessagePattern(USER_COMMANDS.RESET_PASSWORD)
   async resetPassword(payload: { otp: string; newPassword: string }) {
@@ -133,7 +148,12 @@ export class UserController {
 
   /**
    * Change password given user id and current password
+   *
    * Message Pattern: { cmd: USER_COMMANDS.CHANGE_PASSWORD }
+   *
+   * @param {Object} payload - Object containing the user ID, current password, and new password.
+   * @param {string} payload.id - The ID of the user who wants to change their password.
+   * @param {string} payload.currentPassword - The current password of the user, used for verification.
    */
   @MessagePattern(USER_COMMANDS.CHANGE_PASSWORD)
   async changePassword(payload: {
@@ -162,7 +182,13 @@ export class UserController {
 
   /**
    * Update the authenticated user's profile.
+   *
    * Message Pattern: { cmd: USER_COMMANDS.UPDATE_USER_PROFILE }
+   *
+   * @param {Object} payload - Object containing the user ID and the profile update data.
+   * @param {string} payload.id - The ID of the user whose profile is to be updated.
+   * @param {UpdateUserProfileDto} payload.data - DTO containing the fields to update (name and/or avatar).
+   * @returns {Promise<any>} The updated user object with populated role and designation details, or an object indicating that the user was not found.
    */
   @MessagePattern(USER_COMMANDS.UPDATE_USER_PROFILE)
   async updateUserProfile(payload: {
@@ -170,5 +196,26 @@ export class UserController {
     data: UpdateUserProfileDto;
   }) {
     return await this.userService.updateUserProfile(payload.id, payload.data);
+  }
+
+  /**
+   * Update the authenticated user's weekend off.
+   *
+   * Message Pattern: { cmd: USER_COMMANDS.UPDATE_WEEKEND_OFF }
+   *
+   * @param {Object} payload - Object containing the user ID and the new weekend off value.
+   * @param {string} payload.userId - The ID of the user whose weekend off is to be updated.
+   * @param {WeekEndOff} payload.weekEndOff - The new weekend off value to be set for the user.
+   * @returns {Promise<any>} The updated user object with the new weekend off value, or an object indicating that the user was not found.
+   */
+  @MessagePattern(USER_COMMANDS.UPDATE_WEEKEND_OFF)
+  async updateWeekendOff(payload: {
+    userId: UserIdDto["userId"];
+    weekEndOff: WeekEndOff;
+  }) {
+    return await this.userService.updateWeekendOff(
+      payload.userId,
+      payload.weekEndOff,
+    );
   }
 }

@@ -41,5 +41,9 @@ export const USER_COMMANDS = {
   /* Get users count by designation */
   GET_USERS_COUNT_BY_DESIGNATION: { cmd: "get_users_count_by_designation" },
 
+  /* Update user profile */
   UPDATE_USER_PROFILE: { cmd: "update_user_profile" },
+
+  /* Update weekend off for a user */
+  UPDATE_WEEKEND_OFF: { cmd: "update_weekend_off" },
 } as const;

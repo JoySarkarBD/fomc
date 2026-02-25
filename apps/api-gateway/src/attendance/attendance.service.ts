@@ -15,8 +15,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { USER_COMMANDS } from "@shared/constants";
 import { ATTENDANCE_COMMANDS } from "@shared/constants/attendance-command.constants";
+import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import { AuthUser } from "@shared/interfaces/auth-user.interface";
+import { WeekendExchangeDto } from "apps/api-gateway/src/attendance/weekend-exchange.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance/dto/get-attendance.dto";
 import { firstValueFrom } from "rxjs";
 import { buildResponse } from "../common/response.util";
@@ -25,6 +28,7 @@ import { buildResponse } from "../common/response.util";
 export class AttendanceService {
   constructor(
     @Inject("WORKFORCE_SERVICE") private readonly workforceClient: ClientProxy,
+    @Inject("USER_SERVICE") private readonly userClient: ClientProxy,
   ) {}
 
   /**
@@ -93,7 +97,10 @@ export class AttendanceService {
    * @param query - Optional query parameters for filtering attendance records by month and year.
    * @return A promise that resolves to an array of attendance records for the specified user matching the specified criteria, or an object containing a message and exception if there was an error during retrieval.
    */
-  async getSpecificUserAttendance(userId: string, query: GetAttendanceDto) {
+  async getSpecificUserAttendance(
+    userId: UserIdDto["userId"],
+    query: GetAttendanceDto,
+  ) {
     const result = await firstValueFrom(
       this.workforceClient.send(
         ATTENDANCE_COMMANDS.GET_SPECIFIC_USER_ATTENDANCE,
@@ -105,5 +112,31 @@ export class AttendanceService {
     );
 
     return buildResponse("Attendance retrieved", result);
+  }
+
+  /**
+   * Exchanges the weekend off for a user by sending a command to the User micro-service to update the user's weekend off preferences.
+   *
+   * @param userId - The ID of the user whose weekend off is being exchanged.
+   * @param weekEndOff - An array of strings representing the new weekend off values to be set for the user (e.g., ["SUNDAY", "SATURDAY"]).
+   * @return A promise that resolves to a success message if the weekend exchange was successful, or an object containing a message and exception if there was an error during the exchange process (e.g., user not found, invalid weekend off values).
+   */
+  async exchangeWeekend(
+    userId: UserIdDto["userId"],
+    weekEndOff: WeekendExchangeDto["weekEndOff"],
+  ) {
+    const result = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.UPDATE_WEEKEND_OFF, {
+        userId,
+        weekEndOff,
+      }),
+    );
+
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+    }
+
+    return buildResponse("Weekend exchanged successfully", result);
   }
 }

@@ -12,9 +12,6 @@ export class MarkOutAttendanceNotFoundDto extends CustomNotFoundDto {
   @ApiProperty({ example: "api/attendance/out" })
   declare endpoint: string;
 
-  @ApiProperty({ example: 404 })
-  declare statusCode: number;
-
   @ApiProperty({ example: "2026-02-23T12:00:00.000Z" })
   declare timestamp: string;
 

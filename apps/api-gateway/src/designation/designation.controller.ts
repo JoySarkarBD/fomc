@@ -32,7 +32,6 @@ import { DesignationSuccessDto } from "./dto/designation-success.dto";
 
 @ApiTags("Designation")
 @Controller("designation")
-@UseGuards(JwtAuthGuard)
 export class DesignationController {
   constructor(private readonly designationService: DesignationService) {}
 
@@ -51,6 +50,7 @@ export class DesignationController {
     // unauthorized: CustomUnauthorizedDto,
     // internal: CustomInternalServerErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
     return await this.designationService.createDesignation(
@@ -130,6 +130,7 @@ export class DesignationController {
     // unauthorized: CustomUnauthorizedDto,
     // internal: CustomInternalServerErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async updateDesignationById(
     @Param() params: MongoIdDto,
@@ -184,6 +185,7 @@ export class DesignationController {
     // unauthorized: CustomUnauthorizedDto,
     // internal: CustomInternalServerErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async deleteDesignationById(@Param() params: MongoIdDto) {
     return await this.designationService.deleteDesignationById(params.id);

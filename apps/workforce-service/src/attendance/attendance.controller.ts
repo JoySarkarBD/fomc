@@ -9,7 +9,7 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { ATTENDANCE_COMMANDS } from "@shared/constants";
-import { MongoIdDto } from "@shared/dto";
+import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
 import { AttendanceService } from "./attendance.service";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
@@ -81,7 +81,7 @@ export class AttendanceController {
    */
   @MessagePattern(ATTENDANCE_COMMANDS.GET_SPECIFIC_USER_ATTENDANCE)
   async getSpecificUserAttendance(payload: {
-    userId: MongoIdDto["id"];
+    userId: UserIdDto["userId"];
     query: GetAttendanceDto;
   }) {
     return await this.attendanceService.getSpecificUserAttendance(

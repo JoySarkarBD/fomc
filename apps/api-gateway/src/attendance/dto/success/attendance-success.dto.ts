@@ -98,3 +98,37 @@ export class SingleUserAttendanceSuccessDto extends SuccessResponseDto<any[]> {
   })
   declare data: any[];
 }
+
+export class WeekendExchangeSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Weekend exchange successful" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/attendance/weekend-exchange/:userId" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    example: {
+      _id: "69991038cc699292d0d91d99",
+      name: "Jhon Doe",
+      employeeId: "OP 1072",
+      phoneNumber: "+1234567890",
+      email: "developer.joysarkar@gmail.com",
+      secondaryEmail: null,
+      role: "EMPLOYEE",
+      department: "OPERATIONS",
+      designation: "FULL STACK DEVELOPER",
+      isBlocked: false,
+      employmentStatus: true,
+      resignedDates: [],
+      reJoiningDates: [],
+      createdAt: "2026-02-21T01:54:00.517Z",
+      updatedAt: "2026-02-24T08:50:55.114Z",
+      avatar: "uploads/avatars/1771659362765-393732606.webp",
+      weekEndOff: ["SUNDAY", "SATURDAY"],
+    },
+  })
+  declare data: any;
+}

@@ -72,7 +72,6 @@ import {
 
 @ApiTags("Department")
 @Controller("department")
-@UseGuards(JwtAuthGuard)
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
@@ -93,6 +92,7 @@ export class DepartmentController {
     conflict: DepartmentCreateConflictDto,
     internal: DepartmentCreateInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     return await this.departmentService.createDepartment(createDepartmentDto);
@@ -175,6 +175,7 @@ export class DepartmentController {
     conflict: DepartmentUpdateConflictDto,
     internal: DepartmentUpdateInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async updateDepartmentById(
     @Param() params: MongoIdDto,
@@ -210,6 +211,7 @@ export class DepartmentController {
     notFound: DepartmentDeleteByIdNotFoundDto,
     internal: DepartmentDeleteInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async deleteDepartmentById(@Param() params: MongoIdDto) {
     return await this.departmentService.deleteDepartmentById(params.id);

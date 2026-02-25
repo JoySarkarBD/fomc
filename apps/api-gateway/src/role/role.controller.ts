@@ -73,7 +73,6 @@ import { RoleService } from "./role.service";
 
 @ApiTags("Role")
 @Controller("role")
-@UseGuards(JwtAuthGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
@@ -95,6 +94,7 @@ export class RoleController {
     conflict: RoleCreateConflictDto,
     internal: RoleCreateInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createRole(@Body() data: CreateRoleDto) {
     return await this.roleService.createRole(data);
@@ -176,6 +176,7 @@ export class RoleController {
     conflict: RoleUpdateConflictDto,
     internal: RoleUpdateInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async updateRoleById(
     @Param() params: MongoIdDto,
@@ -208,6 +209,7 @@ export class RoleController {
     notFound: RoleDeleteByIdNotFoundDto,
     internal: RoleDeleteInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async deleteRoleById(@Param() params: MongoIdDto) {
     return await this.roleService.deleteRoleById(params.id);

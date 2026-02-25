@@ -25,3 +25,10 @@ export class MongoIdsDto {
   })
   ids!: string[];
 }
+
+export class UserIdDto {
+  /** A valid 24-character MongoDB ObjectId representing a user ID. */
+  @IsMongoId({ message: "User ID must be a valid MongoDB ObjectId" })
+  @IsNotEmpty({ message: "User ID is required" })
+  userId!: string;
+}

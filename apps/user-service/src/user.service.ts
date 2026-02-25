@@ -5,7 +5,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import config from "@shared/config/app.config";
 import { DEPARTMENT_COMMANDS } from "@shared/constants";
 import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.constants";
-import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { MongoIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import * as bcrypt from "bcrypt";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
@@ -13,7 +13,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
 import { UserSearchQueryDto } from "./dto/user-search-query.dto";
 import { RoleService } from "./role/role.service";
-import { User, UserDocument } from "./schemas/user.schema";
+import { User, UserDocument, WeekEndOff } from "./schemas/user.schema";
 
 /**
  * UserService
@@ -442,6 +442,10 @@ export class UserService {
 
   /**
    * Update the authenticated user's profile (name and avatar only).
+   *
+   * @param {MongoIdDto} params - Object containing the user ID.
+   * @param {UpdateUserProfileDto} data - DTO containing the fields to update (name and/or avatar).
+   * @returns {Promise<any>} The updated user object with populated role and designation details, or an object indicating that the user was not found.
    */
   async updateUserProfile(
     id: MongoIdDto["id"],
@@ -464,6 +468,46 @@ export class UserService {
     }
 
     const userObj = (await this.getUser(updatedUser._id.toString())) as any;
+
+    return userObj;
+  }
+
+  /**
+   * Update the authenticated user's weekend off.
+   *
+   * @param {MongoIdDto} params - Object containing the user ID.
+   * @param {WeekEndOff} weekEndOff - The new weekend off value to be set for the user.
+   * @returns {Promise<any>} The updated user object with the new weekend off value, or an object indicating that the user was not found.
+   */
+  async updateWeekendOff(
+    userId: UserIdDto["userId"],
+    weekEndOff: WeekEndOff,
+  ): Promise<any> {
+    console.log(userId);
+
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        new Types.ObjectId(userId),
+        { weekEndOff },
+        {
+          returnDocument: "after",
+          runValidators: true,
+        },
+      )
+      .exec();
+
+    if (!updatedUser) {
+      return {
+        message: "User not found",
+        exception: "NotFoundException",
+      };
+    }
+
+    const userObj = (await this.getUser(updatedUser._id.toString())) as any;
+
+    delete userObj.password;
+    delete userObj.otp;
+    delete userObj.otpExpiry;
 
     return userObj;
   }

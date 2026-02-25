@@ -12,7 +12,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { InjectModel } from "@nestjs/mongoose";
 import { USER_COMMANDS } from "@shared/constants/user-command.constants";
-import { MongoIdDto } from "@shared/dto/mongo-id.dto";
+import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import { AuthUser } from "@shared/interfaces/auth-user.interface";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
@@ -252,7 +252,7 @@ export class AttendanceService {
    * @return A promise that resolves to an array of attendance records matching the specified criteria for the given user, or an object containing a message and exception if there was an error during retrieval.
    */
   async getSpecificUserAttendance(
-    userId: MongoIdDto["id"],
+    userId: UserIdDto["userId"],
     query: GetAttendanceDto,
   ) {
     const { month /* 1-12 */, year /* 1900999*/ } = query;
