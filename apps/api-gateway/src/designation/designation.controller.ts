@@ -18,7 +18,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import { CreateDesignationDto } from "apps/workforce-service/src/designation/dto/create-designation.dto";
@@ -26,6 +26,7 @@ import { UpdateDesignationDto } from "apps/workforce-service/src/designation/dto
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
+import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { DesignationService } from "./designation.service";
 import { DesignationListSuccessDto } from "./dto/designation-list-success.dto";
@@ -46,11 +47,13 @@ export class DesignationController {
     summary: "Create designation",
     description: "Creates a new job designation in the organization.",
   })
+  @ApiBearerAuth("authorization")
   @ApiSuccessResponse(DesignationSuccessDto, 201)
   @ApiErrorResponses({
     // unauthorized: CustomUnauthorizedDto,
     // internal: CustomInternalServerErrorDto,
   })
+  @Roles("SUPER ADMIN")
   @UseGuards(JwtAuthGuard)
   @Post()
   async createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
@@ -93,7 +96,7 @@ export class DesignationController {
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the designation to retrieve",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",
@@ -121,10 +124,11 @@ export class DesignationController {
     summary: "Update designation",
     description: "Updates an existing job designation's details.",
   })
+  @ApiBearerAuth("authorization")
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the designation to update",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",
@@ -138,6 +142,7 @@ export class DesignationController {
     // internal: CustomInternalServerErrorDto,
   })
   @UseGuards(JwtAuthGuard)
+  @Roles("SUPER ADMIN")
   @Patch(":id")
   async updateDesignationById(
     @Param() params: MongoIdDto,
@@ -150,27 +155,6 @@ export class DesignationController {
   }
 
   /**
-   * Retrieve multiple designations by their IDs.
-   *
-   * @param {string[]} ids - An array of designation IDs to be retrieved.
-   * @return Promise resolving to a list of designations matching the provided IDs.
-   */
-  @ApiOperation({
-    summary: "Batch get designations",
-    description: "Retrieves multiple designations by their IDs.",
-  })
-  @ApiSuccessResponse(DesignationListSuccessDto, 200)
-  @ApiErrorResponses({
-    // unauthorized: CustomUnauthorizedDto,
-    // internal: CustomInternalServerErrorDto,
-  })
-  @Get("batch")
-  async findDesignationsByIds(@Query("ids") ids: string | string[]) {
-    const idsArray = Array.isArray(ids) ? ids : [ids];
-    return await this.designationService.findDesignationsByIds(idsArray);
-  }
-
-  /**
    * Delete a designation by ID.
    *
    * @param {string} id - The ID of the designation to be deleted.
@@ -180,10 +164,11 @@ export class DesignationController {
     summary: "Delete designation",
     description: "Deletes a job designation by its ID.",
   })
+  @ApiBearerAuth("authorization")
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the designation to delete",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",
@@ -196,6 +181,7 @@ export class DesignationController {
     // internal: CustomInternalServerErrorDto,
   })
   @UseGuards(JwtAuthGuard)
+  @Roles("SUPER ADMIN")
   @Delete(":id")
   async deleteDesignationById(@Param() params: MongoIdDto) {
     return await this.designationService.deleteDesignationById(params.id);
