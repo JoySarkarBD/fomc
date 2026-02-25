@@ -95,9 +95,9 @@ export class Project extends Document {
   @Prop({
     type: Types.ObjectId,
     ref: "Client",
-    required: true,
+    required: false,
   })
-  client!: Types.ObjectId;
+  client?: Types.ObjectId;
 
   // External order identifier associated with the project.
   @Prop({ required: true })
@@ -107,23 +107,23 @@ export class Project extends Document {
   @Prop({
     type: Types.ObjectId,
     ref: "Profile",
-    required: true,
+    required: false,
   })
-  profile!: Types.ObjectId;
+  profile?: Types.ObjectId;
 
   // Reference to the user collection
   @Prop({
     type: Types.ObjectId,
-    required: true,
+    required: false,
   })
-  salesMember!: Types.ObjectId;
+  salesMember?: Types.ObjectId;
 
   // Departments currently assigned to handle the project. (Transfer history not required as we will maintain)
   @Prop({
     type: Types.ObjectId,
-    required: true,
+    required: false,
   })
-  assignedDepartment!: Types.ObjectId;
+  assignedDepartment?: Types.ObjectId;
 
   // List of associated project file URLs or storage paths.
   @Prop({ type: [String], default: [] })
@@ -134,8 +134,8 @@ export class Project extends Document {
   projectRemarks?: string;
 
   // Project due date.
-  @Prop({ required: true })
-  dueDate!: Date;
+  @Prop({ required: false })
+  dueDate?: Date;
 
   // Actual delivery date of the project.
   @Prop()
