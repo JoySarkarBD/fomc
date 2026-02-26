@@ -10,8 +10,6 @@
 import {
   ConflictException,
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
@@ -42,8 +40,9 @@ export class DepartmentService {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT, data),
     );
-    if (result?.exception === "Conflict") {
-      throw new HttpException(result.message, HttpStatus.CONFLICT);
+    switch (result?.exception) {
+      case "Conflict":
+        throw new ConflictException(result.message);
     }
     return buildResponse("Department created successfully", result);
   }

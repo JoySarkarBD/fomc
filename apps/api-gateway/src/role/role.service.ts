@@ -10,8 +10,6 @@
 import {
   ConflictException,
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
@@ -41,8 +39,9 @@ export class RoleService {
     const result = await firstValueFrom(
       this.roleClient.send(ROLE_COMMANDS.CREATE_ROLE, data),
     );
-    if (result?.exception === "Conflict") {
-      throw new HttpException(result.message, HttpStatus.CONFLICT);
+    switch (result?.exception) {
+      case "Conflict":
+        throw new ConflictException(result.message);
     }
     return buildResponse("Role created successfully", result);
   }

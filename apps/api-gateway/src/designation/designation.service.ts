@@ -41,8 +41,9 @@ export class DesignationService {
         createDesignationDto,
       ),
     );
-    if (result?.exception === "Conflict") {
-      throw new ConflictException(result.message);
+    switch (result?.exception) {
+      case "Conflict":
+        throw new ConflictException(result.message);
     }
     return buildResponse("Designation created successfully", result);
   }
