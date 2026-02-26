@@ -102,6 +102,13 @@ export class SellsShiftManagementController {
 
   /**
    * Creates a new sells shift management entry for a user.
+   *
+   * This endpoint allows a user with the SUPER ADMIN role to create a new sells shift management entry for a specified user. The request must include the ID of the user for whom the shift is being created, as well as the details of the shift in the request body. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can create shift entries.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {UserIdDto} params - The route parameters containing the user ID for whom the shift is being created.
+   * @param {CreateSellsShiftManagementDto} data - The request body containing the details of the sells shift management entry to be created.
+   * @returns {Promise<any>} A response indicating the success of the operation, along with the created sells shift management entry.
    */
   @ApiOperation({
     summary: "Create a new sells shift management entry for a user",
@@ -150,6 +157,12 @@ export class SellsShiftManagementController {
 
   /**
    * Request a shift exchange (Only for Sales users).
+   *
+   * This endpoint allows a Sales user to request a shift exchange. The user must provide the details of the shift exchange request in the request body, including the original shift, the new shift, the date of the exchange, and an optional reason for the exchange. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized Sales users can request shift exchanges.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {RequestShiftExchangeDto} data - The request body containing the details of the shift exchange request.
+   * @returns {Promise<any>} A response indicating the success of the operation, along with the created shift exchange request.
    */
   @ApiOperation({
     summary: "Request a shift exchange",
@@ -184,6 +197,13 @@ export class SellsShiftManagementController {
 
   /**
    * Approve a shift exchange.
+   *
+   * This endpoint allows a user with the SUPER ADMIN, DIRECTOR, or PROJECT MANAGER role to approve a shift exchange request. The user must provide the ID of the shift exchange request to be approved as a route parameter. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can approve shift exchanges.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {ExchangeIdDto} param - The route parameter containing the ID of the shift exchange request to be approved.
+   * @param {ApprovedByDto} approvedBy - The ID of the user approving the shift exchange request, extracted from the JWT token.
+   * @returns {Promise<any>} A response indicating the success of the operation, along with the updated shift exchange request.
    */
   @ApiOperation({
     summary: "Approve a shift exchange",
@@ -227,6 +247,14 @@ export class SellsShiftManagementController {
 
   /**
    * Reject a shift exchange.
+   *
+   * This endpoint allows a user with the SUPER ADMIN, DIRECTOR, or PROJECT MANAGER role to reject a shift exchange request. The user must provide the ID of the shift exchange request to be rejected as a route parameter, as well as an optional reason for the rejection in the request body. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can reject shift exchanges.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {ExchangeIdDto} param - The route parameter containing the ID of the shift exchange request to be rejected.
+   * @param {ApprovedByDto} approvedBy - The ID of the user rejecting the shift exchange request, extracted from the JWT token.
+   * @param {string} reason - An optional reason for rejecting the shift exchange request, provided in the request body.
+   * @returns {Promise<any>} A response indicating the success of the operation, along with the updated shift exchange request.
    */
   @ApiOperation({
     summary: "Reject a shift exchange",
@@ -272,6 +300,11 @@ export class SellsShiftManagementController {
 
   /**
    * Get my shift exchanges.
+   *
+   * This endpoint allows a user to retrieve their own shift exchange requests. The user must be authenticated and can only access their own shift exchange data. The endpoint is protected by JWT authentication to ensure that only authorized users can access their shift exchange information.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @returns {Promise<any>} A response containing the list of shift exchange requests made by the authenticated user.
    */
   @ApiOperation({
     summary: "Get my shift exchanges",
@@ -297,6 +330,11 @@ export class SellsShiftManagementController {
 
   /**
    * Get pending shift exchanges (for managers).
+   *
+   * This endpoint allows users with the SUPER ADMIN, DIRECTOR, or PROJECT MANAGER role to retrieve a list of pending shift exchange requests that require their approval. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can access the pending shift exchange data.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @return {Promise<any>} A response containing the list of pending shift exchange requests that require approval from the authenticated user.
    */
   @ApiOperation({
     summary: "Get pending shift exchanges for approval",
@@ -324,6 +362,13 @@ export class SellsShiftManagementController {
 
   /**
    * Retrieves sells shift management records for a specific user.
+   *
+   * This endpoint allows a user with the SUPER ADMIN role to retrieve sells shift management records for a specified user. The request must include the ID of the user whose records are being retrieved as a route parameter, as well as the month and year for which to retrieve the records as query parameters. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can access the shift management records.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {UserIdDto} params - The route parameters containing the user ID for whom the shift management records are being retrieved.
+   * @param {GetSellsShiftDto} query - The query parameters containing the month and year for which to retrieve the shift management records.
+   * @returns {Promise<any>} A response containing the sells shift management records for the specified user and time period.
    */
   @ApiOperation({
     summary: "Get sells shift management records for a specific user",
