@@ -64,9 +64,6 @@ export class AttendanceService {
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, {
         id: userId,
-        myRole: user.role,
-        myId: userId,
-        myDepartment: user.department,
       }),
     );
 
@@ -215,9 +212,6 @@ export class AttendanceService {
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, {
         id: userId,
-        myRole: user.role,
-        myId: userId,
-        myDepartment: user.department,
       }),
     );
 
@@ -321,6 +315,20 @@ export class AttendanceService {
     userId: UserIdDto["userId"],
     query: GetAttendanceDto,
   ) {
+    // Fetch user from user-service
+    const userExist = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USER, {
+        id: userId,
+      }),
+    );
+
+    if (userExist.exception) {
+      return {
+        message: userExist.message,
+        exception: userExist.exception,
+      };
+    }
+
     const { month /* 1-12 */, year /* 1900999*/ } = query;
 
     const filter: any = {
@@ -369,9 +377,6 @@ export class AttendanceService {
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, {
         id: userId,
-        myRole: "MANAGER",
-        myId: userId,
-        myDepartment: "OPERATIONS",
       }),
     );
 
@@ -444,9 +449,6 @@ export class AttendanceService {
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, {
         id: userId,
-        myRole: "MANAGER",
-        myId: userId,
-        myDepartment: "OPERATIONS",
       }),
     );
 

@@ -1,5 +1,6 @@
-import { applyDecorators } from "@nestjs/common";
+import { applyDecorators, Type } from "@nestjs/common";
 import {
+  ApiExtraModels,
   ApiParam,
   ApiParamOptions,
   ApiQuery,
@@ -11,6 +12,7 @@ type SingleOrArray<T> = T | T[];
 interface SwaggerRequestConfig {
   params?: SingleOrArray<ApiParamOptions>;
   queries?: SingleOrArray<ApiQueryOptions>;
+  queryDto?: Type<unknown>;
 }
 
 export function ApiRequestDetails(
@@ -18,7 +20,7 @@ export function ApiRequestDetails(
 ): MethodDecorator {
   const decorators: MethodDecorator[] = [];
 
-  // Handle Params
+  // Params
   if (config?.params) {
     const paramArray = Array.isArray(config.params)
       ? config.params
@@ -27,13 +29,18 @@ export function ApiRequestDetails(
     decorators.push(...paramArray.map((param) => ApiParam(param)));
   }
 
-  // Handle Queries
+  // Manual Queries
   if (config?.queries) {
     const queryArray = Array.isArray(config.queries)
       ? config.queries
       : [config.queries];
 
     decorators.push(...queryArray.map((query) => ApiQuery(query)));
+  }
+
+  // 🔥 DTO Query Support
+  if (config?.queryDto) {
+    decorators.push(ApiExtraModels(config.queryDto));
   }
 
   return applyDecorators(...decorators);

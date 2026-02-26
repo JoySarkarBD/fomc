@@ -32,3 +32,10 @@ export class UserIdDto {
   @IsNotEmpty({ message: "User ID is required" })
   userId!: string;
 }
+
+export class AssignedByDto {
+  /** A valid 24-character MongoDB ObjectId representing the ID of the user who assigned a shift. */
+  @IsMongoId({ message: "AssignedBy ID must be a valid MongoDB ObjectId" })
+  @IsNotEmpty({ message: "AssignedBy ID is required" })
+  assignedBy!: string;
+}

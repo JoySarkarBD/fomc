@@ -9,10 +9,10 @@
 
 export const SELLS_SHIFT_MANAGEMENT_COMMANDS = {
   /** Create a new sells shift management. */
-  CREATE_SELLS_SHIFT_MANAGEMENT: { cmd: "create_sells_shift_management" },
+  CREATE_SELLS_SHIFT_FOR_USER: { cmd: "create_sells_shift_for_user" },
 
   /** Retrieve sells shift managements for a specific user, optionally filtered. */
-  GET_USER_SELLS_SHIFT_MANAGEMENT: { cmd: "get_user_sells_shift_management" },
+  GET_USER_SELLS_SHIFT: { cmd: "get_user_sells_shift_management" },
 
   /** Mark a sells shift management as read. */
 };

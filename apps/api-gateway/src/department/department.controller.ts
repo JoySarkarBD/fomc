@@ -136,6 +136,7 @@ export class DepartmentController {
         example: "engineering",
       },
     ],
+    queryDto: SearchQueryDto,
   })
   @ApiSuccessResponse(DepartmentsListSuccessDto, 200)
   @ApiErrorResponses({

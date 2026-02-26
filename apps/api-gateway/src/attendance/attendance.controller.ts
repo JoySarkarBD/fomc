@@ -134,6 +134,7 @@ export class AttendanceController {
         example: 2026,
       },
     ],
+    queryDto: GetAttendanceDto,
   })
   @ApiSuccessResponse(MyAttendanceSuccessDto, 200)
   @ApiErrorResponses({
@@ -217,6 +218,7 @@ export class AttendanceController {
         example: 2026,
       },
     ],
+    queryDto: GetAttendanceDto,
   })
   @ApiSuccessResponse(SingleUserAttendanceSuccessDto, 200)
   @ApiErrorResponses({

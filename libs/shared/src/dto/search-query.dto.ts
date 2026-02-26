@@ -8,6 +8,7 @@
  * @module @shared/dto/search-query
  */
 
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
   IsNumber,
@@ -20,6 +21,12 @@ import {
 
 export class SearchQueryDto {
   /** 1-based page number. */
+  @ApiProperty({
+    description: "The page number for pagination (1-based index)",
+    required: true,
+    type: Number,
+    example: 1,
+  })
   @Type(() => Number)
   @IsNumber(
     { allowNaN: false, allowInfinity: false },
@@ -29,6 +36,12 @@ export class SearchQueryDto {
   pageNo!: number;
 
   /** Number of items per page (1–100). */
+  @ApiProperty({
+    description: "The number of items per page (1-100)",
+    required: true,
+    type: Number,
+    example: 10,
+  })
   @Type(() => Number)
   @IsNumber(
     { allowNaN: false, allowInfinity: false },
@@ -39,6 +52,12 @@ export class SearchQueryDto {
   pageSize!: number;
 
   /** Optional free-text search term; can be null or empty. */
+  @ApiProperty({
+    description: "Optional free-text search term; can be null or empty",
+    required: false,
+    type: String,
+    example: "search term",
+  })
   @IsOptional()
   @ValidateIf((o) => o.searchKey !== null && o.searchKey !== undefined)
   @IsString({ message: "searchKey must be a string" })

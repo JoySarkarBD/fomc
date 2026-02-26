@@ -18,7 +18,7 @@ export type SalesShiftAssignmentDocument = SalesShiftAssignment & Document;
 @Schema({ timestamps: true, versionKey: false })
 export class SalesShiftAssignment extends Document {
   // User reference
-  @Prop({ type: Types.ObjectId, required: true, ref: "User" })
+  @Prop({ type: Types.ObjectId, required: true })
   user!: mongo.ObjectId;
 
   // Week start date (normalized: Sunday 00:00 or Monday 00:00)
@@ -31,13 +31,14 @@ export class SalesShiftAssignment extends Document {
 
   // Assigned shift for the whole week
   @Prop({
+    type: String,
     required: true,
     enum: Object.values(ShiftTypeForSales),
   })
   shiftType!: ShiftTypeForSales;
 
   // Who assigned the shift (Manager)
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
+  @Prop({ type: Types.ObjectId, required: true })
   assignedBy!: mongo.ObjectId;
 
   // Optional note

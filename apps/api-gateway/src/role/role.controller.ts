@@ -137,6 +137,7 @@ export class RoleController {
         example: "admin",
       },
     ],
+    queryDto: SearchQueryDto,
   })
   @ApiSuccessResponse(RolesListSuccessDto, 200)
   @ApiErrorResponses({

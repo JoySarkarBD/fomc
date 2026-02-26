@@ -135,6 +135,7 @@ export class DesignationController {
         example: "manager",
       },
     ],
+    queryDto: SearchQueryDto,
   })
   @ApiSuccessResponse(DesignationListSuccessDto, 200)
   @ApiErrorResponses({

@@ -113,6 +113,11 @@ export class AttendanceService {
       ),
     );
 
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+    }
+
     return buildResponse("Attendance retrieved", result);
   }
 
