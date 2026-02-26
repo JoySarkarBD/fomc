@@ -202,6 +202,7 @@ export class AttendanceService {
               diff = currentMinutes - nightStart;
             }
 
+            // If current time is more than 4 hours before shift start or after shift start, prevent marking
             if (diff < -windowMinutes || diff > 4 * 60) {
               return {
                 message: `It is not your shift time. Your shift starts at ${Math.floor(
