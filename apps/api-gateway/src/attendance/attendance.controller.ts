@@ -99,7 +99,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -131,7 +131,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -183,7 +183,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -217,7 +217,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -284,7 +284,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -340,7 +340,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -396,7 +396,7 @@ export class AttendanceController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })

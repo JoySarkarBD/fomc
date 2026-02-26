@@ -84,7 +84,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -131,7 +131,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -163,7 +163,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -206,7 +206,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -251,7 +251,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -276,7 +276,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -304,7 +304,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })

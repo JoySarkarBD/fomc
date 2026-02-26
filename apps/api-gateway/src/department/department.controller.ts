@@ -89,7 +89,7 @@ export class DepartmentController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -198,7 +198,7 @@ export class DepartmentController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -242,7 +242,7 @@ export class DepartmentController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })

@@ -89,7 +89,7 @@ async function bootstrap(): Promise<void> {
         bearerFormat: "JWT",
         in: "header",
       },
-      "authorization", // <- name important
+      "Authorization", // <- name important
     )
     .setVersion("1.0")
     .build();

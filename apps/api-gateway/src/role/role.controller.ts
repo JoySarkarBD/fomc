@@ -90,7 +90,7 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -198,7 +198,7 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
@@ -239,7 +239,7 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "authorization",
+    name: "Authorization",
     description: "Bearer token",
     required: true,
   })
