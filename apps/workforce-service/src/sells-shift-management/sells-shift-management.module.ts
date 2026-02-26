@@ -13,6 +13,8 @@ import {
   SalesShiftAssignment,
   SalesShiftAssignmentSchema,
 } from "../schemas/sales-shift-assignment.schema";
+import { ShiftExchange, ShiftExchangeSchema } from "../schemas/shift-exchange.schema";
+import { Department, DepartmentSchema } from "../schemas/department.schema";
 import { SellsShiftManagementController } from "./sells-shift-management.controller";
 import { SellsShiftManagementService } from "./sells-shift-management.service";
 
@@ -33,11 +35,18 @@ import { SellsShiftManagementService } from "./sells-shift-management.service";
         name: SalesShiftAssignment.name,
         schema: SalesShiftAssignmentSchema,
       },
+      {
+        name: ShiftExchange.name,
+        schema: ShiftExchangeSchema,
+      },
+      {
+        name: Department.name,
+        schema: DepartmentSchema,
+      },
     ]),
 
     /**
-     * Clients Module configured to register a microservice client for the Role Service, enabling communication between the API Gateway and the Role Service over TCP.
-     * This allows the RoleController and RoleService to interact with the Role Service for operations such as retrieving role information, managing role data, and other role-related functionalities, facilitating a microservices architecture where different services can communicate seamlessly.
+     * Clients Module configured to register microservice clients, enabling communication between the Workforce Service and other services over TCP.
      */
     ClientsModule.register([
       {
@@ -46,6 +55,14 @@ import { SellsShiftManagementService } from "./sells-shift-management.service";
         options: {
           host: config.USER_SERVICE_HOST ?? "127.0.0.1",
           port: Number(config.USER_SERVICE_PORT ?? 3001),
+        },
+      },
+      {
+        name: "NOTIFICATION_SERVICE",
+        transport: Transport.TCP,
+        options: {
+          host: config.NOTIFICATION_SERVICE_HOST ?? "127.0.0.1",
+          port: Number(config.NOTIFICATION_SERVICE_PORT ?? 3004),
         },
       },
     ]),

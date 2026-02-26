@@ -6,7 +6,16 @@
  * @module api-gateway/sells-shift-management
  */
 
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -14,13 +23,22 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { UserIdDto } from "@shared/dto/mongo-id.dto";
+import type { AuthUser } from "@shared/interfaces";
+import { CreateSellsShiftManagementDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift-management.dto";
 import { GetSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/get-sells-shift.dto";
+import { RequestShiftExchangeDto } from "apps/workforce-service/src/sells-shift-management/dto/request-shift-exchange.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
+import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
+import { CreateSellsShiftForbiddenDto } from "./dto/error/create-sells-shift/create-sells-shift-forbidden.dto";
+import { CreateSellsShiftInternalErrorDto } from "./dto/error/create-sells-shift/create-sells-shift-internal-error.dto";
+import { CreateSellsShiftNotFoundDto } from "./dto/error/create-sells-shift/create-sells-shift-not-found.dto";
+import { CreateSellsShiftUnauthorizedDto } from "./dto/error/create-sells-shift/create-sells-shift-unauthorized.dto";
+import { CreateSellsShiftValidationDto } from "./dto/error/create-sells-shift/create-sells-shift-validation.dto";
 import {
   GetUserSellsShiftForbiddenDto,
   GetUserSellsShiftInternalErrorDto,
@@ -28,16 +46,25 @@ import {
   GetUserSellsShiftUnauthorizedDto,
   GetUserSellsShiftValidationDto,
 } from "./dto/error/get-user-sells-shift/get-user-sells-shift.dto";
-import { CreateSellsShiftManagementSuccessDto, GetUserSellsShiftSuccessDto } from "./dto/success/sells-shift-management-success.dto";
+import {
+  ShiftExchangeForbiddenDto,
+  ShiftExchangeInternalErrorDto,
+  ShiftExchangeNotFoundDto,
+  ShiftExchangeUnauthorizedDto,
+  ShiftExchangeValidationDto,
+} from "./dto/error/shift-exchange/shift-exchange-error.dto";
+import {
+  CreateSellsShiftManagementSuccessDto,
+  GetUserSellsShiftSuccessDto,
+} from "./dto/success/sells-shift-management-success.dto";
+import {
+  ApproveShiftExchangeSuccessDto,
+  GetMyShiftExchangesSuccessDto,
+  GetPendingShiftExchangesSuccessDto,
+  RejectShiftExchangeSuccessDto,
+  ShiftExchangeRequestSuccessDto,
+} from "./dto/success/shift-exchange-success.dto";
 import { SellsShiftManagementService } from "./sells-shift-management.service";
-import { CreateSellsShiftUnauthorizedDto } from "./dto/error/create-sells-shift/create-sells-shift-unauthorized.dto";
-import { CreateSellsShiftForbiddenDto } from "./dto/error/create-sells-shift/create-sells-shift-forbidden.dto";
-import { CreateSellsShiftNotFoundDto } from "./dto/error/create-sells-shift/create-sells-shift-not-found.dto";
-import { CreateSellsShiftValidationDto } from "./dto/error/create-sells-shift/create-sells-shift-validation.dto";
-import { CreateSellsShiftInternalErrorDto } from "./dto/error/create-sells-shift/create-sells-shift-internal-error.dto";
-import type { AuthUser } from "@shared/interfaces";
-import { GetUser } from "../common/decorators/get-user.decorator";
-import { CreateSellsShiftManagementDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift-management.dto";
 
 @ApiTags("Sells Shift Management")
 @Controller("sells-shift-management")
@@ -49,11 +76,6 @@ export class SellsShiftManagementController {
 
   /**
    * Creates a new sells shift management entry for a user.
-   *
-   * @param user - The authenticated user (SUPER ADMIN) creating the shift.
-   * @param params - The parameters containing the user ID for whom the shift is being created.
-   * @param data - The data for creating a new sells shift management entry.
-   * @returns Result of the creation operation.
    */
   @ApiOperation({
     summary: "Create a new sells shift management entry for a user",
@@ -62,7 +84,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -101,11 +123,179 @@ export class SellsShiftManagementController {
   }
 
   /**
+   * Request a shift exchange (Only for Sales users).
+   */
+  @ApiOperation({
+    summary: "Request a shift exchange",
+    description: "Allows a Sales user to request a shift exchange.",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiSuccessResponse(ShiftExchangeRequestSuccessDto, 201)
+  @ApiErrorResponses({
+    unauthorized: ShiftExchangeUnauthorizedDto,
+    forbidden: ShiftExchangeForbiddenDto,
+    notFound: ShiftExchangeNotFoundDto,
+    validation: ShiftExchangeValidationDto,
+    internal: ShiftExchangeInternalErrorDto,
+  })
+  @Post("exchange/request")
+  async requestShiftExchange(
+    @GetUser() user: AuthUser,
+    @Body() data: RequestShiftExchangeDto,
+  ) {
+    return this.sellsShiftManagementService.requestShiftExchange(
+      user._id!,
+      data,
+    );
+  }
+
+  /**
+   * Approve a shift exchange.
+   */
+  @ApiOperation({
+    summary: "Approve a shift exchange",
+    description: "Required role: SUPER ADMIN, DIRECTOR, or PROJECT MANAGER",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiRequestDetails({
+    params: {
+      name: "exchangeId",
+      description: "The ID of the shift exchange request to approve",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123458",
+    },
+  })
+  @ApiSuccessResponse(ApproveShiftExchangeSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: ShiftExchangeUnauthorizedDto,
+    forbidden: ShiftExchangeForbiddenDto,
+    notFound: ShiftExchangeNotFoundDto,
+    validation: ShiftExchangeValidationDto,
+    internal: ShiftExchangeInternalErrorDto,
+  })
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER")
+  @Patch("exchange/approve/:exchangeId")
+  async approveShiftExchange(
+    @GetUser() user: AuthUser,
+    @Param("exchangeId") exchangeId: string,
+  ) {
+    return this.sellsShiftManagementService.approveShiftExchange(
+      exchangeId,
+      user._id!,
+    );
+  }
+
+  /**
+   * Reject a shift exchange.
+   */
+  @ApiOperation({
+    summary: "Reject a shift exchange",
+    description: "Required role: SUPER ADMIN, DIRECTOR, or PROJECT MANAGER",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiRequestDetails({
+    params: {
+      name: "exchangeId",
+      description: "The ID of the shift exchange request to reject",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123458",
+    },
+  })
+  @ApiSuccessResponse(RejectShiftExchangeSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: ShiftExchangeUnauthorizedDto,
+    forbidden: ShiftExchangeForbiddenDto,
+    notFound: ShiftExchangeNotFoundDto,
+    validation: ShiftExchangeValidationDto,
+    internal: ShiftExchangeInternalErrorDto,
+  })
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER")
+  @Patch("exchange/reject/:exchangeId")
+  async rejectShiftExchange(
+    @GetUser() user: AuthUser,
+    @Param("exchangeId") exchangeId: string,
+    @Body("reason") reason?: string,
+  ) {
+    return this.sellsShiftManagementService.rejectShiftExchange(
+      exchangeId,
+      user._id!,
+      reason,
+    );
+  }
+
+  /**
+   * Get my shift exchanges.
+   */
+  @ApiOperation({
+    summary: "Get my shift exchanges",
+    description: "Retrieves the logged-in user's shift exchange requests.",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiSuccessResponse(GetMyShiftExchangesSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: ShiftExchangeUnauthorizedDto,
+    forbidden: ShiftExchangeForbiddenDto,
+    notFound: ShiftExchangeNotFoundDto,
+    internal: ShiftExchangeInternalErrorDto,
+  })
+  @Get("exchange/my")
+  async getMyShiftExchanges(@GetUser() user: AuthUser) {
+    return this.sellsShiftManagementService.getUserShiftExchanges(user._id!);
+  }
+
+  /**
+   * Get pending shift exchanges (for managers).
+   */
+  @ApiOperation({
+    summary: "Get pending shift exchanges for approval",
+    description: "Required role: SUPER ADMIN, DIRECTOR, or PROJECT MANAGER",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiSuccessResponse(GetPendingShiftExchangesSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: ShiftExchangeUnauthorizedDto,
+    forbidden: ShiftExchangeForbiddenDto,
+    notFound: ShiftExchangeNotFoundDto,
+    internal: ShiftExchangeInternalErrorDto,
+  })
+  @UseGuards(RolesGuard)
+  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER")
+  @Get("exchange/pending")
+  async getPendingShiftExchanges() {
+    return this.sellsShiftManagementService.getPendingShiftExchanges();
+  }
+
+  /**
    * Retrieves sells shift management records for a specific user.
-   *
-   * @param params - The parameters containing the user ID whose records are being retrieved.
-   * @param query - Optional query parameters for filtering records by month and year.
-   * @returns List of sells shift management records for the specified user.
    */
   @ApiOperation({
     summary: "Get sells shift management records for a specific user",
@@ -114,7 +304,7 @@ export class SellsShiftManagementController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })

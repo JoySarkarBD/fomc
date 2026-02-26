@@ -90,7 +90,7 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -168,7 +168,7 @@ export class RoleController {
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the role to retrieve",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",
@@ -198,14 +198,14 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the role to update",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",
@@ -239,14 +239,14 @@ export class RoleController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
   @ApiRequestDetails({
     params: {
       name: "id",
-      description: "The ID of the department to retrieve",
+      description: "The ID of the role to delete",
       required: true,
       type: String,
       example: "65f1b2c3d4e5f67890123456",

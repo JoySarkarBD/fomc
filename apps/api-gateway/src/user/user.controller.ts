@@ -90,7 +90,7 @@ export class UserController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -148,7 +148,7 @@ export class UserController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -181,7 +181,7 @@ export class UserController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -213,7 +213,7 @@ export class UserController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })

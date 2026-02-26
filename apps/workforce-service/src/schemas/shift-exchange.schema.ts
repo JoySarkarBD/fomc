@@ -21,12 +21,14 @@ export class ShiftExchange extends Document {
   exchangeDate!: Date;
 
   @Prop({
+    type: String,
     required: true,
     enum: Object.values(ShiftTypeForSales),
   })
   originalShift!: ShiftTypeForSales;
 
   @Prop({
+    type: String,
     required: true,
     enum: Object.values(ShiftTypeForSales),
   })
@@ -35,8 +37,8 @@ export class ShiftExchange extends Document {
   @Prop({ default: null })
   reason?: string;
 
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
-  approvedBy!: mongo.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  approvedBy?: mongo.ObjectId;
 
   @Prop({
     enum: Object.values(ShiftExchangeStatus),

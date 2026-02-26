@@ -155,7 +155,7 @@ export class AuthController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })
@@ -189,7 +189,7 @@ export class AuthController {
   })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
-    name: "Authorization",
+    name: "authorization",
     description: "Bearer token",
     required: true,
   })

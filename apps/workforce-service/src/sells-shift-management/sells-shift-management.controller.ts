@@ -10,6 +10,7 @@ import { AssignedByDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import { CreateSellsShiftManagementDto } from "./dto/create-sells-shift-management.dto";
 import { GetSellsShiftDto } from "./dto/get-sells-shift.dto";
 import { SellsShiftManagementService } from "./sells-shift-management.service";
+import { RequestShiftExchangeDto } from "./dto/request-shift-exchange.dto";
 
 /**
  * Sells Shift Management Controller
@@ -25,12 +26,6 @@ export class SellsShiftManagementController {
 
   /**
    * Create a new sells shift management record for a user.
-   *
-   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER }
-   * @param {Object} payload - The payload containing the user ID and the details of the sells shift management to be created.
-   * @param {UserIdDto["userId"]} payload.userId - The ID of the user for whom the sells shift management record is being created.
-   * @param {CreateSellsShiftManagementDto} payload.createSellsShiftManagementDto - The data transfer object containing the details of the sells shift management to be created.
-   * @returns {Promise<any>} Newly created sells shift management record.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER)
   async create(
@@ -50,13 +45,6 @@ export class SellsShiftManagementController {
 
   /**
    * Retrieve sells shift management records for a specific user.
-   *
-   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SELLS_SHIFT }
-   *
-   * @param {Object} payload - The payload containing the user ID and optional query parameters for filtering the sells shift management records.
-   * @param {UserIdDto["userId"]} payload.userId - The ID of the user whose sells shift management records are being retrieved.
-   * @param {GetSellsShiftDto} payload.query - Optional query parameters for filtering the sells shift management records by month and year.
-   * @returns {Promise<any>} List of sells shift management records for the specified user.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SELLS_SHIFT)
   async findOne(
@@ -70,5 +58,76 @@ export class SellsShiftManagementController {
       payload.userId,
       payload.query,
     );
+  }
+
+  /**
+   * Request a shift exchange.
+   */
+  @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.REQUEST_SHIFT_EXCHANGE)
+  async requestShiftExchange(
+    @Payload()
+    payload: {
+      userId: string;
+      requestShiftExchangeDto: RequestShiftExchangeDto;
+    },
+  ) {
+    return await this.sellsShiftManagementService.requestShiftExchange(
+      payload.userId,
+      payload.requestShiftExchangeDto,
+    );
+  }
+
+  /**
+   * Approve a shift exchange.
+   */
+  @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.APPROVE_SHIFT_EXCHANGE)
+  async approveShiftExchange(
+    @Payload()
+    payload: {
+      exchangeId: string;
+      managerId: string;
+    },
+  ) {
+    return await this.sellsShiftManagementService.approveShiftExchange(
+      payload.exchangeId,
+      payload.managerId,
+    );
+  }
+
+  /**
+   * Reject a shift exchange.
+   */
+  @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.REJECT_SHIFT_EXCHANGE)
+  async rejectShiftExchange(
+    @Payload()
+    payload: {
+      exchangeId: string;
+      managerId: string;
+      reason?: string;
+    },
+  ) {
+    return await this.sellsShiftManagementService.rejectShiftExchange(
+      payload.exchangeId,
+      payload.managerId,
+      payload.reason,
+    );
+  }
+
+  /**
+   * Get user shift exchanges.
+   */
+  @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SHIFT_EXCHANGES)
+  async getUserShiftExchanges(@Payload() payload: { userId: string }) {
+    return await this.sellsShiftManagementService.getUserShiftExchanges(
+      payload.userId,
+    );
+  }
+
+  /**
+   * Get pending shift exchanges for approval.
+   */
+  @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_PENDING_SHIFT_EXCHANGES)
+  async getPendingShiftExchanges() {
+    return await this.sellsShiftManagementService.getPendingShiftExchanges();
   }
 }

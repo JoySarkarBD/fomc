@@ -14,6 +14,7 @@ import { DesignationModule } from "./designation/designation.module";
 import { Attendance, AttendanceSchema } from "./schemas/attendance.schema";
 import { Department, DepartmentSchema } from "./schemas/department.schema";
 import { Leave, LeaveSchema } from "./schemas/leave.schema";
+import { ShiftExchange, ShiftExchangeSchema } from "./schemas/shift-exchange.schema";
 import { SeedDepartmentAndDesignationModule } from "./seed/seed-department-and-designation.module";
 import { TaskModule } from "./task/task.module";
 import { SellsShiftManagementModule } from './sells-shift-management/sells-shift-management.module';
@@ -38,6 +39,10 @@ import { SellsShiftManagementModule } from './sells-shift-management/sells-shift
       {
         name: Leave.name,
         schema: LeaveSchema,
+      },
+      {
+        name: ShiftExchange.name,
+        schema: ShiftExchangeSchema,
       },
     ]),
     AttendanceModule,

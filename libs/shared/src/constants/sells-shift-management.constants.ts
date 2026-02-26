@@ -14,5 +14,18 @@ export const SELLS_SHIFT_MANAGEMENT_COMMANDS = {
   /** Retrieve sells shift managements for a specific user, optionally filtered. */
   GET_USER_SELLS_SHIFT: { cmd: "get_user_sells_shift_management" },
 
-  /** Mark a sells shift management as read. */
+  /** Request a shift exchange. */
+  REQUEST_SHIFT_EXCHANGE: { cmd: "request_shift_exchange" },
+
+  /** Approve a shift exchange request. */
+  APPROVE_SHIFT_EXCHANGE: { cmd: "approve_shift_exchange" },
+
+  /** Reject a shift exchange request. */
+  REJECT_SHIFT_EXCHANGE: { cmd: "reject_shift_exchange" },
+
+  /** Get all shift exchange requests for a user. */
+  GET_USER_SHIFT_EXCHANGES: { cmd: "get_user_shift_exchanges" },
+
+  /** Get all shift exchange requests for approval (for managers). */
+  GET_PENDING_SHIFT_EXCHANGES: { cmd: "get_pending_shift_exchanges" },
 };
