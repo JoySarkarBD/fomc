@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
   app.enableCors({
     origin: "*", // Allow all origins (adjust for production)
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type, Accept, Authorization",
+    allowedHeaders: "Content-Type, Accept, Authorization, x-device-id",
   });
 
   // Set global route prefix to "api"
