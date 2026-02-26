@@ -136,6 +136,12 @@ export class AuthController {
     throttle: ResetPasswordThrottlerDto,
     internal: ResetPasswordInternalErrorDto,
   })
+  @ApiHeader({
+    name: "x-device-id",
+    description:
+      "Unique identifier for the user's device, used for throttling password reset requests.",
+    required: true,
+  })
   @Patch("reset-password")
   @UseGuards(ResetThrottleGuard)
   async reset(@Body() data: ResetPasswordDto) {
