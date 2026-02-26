@@ -16,6 +16,7 @@ import {
 import { ClientProxy } from "@nestjs/microservices";
 import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-management.constants";
 import {
+  ApprovedByDto,
   AssignedByDto,
   ExchangeIdDto,
   UserIdDto,
@@ -105,7 +106,7 @@ export class SellsShiftManagementService {
    */
   async approveShiftExchange(
     exchangeId: ExchangeIdDto["exchangeId"],
-    approvedBy: string,
+    approvedBy: ApprovedByDto["approvedBy"],
   ) {
     const result = await firstValueFrom(
       this.workforceClient.send(
@@ -130,7 +131,7 @@ export class SellsShiftManagementService {
    */
   async rejectShiftExchange(
     exchangeId: ExchangeIdDto["exchangeId"],
-    approvedBy: string,
+    approvedBy: ApprovedByDto["approvedBy"],
     reason?: string,
   ) {
     const result = await firstValueFrom(
