@@ -36,6 +36,12 @@ import { ResponseInterceptor } from "./common/response.interceptor";
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: "*", // Allow all origins (adjust for production)
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Accept, Authorization",
+  });
+
   // Set global route prefix to "api"
   app.setGlobalPrefix("api");
 
