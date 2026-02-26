@@ -14,6 +14,7 @@ import {
   WeekendExchange,
   WeekendExchangeSchema,
 } from "../schemas/weekend-exchange.schema";
+import { SellsShiftManagementModule } from "../sells-shift-management/sells-shift-management.module";
 import { AttendanceController } from "./attendance.controller";
 import { AttendanceService } from "./attendance.service";
 
@@ -38,6 +39,7 @@ import { AttendanceService } from "./attendance.service";
       { name: Attendance.name, schema: AttendanceSchema },
       { name: WeekendExchange.name, schema: WeekendExchangeSchema },
     ]),
+    SellsShiftManagementModule,
   ],
   controllers: [AttendanceController],
   providers: [AttendanceService],

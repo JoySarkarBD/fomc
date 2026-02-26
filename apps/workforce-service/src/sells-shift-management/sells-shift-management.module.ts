@@ -62,5 +62,6 @@ import { SellsShiftManagementService } from "./sells-shift-management.service";
    * The SellsShiftManagementService contains methods that communicate with the Workforce Service microservice to perform operations such as fetching workforce details, updating workforce information, and other workforce-related functionalities, allowing for a clean separation of concerns and maintainable code structure within the API Gateway.
    */
   providers: [SellsShiftManagementService],
+  exports: [SellsShiftManagementService],
 })
 export class SellsShiftManagementModule {}

@@ -112,4 +112,22 @@ export class SellsShiftManagementService {
 
     return result;
   }
+
+  /**
+   * Retrieves the sells shift management record for a specific user on a specific date.
+   *
+   * @param userId - The ID of the user.
+   * @param date - The date for which to retrieve the shift.
+   * @returns The sells shift management record if found, otherwise null.
+   */
+  async getShiftForDate(userId: string, date: Date) {
+    const todayDate = new Date(date);
+    todayDate.setHours(0, 0, 0, 0);
+
+    return await this.salesShiftAssignmentModel.findOne({
+      user: new Types.ObjectId(userId),
+      weekStartDate: { $lte: todayDate },
+      weekEndDate: { $gte: todayDate },
+    });
+  }
 }

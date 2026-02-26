@@ -27,6 +27,7 @@ import {
   WeekendExchange,
   WeekendExchangeDocument,
 } from "../schemas/weekend-exchange.schema";
+import { SellsShiftManagementService } from "../sells-shift-management/sells-shift-management.service";
 import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
 import { WeekendExchangeByAuthorityDto } from "./dto/weekend-exchange-by-authority.dto";
@@ -47,6 +48,7 @@ export class AttendanceService {
     private readonly attendanceModel: Model<AttendanceDocument>,
     @InjectModel(WeekendExchange.name)
     private readonly weekendExchangeModel: Model<WeekendExchangeDocument>,
+    private readonly sellsShiftManagementService: SellsShiftManagementService,
   ) {}
 
   /**
@@ -146,25 +148,67 @@ export class AttendanceService {
             break;
 
           case "SALES": {
-            const morningStart = 7 * 60;
-            const morningEnd = 15 * 60;
-            const eveningStart = 15 * 60;
-            const eveningEnd = 23 * 60;
-            const nightStart = 23 * 60;
-            const nightEnd = 7 * 60;
+            // Use the microservice (service method) to get the user shift details
+            const assignedShift =
+              await this.sellsShiftManagementService.getShiftForDate(
+                userId,
+                todayDate,
+              );
 
-            if (currentMinutes >= morningStart && currentMinutes < morningEnd) {
-              shiftType = ShiftTypeForSales.MORNING;
+            if (!assignedShift) {
+              return {
+                message:
+                  "No shift assigned for this week. Please contact admin.",
+                exception: "HttpException",
+              };
+            }
+
+            shiftType = assignedShift.shiftType;
+
+            const morningStart = 7 * 60;
+            const eveningStart = 15 * 60;
+            const nightStart = 23 * 60;
+
+            if (shiftType === ShiftTypeForSales.MORNING) {
               shiftStartMinutes = morningStart;
-            } else if (
-              currentMinutes >= eveningStart &&
-              currentMinutes < eveningEnd
-            ) {
-              shiftType = ShiftTypeForSales.EVENING;
+            } else if (shiftType === ShiftTypeForSales.EVENING) {
               shiftStartMinutes = eveningStart;
-            } else {
-              shiftType = ShiftTypeForSales.NIGHT;
+            } else if (shiftType === ShiftTypeForSales.NIGHT) {
               shiftStartMinutes = nightStart;
+            } else {
+              return {
+                message: "Invalid shift assigned",
+                exception: "HttpException",
+              };
+            }
+
+            // Check if user is trying to mark attendance for a shift that hasn't started or is too late
+            // Allow marking attendance within a window (e.g., 4 hours before shift starts)
+            const windowMinutes = 4 * 60;
+            let diff = currentMinutes - shiftStartMinutes;
+
+            // Handle cross-day for night shift (23:00)
+            if (
+              shiftType === ShiftTypeForSales.NIGHT &&
+              currentMinutes < 12 * 60
+            ) {
+              // It's after midnight (e.g. 01:00 AM)
+              diff = 24 * 60 + currentMinutes - nightStart;
+            } else if (
+              shiftType === ShiftTypeForSales.NIGHT &&
+              currentMinutes >= 12 * 60
+            ) {
+              // It's before midnight (e.g. 22:00 PM)
+              diff = currentMinutes - nightStart;
+            }
+
+            if (diff < -windowMinutes || diff > 4 * 60) {
+              return {
+                message: `It is not your shift time. Your shift starts at ${Math.floor(
+                  shiftStartMinutes / 60,
+                )}:00`,
+                exception: "HttpException",
+              };
             }
             break;
           }
@@ -178,7 +222,16 @@ export class AttendanceService {
       }
 
       const graceLimit = shiftStartMinutes + 15; // 15 min grace
-      const isLate = currentMinutes > graceLimit;
+      let isLate = false;
+
+      if (shiftType === ShiftTypeForSales.NIGHT) {
+        // Night shift cross-day logic
+        const adjustedCurrent =
+          currentMinutes < 12 * 60 ? 24 * 60 + currentMinutes : currentMinutes;
+        isLate = adjustedCurrent > shiftStartMinutes + 15;
+      } else {
+        isLate = currentMinutes > graceLimit;
+      }
 
       attendanceType = isLate
         ? AttendanceInType.LATE
