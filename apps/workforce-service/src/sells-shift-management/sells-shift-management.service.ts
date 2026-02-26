@@ -47,6 +47,12 @@ export class SellsShiftManagementService {
 
   /**
    * Creates a new sells shift management record for a user.
+   *
+   * @param {AssignedByDto["assignedBy"]} assignedBy - The ID of the user who is assigning the shift.
+   * @param {UserIdDto["userId"]} userId - The ID of the user for whom the shift is being assigned.
+   * @param {CreateSellsShiftManagementDto} createSellsShiftManagementDto - The data transfer object containing the details of the shift to be assigned, including week start and end dates, shift type, and any additional notes.
+   * @returns {Promise<any>} The newly created sells shift management record, or an error message if the user does not exist or if a shift is already assigned for the same week.
+   * @remarks This method first checks if the user exists by communicating with the user service. It then checks if there is already an existing shift assignment for the same week to prevent duplicate assignments. If both checks pass, it creates a new shift assignment record in the database and returns it.
    */
   async createForUser(
     assignedBy: AssignedByDto["assignedBy"],
@@ -94,6 +100,11 @@ export class SellsShiftManagementService {
 
   /**
    * Retrieves sells shift management records for a specific user.
+   *
+   * @param {UserIdDto["userId"]} userId - The ID of the user for whom to retrieve the shift management records.
+   * @param {GetSellsShiftDto} query - The query parameters for filtering the shift management records, including the year and month to specify the time range for the records.
+   * @returns {Promise<any>} The sells shift management records for the specified user and time range, or an error message if the user does not exist.
+   * @remarks This method first checks if the user exists by communicating with the user service. If the user exists, it retrieves all shift management records for that user within the specified month and year from the database and returns them.
    */
   async findShiftForUser(userId: UserIdDto["userId"], query: GetSellsShiftDto) {
     // Fetch user from user-service
@@ -123,8 +134,13 @@ export class SellsShiftManagementService {
 
   /**
    * Retrieves the sells shift management record for a specific user on a specific date.
+   *
+   * @param {string} userId - The ID of the user for whom to retrieve the shift management record.
+   * @param {Date} date - The specific date for which to retrieve the shift management record.
+   * @returns {Promise<any>} The sells shift management record for the specified user and date, or null if no record exists for that date.
+   * @remarks This method retrieves the shift management record for the specified user where the provided date falls within the week start and end dates of the record. It returns the record if found, or null if no matching record exists.
    */
-  async getShiftForDate(userId: string, date: Date) {
+  async getShiftForDate(userId: UserIdDto["userId"], date: Date) {
     const todayDate = new Date(date);
     todayDate.setHours(0, 0, 0, 0);
 
@@ -137,9 +153,14 @@ export class SellsShiftManagementService {
 
   /**
    * Request a shift exchange (Only for Sales users).
+   *
+   * @param {string} userId - The ID of the user requesting the shift exchange.
+   * @param {RequestShiftExchangeDto} data - The data transfer object containing the details of the shift exchange request, including the exchange date, original shift type, new shift type, and reason for the exchange.
+   * @returns {Promise<any>} The result of the shift exchange request, which may include the created shift exchange record or an error message if the user is not eligible for shift exchange or if they do not have the specified original shift on the exchange date.
+   * @remarks This method first checks if the user exists and belongs to the Sales department. It then verifies if the user has the specified original shift on the requested exchange date. If both checks pass, it creates
    */
   async requestShiftExchange(
-    userId: string,
+    userId: UserIdDto["userId"],
     data: RequestShiftExchangeDto,
   ): Promise<any> {
     const user = await firstValueFrom(
@@ -191,12 +212,10 @@ export class SellsShiftManagementService {
         }),
       );
 
+      // Assuming that the user service returns a list of users in the "users" property of the response
       if (usersRes && Array.isArray(usersRes.users)) {
         const managers = usersRes.users.filter(
-          (u: any) =>
-            u.role === "PROJECT MANAGER" ||
-            u.role === "DIRECTOR" ||
-            u.role === "SUPER ADMIN",
+          (u: any) => u.role === "SUPER ADMIN",
         );
         managers.forEach((m: any) => managerIds.push(m._id.toString()));
       }
@@ -224,6 +243,10 @@ export class SellsShiftManagementService {
 
   /**
    * Approve a shift exchange request.
+   *
+   * @param {string} exchangeId - The ID of the shift exchange request to be approved.
+   * @param {string} managerId - The ID of the manager approving the shift exchange request.
+   * @return {Promise<any>} The result of the shift exchange approval, which may include the updated shift exchange record or an error message if the exchange request is not found or if it has already been processed.
    */
   async approveShiftExchange(exchangeId: string, managerId: string) {
     const exchange = await this.shiftExchangeModel.findById(exchangeId);
@@ -273,6 +296,11 @@ export class SellsShiftManagementService {
 
   /**
    * Reject a shift exchange request.
+   *
+   * @param {string} exchangeId - The ID of the shift exchange request to be rejected.
+   * @param {string} managerId - The ID of the manager rejecting the shift exchange request.
+   * @param {string} [reason] - Optional reason for rejecting the shift exchange request.
+   * @return {Promise<any>} The result of the shift exchange rejection, which may include the updated shift exchange record or an error message if the exchange request is not found or if it has already been processed.
    */
   async rejectShiftExchange(
     exchangeId: string,
@@ -318,8 +346,12 @@ export class SellsShiftManagementService {
 
   /**
    * Get all shift exchange requests for a user.
+   *
+   * @param {string} userId - The ID of the user for whom to retrieve shift exchange requests.
+   * @return {Promise<any>} The shift exchange requests associated with the specified user, or an error message if the user does not exist.
+   * @remarks This method first checks if the user exists by communicating with the user service. If the user exists, it retrieves all shift exchange requests for that user from the database and returns them.
    */
-  async getUserShiftExchanges(userId: string) {
+  async getUserShiftExchanges(userId: UserIdDto["userId"]) {
     return await this.shiftExchangeModel
       .find({ user: new Types.ObjectId(userId) })
       .sort({ exchangeDate: -1 });

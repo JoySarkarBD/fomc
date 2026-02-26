@@ -1,14 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from "class-validator";
 import { ShiftTypeForSales } from "../../schemas/attendance.schema";
 
 export class RequestShiftExchangeDto {
   @ApiProperty({
     description: "Date for which the shift exchange is requested",
-    example: "2024-05-01",
+    example: "2024-05-01T08:00:00.000Z",
   })
+  @IsDateString({}, { message: "Date must be a valid UTC date string" })
   @IsNotEmpty()
-  @IsDateString()
   exchangeDate!: string;
 
   @ApiProperty({

@@ -1,5 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CustomForbiddenDto } from "apps/api-gateway/src/common/dto/custom-forbidden.dto";
+import {
+  FieldErrorDto,
+  ValidationErrorResponseDto,
+} from "apps/api-gateway/src/common/dto/validation-error.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class GetUserSellsShiftForbiddenDto extends CustomForbiddenDto {
@@ -37,7 +41,7 @@ export class GetUserSellsShiftUnauthorizedDto {
   declare endpoint: string;
 }
 
-export class GetUserSellsShiftValidationDto {
+export class GetUserSellsShiftValidationDto extends ValidationErrorResponseDto {
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
@@ -45,10 +49,17 @@ export class GetUserSellsShiftValidationDto {
   declare endpoint: string;
 
   @ApiProperty({
-    example: {
-      month: ["month must be a number"],
-      year: ["year must be a number"],
-    },
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "month",
+        message: "month must be a number between 1 and 12 - query required",
+      },
+      {
+        field: "year",
+        message: "year must be a number between 1900 and 2999 - query required",
+      },
+    ],
   })
-  declare errors: any;
+  declare errors: FieldErrorDto[];
 }

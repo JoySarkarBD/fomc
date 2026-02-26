@@ -143,6 +143,8 @@ export class SellsShiftManagementController {
     validation: ShiftExchangeValidationDto,
     internal: ShiftExchangeInternalErrorDto,
   })
+  @UseGuards(RolesGuard)
+  @Roles("PROJECT MANAGER", "EMPLOYEE")
   @Post("exchange/request")
   async requestShiftExchange(
     @GetUser() user: AuthUser,

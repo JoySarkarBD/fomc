@@ -9,8 +9,8 @@ import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-m
 import { AssignedByDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import { CreateSellsShiftManagementDto } from "./dto/create-sells-shift-management.dto";
 import { GetSellsShiftDto } from "./dto/get-sells-shift.dto";
-import { SellsShiftManagementService } from "./sells-shift-management.service";
 import { RequestShiftExchangeDto } from "./dto/request-shift-exchange.dto";
+import { SellsShiftManagementService } from "./sells-shift-management.service";
 
 /**
  * Sells Shift Management Controller
@@ -26,6 +26,11 @@ export class SellsShiftManagementController {
 
   /**
    * Create a new sells shift management record for a user.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER }
+   *
+   * @param {Object} payload - The data transfer object containing the details of the sells shift management record to be created, including the assignedBy user ID, target user ID, and the createSellsShiftManagementDto with shift details.
+   * @returns {Promise<any>} Newly created sells shift management record.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER)
   async create(
@@ -45,6 +50,11 @@ export class SellsShiftManagementController {
 
   /**
    * Retrieve sells shift management records for a specific user.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SELLS_SHIFT }
+   *
+   * @param {Object} payload - The payload containing the user ID and query parameters for filtering sells shift management records.
+   * @returns {Promise<any>} The sells shift management records for the specified user.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SELLS_SHIFT)
   async findOne(
@@ -62,6 +72,11 @@ export class SellsShiftManagementController {
 
   /**
    * Request a shift exchange.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.REQUEST_SHIFT_EXCHANGE }
+   *
+   * @param {Object} payload - The payload containing the user ID and the requestShiftExchangeDto with details of the shift exchange request.
+   * @returns {Promise<any>} The result of the shift exchange request.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.REQUEST_SHIFT_EXCHANGE)
   async requestShiftExchange(
@@ -79,6 +94,11 @@ export class SellsShiftManagementController {
 
   /**
    * Approve a shift exchange.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.APPROVE_SHIFT_EXCHANGE }
+   *
+   * @param {Object} payload - The payload containing the exchange ID and manager ID for approving the shift exchange.
+   * @returns {Promise<any>} The result of the shift exchange approval.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.APPROVE_SHIFT_EXCHANGE)
   async approveShiftExchange(
@@ -96,6 +116,11 @@ export class SellsShiftManagementController {
 
   /**
    * Reject a shift exchange.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.REJECT_SHIFT_EXCHANGE }
+   *
+   * @param {Object} payload - The payload containing the exchange ID, manager ID, and optional reason for rejecting the shift exchange.
+   * @returns {Promise<any>} The result of the shift exchange rejection.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.REJECT_SHIFT_EXCHANGE)
   async rejectShiftExchange(
@@ -115,6 +140,11 @@ export class SellsShiftManagementController {
 
   /**
    * Get user shift exchanges.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SHIFT_EXCHANGES }
+   *
+   * @param {Object} payload - The payload containing the user ID for retrieving shift exchanges.
+   * @returns {Promise<any>} The shift exchanges associated with the specified user.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SHIFT_EXCHANGES)
   async getUserShiftExchanges(@Payload() payload: { userId: string }) {
@@ -125,6 +155,10 @@ export class SellsShiftManagementController {
 
   /**
    * Get pending shift exchanges for approval.
+   *
+   * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_PENDING_SHIFT_EXCHANGES }
+   *
+   * @returns {Promise<any>} The pending shift exchanges that require approval.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_PENDING_SHIFT_EXCHANGES)
   async getPendingShiftExchanges() {
