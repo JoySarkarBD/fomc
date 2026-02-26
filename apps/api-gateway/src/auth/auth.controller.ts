@@ -107,6 +107,12 @@ export class AuthController {
     summary: "Forgot password",
     description: "Sends a password reset OTP to the user's email.",
   })
+  @ApiHeader({
+    name: "x-device-id",
+    description:
+      "Unique identifier for the user's device, used for throttling password reset requests.",
+    required: true,
+  })
   @ApiSuccessResponse(ForgotPasswordSuccessDto, 200)
   @ApiErrorResponses({
     validation: ForgotPasswordValidationDto,
@@ -145,6 +151,12 @@ export class AuthController {
   @ApiHeader({
     name: "Authorization",
     description: "Bearer token",
+    required: true,
+  })
+  @ApiHeader({
+    name: "x-device-id",
+    description:
+      "Unique identifier for the user's device, used for throttling password change requests.",
     required: true,
   })
   @ApiSuccessResponse(ChangePasswordSuccessDto, 200)

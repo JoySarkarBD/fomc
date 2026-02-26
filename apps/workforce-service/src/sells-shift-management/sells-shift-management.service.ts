@@ -48,10 +48,23 @@ export class SellsShiftManagementService {
       }),
     );
 
-    if (userExist.exception) {
+    if (userExist?.exception) {
       return {
         message: userExist.message,
         exception: userExist.exception,
+      };
+    }
+
+    // Check if assignment already exists for the same week
+    const existingAssignment = await this.salesShiftAssignmentModel.findOne({
+      user: new Types.ObjectId(userId),
+      weekStartDate: createSellsShiftManagementDto.weekStartDate,
+    });
+
+    if (existingAssignment) {
+      return {
+        message: "Shift already assigned for this week",
+        exception: "HttpException",
       };
     }
 
@@ -61,6 +74,7 @@ export class SellsShiftManagementService {
       weekEndDate: createSellsShiftManagementDto.weekEndDate,
       shiftType: createSellsShiftManagementDto.shiftType,
       assignedBy: new Types.ObjectId(assignedBy),
+      note: createSellsShiftManagementDto.note,
     });
 
     return await result.save();

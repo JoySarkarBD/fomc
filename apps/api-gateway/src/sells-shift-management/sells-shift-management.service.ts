@@ -6,11 +6,20 @@
  * @module api-gateway/sells-shift-management
  */
 
-import { Inject, Injectable } from "@nestjs/common";
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-management.constants";
+import { AssignedByDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import { CreateSellsShiftManagementDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift-management.dto";
+import { GetSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/get-sells-shift.dto";
 import { firstValueFrom } from "rxjs";
+import { buildResponse } from "../common/response.util";
 
 @Injectable()
 export class SellsShiftManagementService {
@@ -19,17 +28,59 @@ export class SellsShiftManagementService {
   ) {}
 
   /**
-   * Creates a new sells shift management entry for a user by sending a command to the Workforce micro-service. The method takes a CreateSellsShiftManagementDto as input, which contains the necessary data for creating a new sells shift management entry, including week start date, week end date, shift type, and an optional note.
+   * Creates a new sells shift management entry for a user by sending a command to the Workforce micro-service.
    *
-   *
+   * @param assignedBy - The ID of the user who is assigning the shift.
+   * @param userId - The ID of the user for whom the shift is being created.
+   * @param data - The data for creating a new sells shift management entry.
+   * @returns Result of the creation process.
    */
-  async create(data: CreateSellsShiftManagementDto) {
+  async create(
+    assignedBy: AssignedByDto["assignedBy"],
+    userId: UserIdDto["userId"],
+    data: CreateSellsShiftManagementDto,
+  ) {
     const result = await firstValueFrom(
       this.workforceClient.send(
         SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER,
-        data,
+        {
+          assignedBy,
+          userId,
+          createSellsShiftManagementDto: data,
+        },
       ),
     );
-    return result;
+
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+      case "HttpException":
+        throw new HttpException(result.message, HttpStatus.FORBIDDEN);
+    }
+
+    return buildResponse("Sells shift created successfully", result);
+  }
+
+  /**
+   * Retrieves sells shift management records for a specific user.
+   *
+   * @param userId - The ID of the user whose sells shift records are being retrieved.
+   * @param query - Query parameters for filtering the records.
+   * @returns List of sells shift records for the specified user.
+   */
+  async findShiftForUser(userId: UserIdDto["userId"], query: GetSellsShiftDto) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SELLS_SHIFT, {
+        userId,
+        query,
+      }),
+    );
+
+    switch (result?.exception) {
+      case "NotFoundException":
+        throw new NotFoundException(result.message);
+    }
+
+    return buildResponse("Sells shift retrieved", result);
   }
 }
