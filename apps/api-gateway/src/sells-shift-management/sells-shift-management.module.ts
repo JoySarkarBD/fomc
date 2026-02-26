@@ -29,7 +29,17 @@ import { SellsShiftManagementService } from "./sells-shift-management.service";
       },
     ]),
   ],
+
+  /**
+   * Controllers responsible for handling incoming HTTP requests related to sells shift management operations, such as retrieving sells shift information, updating sells shift data, and other sells shift-related functionalities.
+   * The SellsShiftManagementController defines the endpoints and request handling logic for these operations, utilizing the SellsShiftManagementService to perform the necessary business logic.
+   */
   controllers: [SellsShiftManagementController],
+
+  /**
+   * Providers responsible for implementing the business logic for sells shift management operations, such as interacting with the Workforce Service to retrieve and manage workforce data related to sells shifts.
+   * The SellsShiftManagementService contains methods that communicate with the Workforce Service microservice to perform operations such as fetching workforce details, updating workforce information, and other workforce-related functionalities, allowing for a clean separation of concerns and maintainable code structure within the API Gateway.
+   */
   providers: [SellsShiftManagementService],
 })
 export class SellsShiftManagementModule {}
