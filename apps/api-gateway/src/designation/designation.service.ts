@@ -34,7 +34,7 @@ export class DesignationService {
    * @param {CreateDesignationDto} data - The data transfer object containing the details of the designation to be created.
    * @return Promise resolving to the newly created designation.
    */
-  async createDesignation(createDesignationDto: CreateDesignationDto) {
+  async create(createDesignationDto: CreateDesignationDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(
         DESIGNATION_COMMANDS.CREATE_DESIGNATION,
@@ -54,7 +54,7 @@ export class DesignationService {
    * @param {SearchQueryDto} query - The search query parameters.
    * @returns Promise resolving to a list of designations matching the search criteria.
    */
-  async findDesignations(query: SearchQueryDto) {
+  async findAll(query: SearchQueryDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(DESIGNATION_COMMANDS.GET_DESIGNATIONS, query),
     );
@@ -67,7 +67,7 @@ export class DesignationService {
    * @param {string} id - The ID of the designation to be retrieved.
    * @return Promise resolving to the designation details.
    */
-  async findDesignationById(id: MongoIdDto["id"]) {
+  async findOne(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
       this.workforceClient.send(DESIGNATION_COMMANDS.GET_DESIGNATION, { id }),
     );
@@ -84,7 +84,7 @@ export class DesignationService {
    * @param {UpdateDesignationDto} updateDesignationDto - The data transfer object containing the updated details of the designation.
    * @return Promise resolving to the updated designation details.
    */
-  async updateDesignationById(id: string, data: UpdateDesignationDto) {
+  async update(id: string, data: UpdateDesignationDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(DESIGNATION_COMMANDS.UPDATE_DESIGNATION, {
         id,
@@ -107,7 +107,7 @@ export class DesignationService {
    * @param {string} id - The ID of the designation to be deleted.
    * @return Promise resolving to a message indicating the result of the delete operation.
    */
-  async deleteDesignationById(id: MongoIdDto["id"]) {
+  async remove(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
       this.workforceClient.send(DESIGNATION_COMMANDS.DELETE_DESIGNATION, id),
     );

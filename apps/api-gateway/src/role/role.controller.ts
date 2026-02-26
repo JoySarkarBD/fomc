@@ -99,7 +99,7 @@ export class RoleController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() data: CreateRoleDto) {
-    return await this.roleService.createRole(data);
+    return await this.roleService.create(data);
   }
 
   /**
@@ -148,7 +148,7 @@ export class RoleController {
   })
   @Get()
   async findAll(@Query() query: SearchQueryDto) {
-    return await this.roleService.findRoles(query);
+    return await this.roleService.findAll(query);
   }
 
   /**
@@ -180,7 +180,7 @@ export class RoleController {
   })
   @Get(":id")
   async findOne(@Param() params: MongoIdDto) {
-    return await this.roleService.findRoleById(params.id);
+    return await this.roleService.findOne(params.id);
   }
 
   /**
@@ -215,7 +215,7 @@ export class RoleController {
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async update(@Param() params: MongoIdDto, @Body() data: UpdateRoleDto) {
-    return await this.roleService.updateRoleById(params.id, data);
+    return await this.roleService.update(params.id, data);
   }
 
   /**
@@ -248,7 +248,7 @@ export class RoleController {
   })
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async delete(@Param() params: MongoIdDto) {
-    return await this.roleService.deleteRoleById(params.id);
+  async remove(@Param() params: MongoIdDto) {
+    return await this.roleService.remove(params.id);
   }
 }

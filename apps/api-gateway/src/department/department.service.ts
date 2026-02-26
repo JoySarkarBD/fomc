@@ -36,7 +36,7 @@ export class DepartmentService {
    * @param {CreateDepartmentDto} data - The data transfer object containing the details of the department to be created.
    * @return Promise resolving to the newly created department.
    */
-  async createDepartment(data: CreateDepartmentDto) {
+  async create(data: CreateDepartmentDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT, data),
     );
@@ -53,7 +53,7 @@ export class DepartmentService {
    * @param {SearchQueryDto} query - The search query parameters.
    * @returns Promise resolving to a list of departments matching the search criteria.
    */
-  async findDepartments(query: SearchQueryDto) {
+  async findAll(query: SearchQueryDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENTS, query),
     );
@@ -66,7 +66,7 @@ export class DepartmentService {
    * @param {string} id - The ID of the department to be retrieved.
    * @return Promise resolving to the department details.
    */
-  async findDepartmentById(id: MongoIdDto["id"]) {
+  async findOne(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.GET_DEPARTMENT, id),
     );
@@ -83,7 +83,7 @@ export class DepartmentService {
    * @param {UpdateDepartmentDto} updateDepartmentDto - The data transfer object containing the updated details of the department.
    * @return Promise resolving to the updated department details.
    */
-  async updateDepartmentById(id: MongoIdDto["id"], data: UpdateDepartmentDto) {
+  async update(id: MongoIdDto["id"], data: UpdateDepartmentDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.UPDATE_DEPARTMENT, {
         id,
@@ -109,7 +109,7 @@ export class DepartmentService {
    * @param {string} id - The ID of the department to be deleted.
    * @return Promise resolving to the result of the delete operation.
    */
-  async deleteDepartmentById(id: MongoIdDto["id"]) {
+  async remove(id: MongoIdDto["id"]) {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT, id),
     );
