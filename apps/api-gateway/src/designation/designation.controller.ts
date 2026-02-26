@@ -93,7 +93,7 @@ export class DesignationController {
   @Roles("SUPER ADMIN")
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createDesignation(@Body() createDesignationDto: CreateDesignationDto) {
+  async create(@Body() createDesignationDto: CreateDesignationDto) {
     return await this.designationService.createDesignation(
       createDesignationDto,
     );
@@ -145,7 +145,7 @@ export class DesignationController {
     internal: DesignationsInternalErrorDto,
   })
   @Get()
-  async findDesignations(@Query() query: SearchQueryDto) {
+  async findAll(@Query() query: SearchQueryDto) {
     return await this.designationService.findDesignations(query);
   }
 
@@ -177,7 +177,7 @@ export class DesignationController {
     internal: DesignationInternalErrorDto,
   })
   @Get(":id")
-  async findDesignationById(@Param() params: MongoIdDto) {
+  async findOne(@Param() params: MongoIdDto) {
     return await this.designationService.findDesignationById(params.id);
   }
 
@@ -214,7 +214,7 @@ export class DesignationController {
   @UseGuards(JwtAuthGuard)
   @Roles("SUPER ADMIN")
   @Patch(":id")
-  async updateDesignationById(
+  async update(
     @Param() params: MongoIdDto,
     @Body() updateDesignationDto: UpdateDesignationDto,
   ) {
@@ -253,7 +253,7 @@ export class DesignationController {
   @UseGuards(JwtAuthGuard)
   @Roles("SUPER ADMIN")
   @Delete(":id")
-  async deleteDesignationById(@Param() params: MongoIdDto) {
+  async remove(@Param() params: MongoIdDto) {
     return await this.designationService.deleteDesignationById(params.id);
   }
 }

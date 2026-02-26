@@ -96,7 +96,7 @@ export class DepartmentController {
   })
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
+  async create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return await this.departmentService.createDepartment(createDepartmentDto);
   }
 
@@ -146,7 +146,7 @@ export class DepartmentController {
     internal: DepartmentInternalErrorDto,
   })
   @Get()
-  async findDepartments(@Query() query: SearchQueryDto) {
+  async findAll(@Query() query: SearchQueryDto) {
     return await this.departmentService.findDepartments(query);
   }
 
@@ -178,7 +178,7 @@ export class DepartmentController {
     internal: DepartmentInternalErrorDto,
   })
   @Get(":id")
-  async findDepartmentById(@Param() params: MongoIdDto) {
+  async findOne(@Param() params: MongoIdDto) {
     return await this.departmentService.findDepartmentById(params.id);
   }
 
@@ -214,7 +214,7 @@ export class DepartmentController {
   })
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
-  async updateDepartmentById(
+  async update(
     @Param() params: MongoIdDto,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
   ) {
@@ -254,7 +254,7 @@ export class DepartmentController {
   })
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async deleteDepartmentById(@Param() params: MongoIdDto) {
+  async remove(@Param() params: MongoIdDto) {
     return await this.departmentService.deleteDepartmentById(params.id);
   }
 }
