@@ -30,6 +30,7 @@ export class AttendanceByAuthorityDto {
     example: "2024-05-01T08:00:00.000Z",
   })
   @IsDateString({}, { message: "Date must be a valid UTC date string" })
+  @IsOptional()
   checkInTime?: Date;
 
   @ApiProperty({
@@ -37,6 +38,7 @@ export class AttendanceByAuthorityDto {
     description: "The check-out time for the attendance record (optional)",
     example: "2024-05-01T17:00:00.000Z",
   })
+  @IsOptional()
   @IsDateString({}, { message: "Date must be a valid UTC date string" })
   checkOutTime?: Date;
 
