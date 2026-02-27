@@ -61,11 +61,8 @@ export class SellsShiftManagementService {
     userId: UserIdDto["userId"],
     createSellsShiftManagementDto: CreateSellsShiftManagementDto,
   ) {
-    // Fetch user from user-service
     const userExist = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USER, {
-        id: userId,
-      }),
+      this.userClient.send(USER_COMMANDS.GET_USER, { id: userId }),
     );
 
     if (userExist?.exception) {
@@ -75,48 +72,53 @@ export class SellsShiftManagementService {
       };
     }
 
-    // check the week start date is before the week end date
-    if (
-      createSellsShiftManagementDto.weekStartDate >=
-      createSellsShiftManagementDto.weekEndDate
-    ) {
+    // Convert to BD Time
+    const BD_OFFSET = 6 * 60 * 60 * 1000;
+
+    const toBDDate = (dateInput: Date | string) => {
+      const utcDate = new Date(dateInput);
+      if (isNaN(utcDate.getTime())) return null;
+
+      const bdDate = new Date(utcDate.getTime() + BD_OFFSET);
+      bdDate.setHours(0, 0, 0, 0);
+      return bdDate;
+    };
+
+    const weekStartDate = toBDDate(createSellsShiftManagementDto.weekStartDate);
+    const weekEndDate = toBDDate(createSellsShiftManagementDto.weekEndDate);
+
+    if (!weekStartDate || !weekEndDate) {
+      return {
+        message: "Invalid date format",
+        exception: "HttpException",
+      };
+    }
+
+    // Ensure start < end
+    if (weekStartDate >= weekEndDate) {
       return {
         message: "weekStartDate must be before weekEndDate",
         exception: "HttpException",
       };
     }
 
-    // check the week start date and week end date are in the same week
-    const startOfWeek = new Date(createSellsShiftManagementDto.weekStartDate);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    // Ensure exactly 7 days
 
-    const endOfWeek = new Date(createSellsShiftManagementDto.weekEndDate);
-    endOfWeek.setDate(endOfWeek.getDate() - endOfWeek.getDay() + 6);
+    const diffInMs = weekEndDate.getTime() - weekStartDate.getTime();
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-    if (
-      startOfWeek.toISOString().slice(0, 10) !==
-      createSellsShiftManagementDto.weekStartDate.toISOString().slice(0, 10)
-    ) {
+    if (diffInDays !== 6) {
       return {
-        message: "weekStartDate must be the start of the week",
+        message: "Shift assignment must cover exactly 7 days",
         exception: "HttpException",
       };
     }
 
-    if (
-      endOfWeek.toISOString().slice(0, 10) !==
-      createSellsShiftManagementDto.weekEndDate.toISOString().slice(0, 10)
-    ) {
-      return {
-        message: "weekEndDate must be the end of the week",
-        exception: "HttpException",
-      };
-    }
+    // Prevent duplicate week
 
-    // Check if assignment already exists for the same week
     const existingAssignment = await this.salesShiftAssignmentModel.findOne({
       user: new Types.ObjectId(userId),
-      weekStartDate: createSellsShiftManagementDto.weekStartDate,
+      weekStartDate: weekStartDate,
     });
 
     if (existingAssignment) {
@@ -126,16 +128,20 @@ export class SellsShiftManagementService {
       };
     }
 
+    // Convert back to UTC for storage
+    const utcStart = new Date(weekStartDate.getTime() - BD_OFFSET);
+    const utcEnd = new Date(weekEndDate.getTime() - BD_OFFSET);
+
     const result = await this.salesShiftAssignmentModel.create({
       user: new Types.ObjectId(userId),
-      weekStartDate: createSellsShiftManagementDto.weekStartDate,
-      weekEndDate: createSellsShiftManagementDto.weekEndDate,
+      weekStartDate: utcStart,
+      weekEndDate: utcEnd,
       shiftType: createSellsShiftManagementDto.shiftType,
       assignedBy: new Types.ObjectId(assignedBy),
       note: createSellsShiftManagementDto.note,
     });
 
-    return await result.save();
+    return result;
   }
 
   /**
