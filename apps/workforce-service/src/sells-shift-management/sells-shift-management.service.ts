@@ -75,6 +75,44 @@ export class SellsShiftManagementService {
       };
     }
 
+    // check the week start date is before the week end date
+    if (
+      createSellsShiftManagementDto.weekStartDate >=
+      createSellsShiftManagementDto.weekEndDate
+    ) {
+      return {
+        message: "weekStartDate must be before weekEndDate",
+        exception: "HttpException",
+      };
+    }
+
+    // check the week start date and week end date are in the same week
+    const startOfWeek = new Date(createSellsShiftManagementDto.weekStartDate);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+    const endOfWeek = new Date(createSellsShiftManagementDto.weekEndDate);
+    endOfWeek.setDate(endOfWeek.getDate() - endOfWeek.getDay() + 6);
+
+    if (
+      startOfWeek.toISOString().slice(0, 10) !==
+      createSellsShiftManagementDto.weekStartDate.toISOString().slice(0, 10)
+    ) {
+      return {
+        message: "weekStartDate must be the start of the week",
+        exception: "HttpException",
+      };
+    }
+
+    if (
+      endOfWeek.toISOString().slice(0, 10) !==
+      createSellsShiftManagementDto.weekEndDate.toISOString().slice(0, 10)
+    ) {
+      return {
+        message: "weekEndDate must be the end of the week",
+        exception: "HttpException",
+      };
+    }
+
     // Check if assignment already exists for the same week
     const existingAssignment = await this.salesShiftAssignmentModel.findOne({
       user: new Types.ObjectId(userId),
