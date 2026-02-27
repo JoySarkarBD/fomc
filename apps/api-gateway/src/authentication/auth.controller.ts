@@ -23,7 +23,7 @@ import {
 } from "@nestjs/swagger";
 import type { AuthUser } from "@shared/interfaces/auth-user.interface";
 import type { Request } from "express";
-import { CreateUserDto } from "../../../user-service/src/dto/create-user.dto";
+import { CreateUserDto } from "../../../user-service/src/user-management/dto/create-user.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
