@@ -10,8 +10,8 @@ import { Permission, PermissionSchema } from "./schemas/permission.schema";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { User, UserSchema } from "./schemas/user.schema";
 import { SeedRoleAndPermissionModule } from "./seed/seed-role-and-permission.module";
-import { UserController } from "./user.controller";
-import { UserService } from "./user.service";
+import { UserController } from "./user-management/user.controller";
+import { UserService } from "./user-management/user.service";
 
 /**
  * User Module responsible for managing user-related functionality within the User Service.
