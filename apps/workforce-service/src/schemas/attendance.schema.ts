@@ -78,7 +78,7 @@ export class Attendance extends Document {
   shiftType?: string;
 
   // Optional field to track if the attendance record has been marked as late
-  @Prop({ default: false })
+  @Prop({ default: false, nullable: true })
   isLate?: boolean;
 }
 

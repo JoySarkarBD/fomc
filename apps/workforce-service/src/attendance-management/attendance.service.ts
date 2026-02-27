@@ -62,11 +62,10 @@ export class AttendanceService {
   ): Promise<Attendance | { message: string; exception: string }> {
     const userId = (user.id ?? user._id) as string;
 
-    // Fetch user
+    // Fetch user from user-service
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, { id: userId }),
     );
-
     if (userExist.exception) {
       return { message: userExist.message, exception: userExist.exception };
     }
@@ -101,7 +100,6 @@ export class AttendanceService {
       user: userId,
       newOffDate: todayDate,
     });
-
     const exchangeOriginal = await this.weekendExchangeModel.findOne({
       user: userId,
       originalWeekendDate: todayDate,
@@ -112,93 +110,87 @@ export class AttendanceService {
     let shiftType: string = ShiftTypeForOperations.DAY;
     let shiftStartMinutes = 9 * 60; // default 9 AM
 
+    // WEEKEND / EXCHANGE OFF
     if (exchangeToday || userExist.weekendOff?.includes(todayDay)) {
       attendanceType = AttendanceInType.WEEKEND;
-    } else if (exchangeOriginal) {
+
+      return this.attendanceModel.create({
+        user: new Types.ObjectId(userId),
+        date: todayDate,
+        inType: attendanceType,
+        shiftType,
+        checkInTime: undefined,
+        isLate: undefined,
+      });
+    }
+
+    // Original weekend exchanged to working day → PRESENT
+    if (exchangeOriginal) {
       attendanceType = AttendanceInType.PRESENT;
     } else {
-      // Normal working day
+      // Normal working day logic
       const currentMinutes = bdNow.getHours() * 60 + bdNow.getMinutes();
 
-      if (user.role === "HR") {
+      // Set shift & start time
+      if (user.role === "HR" || user.department === "OPERATIONS") {
         shiftType = ShiftTypeForOperations.DAY;
         shiftStartMinutes = 9 * 60;
-      } else {
-        switch (user.department) {
-          case "OPERATIONS":
-            shiftType = ShiftTypeForOperations.DAY;
-            shiftStartMinutes = 9 * 60;
-            break;
-
-          case "SALES":
-            const assignedShift =
-              await this.sellsShiftManagementService.getShiftForDate(
-                userId,
-                todayDate,
-              );
-            if (!assignedShift) {
-              return {
-                message:
-                  "No shift assigned for this week. Please contact admin.",
-                exception: "HttpException",
-              };
-            }
-
-            shiftType = assignedShift.shiftType;
-
-            const shiftStartMap = {
-              [ShiftTypeForSales.MORNING]: 7 * 60,
-              [ShiftTypeForSales.EVENING]: 15 * 60,
-              [ShiftTypeForSales.NIGHT]: 23 * 60,
-            };
-
-            shiftStartMinutes =
-              shiftStartMap[shiftType as keyof typeof shiftStartMap];
-
-            if (shiftStartMinutes === undefined) {
-              return {
-                message: "Invalid shift assigned",
-                exception: "HttpException",
-              };
-            }
-
-            break;
-
-          default:
-            return {
-              message: "Department not found",
-              exception: "HttpException",
-            };
+      } else if (user.department === "SALES") {
+        const assignedShift =
+          await this.sellsShiftManagementService.getShiftForDate(
+            userId,
+            todayDate,
+          );
+        if (!assignedShift) {
+          return {
+            message: "No shift assigned for this week. Please contact admin.",
+            exception: "HttpException",
+          };
         }
+
+        shiftType = assignedShift.shiftType;
+        const shiftStartMap = {
+          [ShiftTypeForSales.MORNING]: 7 * 60,
+          [ShiftTypeForSales.EVENING]: 15 * 60,
+          [ShiftTypeForSales.NIGHT]: 23 * 60,
+        };
+
+        shiftStartMinutes =
+          shiftStartMap[shiftType as keyof typeof shiftStartMap];
+        if (shiftStartMinutes === undefined) {
+          return {
+            message: "Invalid shift assigned",
+            exception: "HttpException",
+          };
+        }
+      } else {
+        return { message: "Department not found", exception: "HttpException" };
       }
 
-      // Late calculation
-      let isLate = false;
+      // Calculate late
       let adjustedCurrent = currentMinutes;
-
       if (shiftType === ShiftTypeForSales.NIGHT) {
-        // Night shift crosses midnight
+        // night shift crosses midnight
         adjustedCurrent =
           currentMinutes < 12 * 60 ? 24 * 60 + currentMinutes : currentMinutes;
       }
 
       const graceLimit = shiftStartMinutes + 15;
-      isLate = adjustedCurrent > graceLimit;
-
-      attendanceType = isLate
-        ? AttendanceInType.LATE
-        : AttendanceInType.PRESENT;
-
-      // Check if marking outside allowed window (4 hours before shift)
       const windowMinutes = 4 * 60;
-      let diff = adjustedCurrent - shiftStartMinutes;
 
+      // Check allowed marking window (4 hours before to 4 hours after shift)
+      const diff = adjustedCurrent - shiftStartMinutes;
       if (diff < -windowMinutes || diff > 4 * 60) {
         return {
           message: `It is not your shift time. Your shift starts at ${Math.floor(shiftStartMinutes / 60)}:00`,
           exception: "HttpException",
         };
       }
+
+      const isLate = adjustedCurrent > graceLimit;
+      attendanceType = isLate
+        ? AttendanceInType.LATE
+        : AttendanceInType.PRESENT;
     }
 
     // Save attendance
@@ -213,7 +205,7 @@ export class AttendanceService {
         AttendanceInType.WORK_FROM_HOME,
       ].includes(attendanceType)
         ? bdNow
-        : undefined,
+        : undefined, // weekends → undefined
       isLate: attendanceType === AttendanceInType.LATE,
     });
 
