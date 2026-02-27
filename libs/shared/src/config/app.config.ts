@@ -31,6 +31,23 @@ interface AppConfig {
   /** TCP port of the Notification microservice. */
   NOTIFICATION_SERVICE_PORT: number;
 
+  /** Minio Self Hosted S3 Endpoint **/
+  MINIO_ENDPOINT: string;
+  /** Minio Self Hosted S3 PORT **/
+  MINIO_PORT: number;
+  /** Minio Self Hosted S3 SLL **/
+  MINIO_USE_SSL: boolean;
+  /** Minio Self Hosted S3 Access Key **/
+  MINIO_ACCESS_KEY: string;
+  /** Minio Self Hosted S3 Secret Key **/
+  MINIO_SECRET_KEY: string;
+  /** Minio Self Hosted S3 Bucket Name **/
+  MINIO_BUCKET: string;
+  /** Minio Self Hosted S3 Public URL **/
+  MINIO_PUBLIC_URL: string;
+  /** Minio object expiration time in seconds for avatar uploads */
+  MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR: number;
+
   /** JWT token lifetime in seconds (default: 30 days). */
   JWT_EXPIRES_IN: number;
   /** Secret key used to sign JWT tokens. */
@@ -102,6 +119,17 @@ const config: AppConfig = {
 
   NOTIFICATION_SERVICE_HOST: str("NOTIFICATION_SERVICE_HOST"),
   NOTIFICATION_SERVICE_PORT: int("NOTIFICATION_SERVICE_PORT"),
+
+  MINIO_ENDPOINT: str("MINIO_ENDPOINT"),
+  MINIO_PORT: int("MINIO_PORT"),
+  MINIO_USE_SSL: (str("MINIO_USE_SSL") || "false") === "true",
+  MINIO_ACCESS_KEY: str("MINIO_ACCESS_KEY"),
+  MINIO_SECRET_KEY: str("MINIO_SECRET_KEY"),
+  MINIO_BUCKET: str("MINIO_BUCKET"),
+  MINIO_PUBLIC_URL: str("MINIO_PUBLIC_URL"),
+  MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR: int(
+    "MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR",
+  ),
 
   JWT_EXPIRES_IN: int("JWT_EXPIRES_IN"),
   JWT_SECRET: str("JWT_SECRET"),

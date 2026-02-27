@@ -6,9 +6,12 @@
  */
 
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
+  Logger,
   Param,
   Patch,
   Query,
@@ -19,16 +22,19 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiHeader,
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
+import { removeFile, uploadFile } from "@shared/utils/minio.client";
 import { UpdateUserProfileDto } from "apps/user-service/src/user-management/dto/update-user-profile.dto";
 import { UserSearchQueryDto } from "apps/user-service/src/user-management/dto/user-search-query.dto";
 import * as fs from "fs";
-import type { File } from "multer";
+import type { Multer } from "multer";
 import { memoryStorage } from "multer";
 import * as path from "path";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
@@ -38,7 +44,6 @@ import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { removeFile, uploadFile } from "../common/utils/minio.client";
 import {
   UserForbiddenDto,
   UsersForbiddenDto,
@@ -234,6 +239,25 @@ export class UserController {
     description: "Bearer token",
     required: true,
   })
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "The full name of the user",
+          example: "John Doe",
+        },
+        avatar: {
+          type: "string",
+          format: "binary",
+          description: "Avatar image file",
+        },
+      },
+      required: [],
+    },
+  })
   @ApiSuccessResponse(UserProfileUpdateSuccessDto, 200)
   @ApiErrorResponses({
     validation: UserProfileUpdateValidationDto,
@@ -241,52 +265,77 @@ export class UserController {
     internal: UpdateUserProfileInternalErrorDto,
   })
   @Patch("profile/me")
+  @ApiConsumes("multipart/form-data")
   @UseInterceptors(
     FileInterceptor("avatar", {
-      storage: memoryStorage(),
+      storage: memoryStorage(), // keep in memory for MinIO or custom upload
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith("image/")) {
+          return cb(
+            new BadRequestException("Only image files are allowed"),
+            false,
+          );
+        }
+        cb(null, true);
+      },
     }),
   )
   async updateProfile(
     @GetUser() user: AuthUser,
     @Body() data: UpdateUserProfileDto,
-    @UploadedFile() avatarFile?: File,
+    @UploadedFile() avatarFile?: Multer.File,
   ) {
-    const existingProfile = avatarFile
-      ? await this.userService.getUser(
-          (user._id ?? user.id) as MongoIdDto["id"],
-        )
-      : null;
-    const existingAvatarPath = existingProfile?.data?.avatar as
-      | string
-      | null
-      | undefined;
+    const logger = new Logger(UserController.name);
 
-    let avatarPath: string | undefined = undefined;
-    if (avatarFile && avatarFile.buffer) {
-      avatarPath = await uploadFile(
-        avatarFile.buffer,
-        avatarFile.originalname,
-        avatarFile.mimetype,
-      );
+    let avatarPath: string | undefined;
+
+    // Upload avatar if provided
+    if (avatarFile) {
+      try {
+        avatarPath = await uploadFile(
+          avatarFile.buffer,
+          avatarFile.originalname,
+          avatarFile.mimetype,
+        );
+        // Keep the stored path as minio://bucket/objectName so it remains private.
+        // We will generate a presigned URL when returning user data.
+      } catch (err) {
+        logger.error("Avatar upload failed", err);
+        throw new InternalServerErrorException(
+          "Failed to upload avatar. Check MinIO configuration.",
+        );
+      }
     }
 
+    // Fetch existing profile to remove old avatar if needed
+    const existingProfile = avatarFile
+      ? await this.userService.getUser(user._id! as MongoIdDto["id"])
+      : null;
+
     const updated = await this.userService.updateUserProfile(
-      (user._id ?? user.id) as MongoIdDto["id"],
+      user._id! as MongoIdDto["id"],
       {
         ...data,
-        avatar: avatarPath,
+        ...(avatarPath ? { avatar: avatarPath } : {}),
       },
     );
 
-    if (avatarFile && existingAvatarPath && existingAvatarPath !== avatarPath) {
-      const normalized = existingAvatarPath.replace(/^\/+/, "");
-      if (normalized.startsWith("uploads/avatars/")) {
-        const absolutePath = path.join(process.cwd(), normalized);
-        if (fs.existsSync(absolutePath)) {
-          fs.unlinkSync(absolutePath);
-        }
-      } else if (existingAvatarPath.startsWith("minio://")) {
-        await removeFile(existingAvatarPath);
+    // Remove old avatar
+    if (
+      avatarFile &&
+      existingProfile?.data?.avatar &&
+      existingProfile.data.avatar !== avatarPath
+    ) {
+      const oldAvatar = existingProfile.data.avatar;
+      if (oldAvatar.startsWith("uploads/avatars/")) {
+        const absolutePath = path.join(
+          process.cwd(),
+          oldAvatar.replace(/^\/+/, ""),
+        );
+        if (fs.existsSync(absolutePath)) fs.unlinkSync(absolutePath);
+      } else if (oldAvatar.startsWith("minio://")) {
+        await removeFile(oldAvatar);
       }
     }
 
