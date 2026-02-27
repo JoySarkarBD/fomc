@@ -33,6 +33,10 @@ export class SellsShiftManagementService {
 
   /**
    * Creates a new sells shift management entry for a user.
+   *
+   * @param assignedBy - The ID of the user who is assigning the shift.
+   * @param userId - The ID of the user for whom the shift is being created.
+   * @param data - The details of the shift to be created.
    */
   async create(
     assignedBy: AssignedByDto["assignedBy"],
@@ -57,6 +61,11 @@ export class SellsShiftManagementService {
 
   /**
    * Retrieves sells shift management records for a specific user.
+   *
+   * @param userId - The ID of the user whose shift records are to be retrieved.
+   * @param query - Optional query parameters for filtering the shift records.
+   * @return A response containing the retrieved shift records or an appropriate error message if the operation fails.
+   * @throws NotFoundException if no shift records are found for the specified user.
    */
   async findShiftForUser(userId: UserIdDto["userId"], query: GetSellsShiftDto) {
     const result = await firstValueFrom(
@@ -76,6 +85,12 @@ export class SellsShiftManagementService {
 
   /**
    * Request a shift exchange.
+   *
+   * @param userId - The ID of the user requesting the shift exchange.
+   * @param data - The details of the shift exchange request, including the shift to be exchanged and the desired shift.
+   * @return A response indicating the success of the shift exchange request submission or an appropriate error message if the operation fails.
+   * @throws NotFoundException if the specified shift or user is not found.
+   * @throws HttpException for any other errors that may occur during the shift exchange request process.
    */
   async requestShiftExchange(
     userId: UserIdDto["userId"],
@@ -101,6 +116,12 @@ export class SellsShiftManagementService {
 
   /**
    * Approve a shift exchange.
+   *
+   * @param exchangeId - The ID of the shift exchange request to be approved.
+   * @param approvedBy - The ID of the user who is approving the shift exchange request.
+   * @return A response indicating the success of the shift exchange approval or an appropriate error message if the operation fails.
+   * @throws NotFoundException if the specified shift exchange request is not found.
+   * @throws HttpException for any other errors that may occur during the shift exchange approval process.
    */
   async approveShiftExchange(
     exchangeId: ExchangeIdDto["exchangeId"],
@@ -126,6 +147,10 @@ export class SellsShiftManagementService {
 
   /**
    * Reject a shift exchange.
+   *
+   * @param exchangeId - The ID of the shift exchange request to be rejected.
+   * @param approvedBy - The ID of the user who is rejecting the shift exchange request.
+   * @param reason - An optional reason for rejecting the shift exchange request.
    */
   async rejectShiftExchange(
     exchangeId: ExchangeIdDto["exchangeId"],
@@ -153,6 +178,11 @@ export class SellsShiftManagementService {
 
   /**
    * Get user's shift exchanges.
+   *
+   * @param userId - The ID of the user whose shift exchanges are to be retrieved.
+   * @return A response containing the retrieved shift exchange records or an appropriate error message if the operation fails.
+   * @throws NotFoundException if no shift exchange records are found for the specified user.
+   * @throws HttpException for any other errors that may occur during the retrieval of shift exchange records.
    */
   async getUserShiftExchanges(userId: UserIdDto["userId"]) {
     const result = await firstValueFrom(
@@ -171,6 +201,10 @@ export class SellsShiftManagementService {
 
   /**
    * Get pending shift exchanges for managers.
+   *
+   * @return A response containing the retrieved pending shift exchange records or an appropriate error message if the operation fails.
+   * @throws NotFoundException if no pending shift exchange records are found.
+   * @throws HttpException for any other errors that may occur during the retrieval of pending shift exchange records.
    */
   async getPendingShiftExchanges() {
     const result = await firstValueFrom(
@@ -185,6 +219,11 @@ export class SellsShiftManagementService {
     return buildResponse("Pending shift exchanges retrieved", result);
   }
 
+  /**
+   * Handle exceptions from the Workforce micro-service responses.
+   *
+   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
+   */
   private handleException(result: any) {
     if (result?.exception) {
       switch (result.exception) {

@@ -4,14 +4,14 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MongooseConnectionsModule } from "@shared/database/mongoose-connections.module";
-import { NotificationServiceController } from "./notification-service.controller";
-import { NotificationServiceService } from "./notification-service.service";
+import { NotificationController } from "./notification.controller";
+import { NotificationService } from "./notification.service";
 import { Notification, NotificationSchema } from "./schema/notification.schema";
 
 /**
  * NotificationServiceModule is responsible for managing notification-related functionality within the Notification Service.
  * This module imports necessary dependencies such as MongoDB connection and schema definitions.
- * It provides the NotificationServiceController to handle notification-related microservice messages and the NotificationServiceService to perform the business logic for notification operations.
+ * It provides the NotificationController to handle notification-related microservice messages and the NotificationService to perform the business logic for notification operations.
  * The module also exports relevant services and modules for use in other parts of the application.
  * The Notification Service Module is designed to be a self-contained unit that encapsulates all notification-related functionality, allowing for modularity and separation of concerns within the microservices architecture.
  * The module establishes a connection to MongoDB using Mongoose, defines the Notification schema, and sets up the necessary controllers and providers to handle notification-related operations such as creating notifications, retrieving user notifications, and marking notifications as read or unread.
@@ -37,13 +37,13 @@ import { Notification, NotificationSchema } from "./schema/notification.schema";
   ],
 
   /**
-   * Controllers for the Notification Service. The NotificationServiceController is responsible for handling incoming message patterns related to notifications and delegating business logic to the NotificationServiceService.
+   * Controllers for the Notification Service. The NotificationController is responsible for handling incoming message patterns related to notifications and delegating business logic to the NotificationService.
    */
-  controllers: [NotificationServiceController],
+  controllers: [NotificationController],
 
   /**
-   * Providers for the Notification Service. The NotificationServiceService contains the business logic for managing notifications, including creating notifications, retrieving user notifications, and marking notifications as read or unread.
+   * Providers for the Notification Service. The NotificationService contains the business logic for managing notifications, including creating notifications, retrieving user notifications, and marking notifications as read or unread.
    */
-  providers: [NotificationServiceService],
+  providers: [NotificationService],
 })
 export class NotificationServiceModule {}

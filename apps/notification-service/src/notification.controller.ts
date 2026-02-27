@@ -5,18 +5,16 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { NOTIFICATION_COMMANDS } from "@shared/constants";
 import { CreateNotificationDto } from "./dto/create-notification.dto";
-import { NotificationServiceService } from "./notification-service.service";
+import { NotificationService } from "./notification.service";
 
 @Controller()
-export class NotificationServiceController {
+export class NotificationController {
   /**
-   * Creates an instance of NotificationServiceController.
+   * Creates an instance of NotificationController.
    *
-   * @param notificationServiceService - Service layer responsible for notification business logic, injected via NestJS's dependency injection system.
+   * @param notificationService - Service layer responsible for notification business logic, injected via NestJS's dependency injection system.
    */
-  constructor(
-    private readonly notificationServiceService: NotificationServiceService,
-  ) {}
+  constructor(private readonly notificationService: NotificationService) {}
 
   /**
    * Handle the message pattern for creating a new notification.
@@ -28,9 +26,7 @@ export class NotificationServiceController {
    */
   @MessagePattern(NOTIFICATION_COMMANDS.CREATE_NOTIFICATION)
   createNotification(@Payload() createNotification: CreateNotificationDto) {
-    return this.notificationServiceService.createNotification(
-      createNotification,
-    );
+    return this.notificationService.createNotification(createNotification);
   }
 
   /**
@@ -43,7 +39,7 @@ export class NotificationServiceController {
    */
   @MessagePattern(NOTIFICATION_COMMANDS.GET_USER_NOTIFICATIONS)
   getUserNotifications(data: any) {
-    return this.notificationServiceService.getUserNotifications(data);
+    return this.notificationService.getUserNotifications(data);
   }
 
   /**
@@ -56,7 +52,7 @@ export class NotificationServiceController {
    */
   @MessagePattern(NOTIFICATION_COMMANDS.MARK_AS_READ)
   markAsRead(data: any) {
-    return this.notificationServiceService.markAsRead(data);
+    return this.notificationService.markAsRead(data);
   }
 
   /**
@@ -69,6 +65,6 @@ export class NotificationServiceController {
    */
   @MessagePattern(NOTIFICATION_COMMANDS.MARK_AS_UNREAD)
   markAsUnread(data: any) {
-    return this.notificationServiceService.markAsUnread(data);
+    return this.notificationService.markAsUnread(data);
   }
 }

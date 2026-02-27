@@ -11,9 +11,9 @@ import {
 } from "./schema/notification.schema";
 
 @Injectable()
-export class NotificationServiceService {
+export class NotificationService {
   /**
-   * Create an instance of NotificationServiceService.
+   * Create an instance of NotificationService.
    *
    * @param notificationModel - Mongoose model for Notification, injected via NestJS's dependency injection system.
    */
