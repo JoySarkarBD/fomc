@@ -5,8 +5,6 @@
  * exposes them as a strongly-typed, frozen configuration object.
  * Every service in the monorepo should import config from here
  * instead of reading `process.env` directly.
- *
- * @module @shared/config
  */
 
 import dotenv from "dotenv";

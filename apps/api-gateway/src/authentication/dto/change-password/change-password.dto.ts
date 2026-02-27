@@ -3,8 +3,6 @@
  *
  * Validates the current-password / new-password pair submitted
  * by an authenticated user.
- *
- * @module api-gateway/auth/dto
  */
 
 import { ApiProperty } from "@nestjs/swagger";

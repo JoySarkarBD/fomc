@@ -4,8 +4,6 @@
  * Both the API Gateway and the User microservice import these
  * constants so that producers and consumers always agree on
  * the exact command strings.
- *
- * @module @shared/constants/user-command
  */
 
 export const USER_COMMANDS = {

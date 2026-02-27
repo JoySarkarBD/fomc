@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and User microservice to communicate
  * designation CRUD operations over the TCP transport.
- *
- * @module @shared/constants/designDesignation-command
  */
 
 export const DESIGNATION_COMMANDS = {

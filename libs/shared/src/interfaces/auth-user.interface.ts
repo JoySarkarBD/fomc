@@ -4,8 +4,6 @@
  * After a successful JWT validation the `JwtStrategy` fetches the
  * full user record and places it on `request.user`. This interface
  * describes the public (non-sensitive) fields available from there.
- *
- * @module @shared/interfaces/auth-user
  */
 
 export interface AuthUser {

@@ -4,8 +4,6 @@
  * Every response emitted by the API Gateway is wrapped in this
  * shape by the global {@link ResponseInterceptor} so that clients
  * always receive a predictable JSON structure.
- *
- * @module @shared/interfaces/response
  */
 
 export interface ServiceResponse<T = any> {

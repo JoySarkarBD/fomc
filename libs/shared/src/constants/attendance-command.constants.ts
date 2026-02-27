@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and Workforce microservice to communicate
  * attendance operations over the TCP transport.
- *
- * @module @shared/constants/attendance-command
  */
 
 export const ATTENDANCE_COMMANDS = {

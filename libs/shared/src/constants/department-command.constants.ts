@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and Workforce microservice to communicate
  * department CRUD operations over the TCP transport.
- *
- * @module @shared/constants/department-command
  */
 
 export const DEPARTMENT_COMMANDS = {

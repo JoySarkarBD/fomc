@@ -3,8 +3,6 @@
  *
  * Validates the OTP + new password pair submitted to complete
  * a password reset.
- *
- * @module api-gateway/auth/dto
  */
 
 import { ApiProperty } from "@nestjs/swagger";

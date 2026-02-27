@@ -3,8 +3,6 @@
  *
  * Rate-limit configuration for authentication-related endpoints
  * (forgot-password, reset-password).
- *
- * @module api-gateway/auth/constants
  */
 
 export const FORGOT_PASSWORD = {

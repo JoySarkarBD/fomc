@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and Notification microservice to communicate
  * notification operations over the TCP transport.
- *
- * @module @shared/constants/notification-command
  */
 
 export const NOTIFICATION_COMMANDS = {

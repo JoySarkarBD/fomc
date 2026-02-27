@@ -1,6 +1,5 @@
 /**
  * @fileoverview Root application service.
- * @module api-gateway/app.service
  */
 
 import { Injectable } from "@nestjs/common";

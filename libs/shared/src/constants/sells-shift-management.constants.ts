@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and Sells_SHIFT_MANAGEMENT microservice to communicate
  * sells_SHIFT_MANAGEMENT operations over the TCP transport.
- *
- * @module @shared/constants/sells_SHIFT_MANAGEMENT-command
  */
 
 export const SELLS_SHIFT_MANAGEMENT_COMMANDS = {

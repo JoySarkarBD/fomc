@@ -2,8 +2,6 @@
  * @fileoverview Login DTO.
  *
  * Validates the email / password pair submitted for authentication.
- *
- * @module api-gateway/auth/dto
  */
 
 import { ApiProperty } from "@nestjs/swagger";

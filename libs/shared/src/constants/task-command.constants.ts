@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and Workforce microservice to communicate
  * task CRUD operations over the TCP transport.
- *
- * @module @shared/constants/task-command
  */
 
 export const TASK_COMMANDS = {

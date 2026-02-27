@@ -3,8 +3,6 @@
  *
  * Used by the API Gateway and User microservice to communicate
  * role CRUD operations over the TCP transport.
- *
- * @module @shared/constants/role-command
  */
 
 export const ROLE_COMMANDS = {

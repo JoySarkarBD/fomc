@@ -5,8 +5,6 @@
  * client requests.  Registers global middleware (Helmet, Morgan),
  * validation pipes, the response interceptor, and the HTTP exception
  * filter before listening on the configured port.
- *
- * @module api-gateway/main
  */
 
 import { ValidationPipe } from "@nestjs/common";

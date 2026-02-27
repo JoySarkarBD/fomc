@@ -4,8 +4,6 @@
  * Attach to any `@Query()` parameter on a controller to enforce
  * page number, page size, and optional text search across
  * every listing endpoint in a consistent way.
- *
- * @module @shared/dto/search-query
  */
 
 import { ApiProperty } from "@nestjs/swagger";

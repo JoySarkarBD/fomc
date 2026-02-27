@@ -1,6 +1,6 @@
 /**
  * @fileoverview CreateNotificationDto. Validation schema for notification creation payloads.
- * @module notification-service/dto/create-notification.dto*/
+ */
 import { ApiProperty } from "@nestjs/swagger";
 import {
   ArrayNotEmpty,
