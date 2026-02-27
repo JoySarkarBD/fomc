@@ -136,7 +136,12 @@ export class UserService {
       return {
         _id: user._id,
         name: user.name,
-        avatar: user.avatar ? await getSignedUrl(user.avatar, 60 * 10) : null,
+        avatar: user.avatar
+          ? await getSignedUrl(
+              user.avatar,
+              config.MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR,
+            )
+          : null,
         employeeId: user.employeeId,
         phoneNumber: user.phoneNumber,
         email: user.email,
@@ -292,7 +297,10 @@ export class UserService {
     userObj.designation = designation?.name || null;
     userObj.department = designation?.departmentName || null;
     userObj.avatar = userObj.avatar
-      ? await getSignedUrl(userObj.avatar, 60 * 10)
+      ? await getSignedUrl(
+          userObj.avatar,
+          config.MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR,
+        )
       : null;
 
     return userObj;

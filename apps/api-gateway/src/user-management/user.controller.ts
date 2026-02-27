@@ -28,14 +28,9 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
-import config from "@shared/config/app.config";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
-import {
-  getSignedUrl,
-  removeFile,
-  uploadFile,
-} from "@shared/utils/minio.client";
+import { removeFile, uploadFile } from "@shared/utils/minio.client";
 import { UpdateUserProfileDto } from "apps/user-service/src/user-management/dto/update-user-profile.dto";
 import { UserSearchQueryDto } from "apps/user-service/src/user-management/dto/user-search-query.dto";
 import * as fs from "fs";
@@ -341,24 +336,6 @@ export class UserController {
         if (fs.existsSync(absolutePath)) fs.unlinkSync(absolutePath);
       } else if (oldAvatar.startsWith("minio://")) {
         await removeFile(oldAvatar);
-      }
-    }
-
-    // Convert stored minio:// path to a time-limited signed URL before returning
-    if (updated?.data) {
-      if (updated.data.avatar) {
-        try {
-          const expires = Number(
-            config.MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR || 3600,
-          );
-          const signed = await getSignedUrl(updated.data.avatar, expires);
-          updated.data.avatar = signed;
-        } catch (err) {
-          logger.warn("Failed to generate signed URL for avatar", err);
-          updated.data.avatar = null;
-        }
-      } else {
-        updated.data.avatar = null;
       }
     }
 
