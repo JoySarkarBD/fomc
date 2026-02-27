@@ -234,7 +234,7 @@ export class SellsShiftManagementService {
             message: `${user.name} has requested a shift exchange on ${exchangeDate.toDateString()}.`,
             type: NotificationType.SHIFT_EXCHANGE_REQUEST,
             referenceModel: "ShiftExchange",
-            referenceId: shiftExchange._id.toString(),
+            referenceId: new Types.ObjectId(shiftExchange._id),
           },
         ),
       );
@@ -292,7 +292,7 @@ export class SellsShiftManagementService {
         message: `Your shift exchange request for ${exchange.exchangeDate.toDateString()} has been approved.`,
         type: NotificationType.SHIFT_EXCHANGE_APPROVED,
         referenceModel: "ShiftExchange",
-        referenceId: exchange._id.toString(),
+        referenceId: new Types.ObjectId(exchange._id),
       }),
     );
 
@@ -342,7 +342,7 @@ export class SellsShiftManagementService {
         message: `Your shift exchange request for ${exchange.exchangeDate.toDateString()} has been rejected.`,
         type: NotificationType.SHIFT_EXCHANGE_REJECTED,
         referenceModel: "ShiftExchange",
-        referenceId: exchange._id.toString(),
+        referenceId: new Types.ObjectId(exchange._id),
       }),
     );
 
