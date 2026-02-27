@@ -1,12 +1,13 @@
+import config from "@shared/config/app.config";
 import { Client } from "minio";
 import * as path from "path";
 
-const endpoint = process.env.MINIO_ENDPOINT || "127.0.0.1";
-const port = parseInt(process.env.MINIO_PORT || "9000", 10);
-const useSSL = (process.env.MINIO_USE_SSL || "false") === "true";
-const accessKey = process.env.MINIO_ACCESS_KEY || "minioadmin";
-const secretKey = process.env.MINIO_SECRET_KEY || "minioadmin";
-const defaultBucket = process.env.MINIO_BUCKET || "avatars";
+const endpoint = config.MINIO_ENDPOINT || "127.0.0.1";
+const port = parseInt(String(config.MINIO_PORT || "9000"), 10);
+const useSSL = String(config.MINIO_USE_SSL || "false") === "true";
+const accessKey = config.MINIO_ACCESS_KEY || "minioadmin";
+const secretKey = config.MINIO_SECRET_KEY || "minioadmin";
+const defaultBucket = config.MINIO_BUCKET || "avatars";
 
 const client = new Client({
   endPoint: endpoint,
