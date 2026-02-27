@@ -8,6 +8,7 @@ import config from "@shared/config/app.config";
 import { DEPARTMENT_COMMANDS } from "@shared/constants";
 import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.constants";
 import { MongoIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
+import { getSignedUrl } from "@shared/utils/minio.client";
 import * as bcrypt from "bcrypt";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
@@ -123,7 +124,7 @@ export class UserService {
       }
     }
 
-    const formattedUsers = users.map((user: any) => {
+    const formattedUsers = users.map(async (user: any) => {
       const designationData = user.designation
         ? designationMap.get(user.designation.toString())
         : null;
@@ -135,6 +136,7 @@ export class UserService {
       return {
         _id: user._id,
         name: user.name,
+        avatar: user.avatar ? await getSignedUrl(user.avatar, 60 * 10) : null,
         employeeId: user.employeeId,
         phoneNumber: user.phoneNumber,
         email: user.email,
@@ -289,6 +291,9 @@ export class UserService {
     userObj.role = userObj.role?.name;
     userObj.designation = designation?.name || null;
     userObj.department = designation?.departmentName || null;
+    userObj.avatar = userObj.avatar
+      ? await getSignedUrl(userObj.avatar, 60 * 10)
+      : null;
 
     return userObj;
   }

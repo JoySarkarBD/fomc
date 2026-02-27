@@ -43,6 +43,10 @@ interface AppConfig {
   MINIO_SECRET_KEY: string;
   /** Minio Self Hosted S3 Bucket Name **/
   MINIO_BUCKET: string;
+  /** Minio Self Hosted S3 Public URL **/
+  MINIO_PUBLIC_URL: string;
+  /** Minio object expiration time in seconds for avatar uploads */
+  MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR: number;
 
   /** JWT token lifetime in seconds (default: 30 days). */
   JWT_EXPIRES_IN: number;
@@ -122,6 +126,10 @@ const config: AppConfig = {
   MINIO_ACCESS_KEY: str("MINIO_ACCESS_KEY"),
   MINIO_SECRET_KEY: str("MINIO_SECRET_KEY"),
   MINIO_BUCKET: str("MINIO_BUCKET"),
+  MINIO_PUBLIC_URL: str("MINIO_PUBLIC_URL"),
+  MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR: int(
+    "MINIO_OBJECT_EXPIRATION_SECONDS_FOR_AVATAR",
+  ),
 
   JWT_EXPIRES_IN: int("JWT_EXPIRES_IN"),
   JWT_SECRET: str("JWT_SECRET"),

@@ -56,4 +56,29 @@ export async function removeFile(filePath: string): Promise<void> {
   }
 }
 
+export async function getSignedUrl(
+  filePath: string,
+  expiresInSeconds,
+): Promise<string | null> {
+  if (!filePath) return null;
+
+  const match = filePath.match(/^minio:\/\/([^\/]+)\/(.+)$/);
+  if (!match) return null;
+
+  const bucket = match[1];
+  const objectName = match[2];
+
+  try {
+    const url = await client.presignedGetObject(
+      bucket,
+      objectName,
+      expiresInSeconds,
+    );
+    return url;
+  } catch (err) {
+    console.error("Failed to generate signed URL", err);
+    return null;
+  }
+}
+
 export { client as minioClient };
