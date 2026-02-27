@@ -32,6 +32,7 @@ import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
+import { CreateSellsShiftConflictDto } from "./dto/error/create-sells-shift/create-selles-shift-conflict.dto";
 import { CreateSellsShiftForbiddenDto } from "./dto/error/create-sells-shift/create-sells-shift-forbidden.dto";
 import { CreateSellsShiftInternalErrorDto } from "./dto/error/create-sells-shift/create-sells-shift-internal-error.dto";
 import { CreateSellsShiftNotFoundDto } from "./dto/error/create-sells-shift/create-sells-shift-not-found.dto";
@@ -136,6 +137,7 @@ export class SellsShiftManagementController {
     forbidden: CreateSellsShiftForbiddenDto,
     notFound: CreateSellsShiftNotFoundDto,
     validation: CreateSellsShiftValidationDto,
+    conflict: CreateSellsShiftConflictDto,
     internal: CreateSellsShiftInternalErrorDto,
   })
   @UseGuards(RolesGuard)

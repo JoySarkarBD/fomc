@@ -73,39 +73,27 @@ export class SellsShiftManagementService {
     }
 
     // Convert to BD Time
-    const BD_OFFSET = 6 * 60 * 60 * 1000;
+    const utcStart = new Date(
+      createSellsShiftManagementDto.weekStartDate.toLocaleString("en-US", {
+        timeZone: "Asia/Dhaka",
+      }),
+    );
+    const utcEnd = new Date(
+      createSellsShiftManagementDto.weekEndDate.toLocaleString("en-US", {
+        timeZone: "Asia/Dhaka",
+      }),
+    );
 
-    const toBDDate = (dateInput: Date | string) => {
-      const utcDate = new Date(dateInput);
-      if (isNaN(utcDate.getTime())) return null;
-
-      const bdDate = new Date(utcDate.getTime() + BD_OFFSET);
-      bdDate.setHours(0, 0, 0, 0);
-      return bdDate;
-    };
-
-    const weekStartDate = toBDDate(createSellsShiftManagementDto.weekStartDate);
-    const weekEndDate = toBDDate(createSellsShiftManagementDto.weekEndDate);
-
-    if (!weekStartDate || !weekEndDate) {
-      return {
-        message: "Invalid date format",
-        exception: "HttpException",
-      };
-    }
-
-    // Ensure start < end
-    if (weekStartDate >= weekEndDate) {
+    if (utcStart >= utcEnd) {
       return {
         message: "weekStartDate must be before weekEndDate",
         exception: "HttpException",
       };
     }
 
-    // Ensure exactly 7 days
-
-    const diffInMs = weekEndDate.getTime() - weekStartDate.getTime();
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    // Check if the shift assignment covers exactly 7 days
+    const diffInDays =
+      (utcEnd.getTime() - utcStart.getTime()) / (1000 * 60 * 60 * 24);
 
     if (diffInDays !== 6) {
       return {
@@ -114,23 +102,22 @@ export class SellsShiftManagementService {
       };
     }
 
-    // Prevent duplicate week
-
-    const existingAssignment = await this.salesShiftAssignmentModel.findOne({
+    const existingShift = await this.salesShiftAssignmentModel.findOne({
       user: new Types.ObjectId(userId),
-      weekStartDate: weekStartDate,
+      $or: [
+        {
+          weekStartDate: { $lte: utcEnd },
+          weekEndDate: { $gte: utcStart },
+        },
+      ],
     });
 
-    if (existingAssignment) {
+    if (existingShift) {
       return {
-        message: "Shift already assigned for this week",
-        exception: "HttpException",
+        message: "Shift overlaps with an existing assignment",
+        exception: "ConflictException",
       };
     }
-
-    // Convert back to UTC for storage
-    const utcStart = new Date(weekStartDate.getTime() - BD_OFFSET);
-    const utcEnd = new Date(weekEndDate.getTime() - BD_OFFSET);
 
     const result = await this.salesShiftAssignmentModel.create({
       user: new Types.ObjectId(userId),
