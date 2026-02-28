@@ -225,7 +225,24 @@ export class SellsShiftManagementService {
       };
     }
 
+    // Verify if the user has the original shift on that date
     const exchangeDate = convertToBDDate(new Date(data.exchangeDate));
+
+    const existingShift = await this.getShiftForDate(userId, exchangeDate);
+
+    if (!existingShift) {
+      return {
+        message: "You do not have any shift assigned on this date",
+        exception: "HttpException",
+      };
+    }
+
+    if (existingShift.shiftType !== data.originalShift) {
+      return {
+        message: "You do not have the specified original shift on this date",
+        exception: "HttpException",
+      };
+    }
 
     // Check if there is already a pending exchange request for the same date
     const pendingExchange = await this.shiftExchangeModel.findOne({
