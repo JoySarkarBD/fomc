@@ -108,6 +108,60 @@ export class SellsShiftManagementController {
   ) {}
 
   /**
+   * Retrieves the logged-in user's sells shift management records.
+   *
+   * This endpoint allows a user to retrieve their own sells shift management records. The request must include the month and year for which to retrieve the records as query parameters. The endpoint is protected by JWT authentication to ensure that only authorized users can access their shift management records.
+   *
+   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
+   * @param {GetSellsShiftDto} query - The query parameters containing the month and year for which to retrieve the shift management records.
+   * @returns {Promise<any>} A response containing the sells shift management records for the authenticated user and specified time period.
+   */
+  @ApiOperation({
+    summary: "Get my sells shifts",
+    description:
+      "Retrieves the logged-in user's sells shift management records.",
+  })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiRequestDetails({
+    queries: [
+      {
+        name: "month",
+        required: true,
+        type: Number,
+        example: 8,
+      },
+      {
+        name: "year",
+        required: true,
+        type: Number,
+        example: 2026,
+      },
+    ],
+    queryDto: GetSellsShiftDto,
+  })
+  @ApiSuccessResponse(GetMyShiftSuccessDto, 200)
+  @ApiErrorResponses({
+    unauthorized: GetMyShiftUnauthorizedDto,
+    forbidden: GetMyShiftForbiddenDto,
+    notFound: GetMyShiftNotFoundDto,
+    validation: GetMyShiftValidationDto,
+    internal: GetMyShiftInternalErrorDto,
+  })
+  @Roles("SUPER ADMIN", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Get("my-shifts")
+  async getMyShifts(
+    @GetUser() user: AuthUser,
+    @Query() query: GetSellsShiftDto,
+  ) {
+    return this.sellsShiftManagementService.findShiftForUser(user._id!, query);
+  }
+
+  /**
    * Creates a new sells shift management entry for a user.
    *
    * This endpoint allows a user with the SUPER ADMIN role to create a new sells shift management entry for a specified user. The request must include the ID of the user for whom the shift is being created, as well as the details of the shift in the request body. The endpoint is protected by JWT authentication and role-based access control to ensure that only authorized users can create shift entries.
@@ -429,59 +483,5 @@ export class SellsShiftManagementController {
       params.userId,
       query,
     );
-  }
-
-  /**
-   * Retrieves the logged-in user's sells shift management records.
-   *
-   * This endpoint allows a user to retrieve their own sells shift management records. The request must include the month and year for which to retrieve the records as query parameters. The endpoint is protected by JWT authentication to ensure that only authorized users can access their shift management records.
-   *
-   * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
-   * @param {GetSellsShiftDto} query - The query parameters containing the month and year for which to retrieve the shift management records.
-   * @returns {Promise<any>} A response containing the sells shift management records for the authenticated user and specified time period.
-   */
-  @ApiOperation({
-    summary: "Get my sells shifts",
-    description:
-      "Retrieves the logged-in user's sells shift management records.",
-  })
-  @ApiBearerAuth("Authorization")
-  @ApiHeader({
-    name: "Authorization",
-    description: "Bearer token",
-    required: true,
-  })
-  @ApiRequestDetails({
-    queries: [
-      {
-        name: "month",
-        required: true,
-        type: Number,
-        example: 8,
-      },
-      {
-        name: "year",
-        required: true,
-        type: Number,
-        example: 2026,
-      },
-    ],
-    queryDto: GetSellsShiftDto,
-  })
-  @ApiSuccessResponse(GetMyShiftSuccessDto, 200)
-  @ApiErrorResponses({
-    unauthorized: GetMyShiftUnauthorizedDto,
-    forbidden: GetMyShiftForbiddenDto,
-    notFound: GetMyShiftNotFoundDto,
-    validation: GetMyShiftValidationDto,
-    internal: GetMyShiftInternalErrorDto,
-  })
-  @Roles("SUPER ADMIN", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
-  @Get("my-shifts")
-  async getMyShifts(
-    @GetUser() user: AuthUser,
-    @Query() query: GetSellsShiftDto,
-  ) {
-    return this.sellsShiftManagementService.findShiftForUser(user._id!, query);
   }
 }
