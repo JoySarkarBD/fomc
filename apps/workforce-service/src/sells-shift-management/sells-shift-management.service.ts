@@ -86,6 +86,15 @@ export class SellsShiftManagementService {
       };
     }
 
+    // Utc start should have to be SUNDAY and utc end should have to be SATURDAY
+    if (utcStart.getUTCDay() !== 0 || utcEnd.getUTCDay() !== 6) {
+      return {
+        message:
+          "weekStartDate must be a Sunday and weekEndDate must be a Saturday",
+        exception: "HttpException",
+      };
+    }
+
     // Check if the shift assignment covers exactly 7 days
     const diffInDays = Math.round(
       (utcEnd.getTime() - utcStart.getTime()) / (1000 * 60 * 60 * 24),
