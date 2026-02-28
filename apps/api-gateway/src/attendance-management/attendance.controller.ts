@@ -80,7 +80,7 @@ import {
 
 @ApiTags("Attendance")
 @Controller("attendance")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
@@ -108,9 +108,8 @@ export class AttendanceController {
     notFound: MarkAttendanceNotFoundDto,
     internal: MarkAttendanceInternalErrorDto,
   })
-  @Post("present")
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Post("present")
   async presentAttendance(@GetUser() user: AuthUser) {
     return this.attendanceService.presentAttendance(user);
   }
@@ -157,9 +156,8 @@ export class AttendanceController {
     forbidden: MyAttendanceForbiddenDto,
     internal: MyAttendanceInternalErrorDto,
   })
-  @Get("my-attendance")
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Get("my-attendance")
   async getMyAttendance(
     @GetUser() user: AuthUser,
     @Query() query: GetAttendanceDto,
@@ -192,9 +190,8 @@ export class AttendanceController {
     notFound: MarkOutAttendanceNotFoundDto,
     internal: MarkOutAttendanceInternalErrorDto,
   })
-  @Post("out")
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Post("out")
   async outAttendance(@GetUser() user: AuthUser) {
     return this.attendanceService.outAttendance(user);
   }
@@ -253,9 +250,8 @@ export class AttendanceController {
     forbidden: SingleUserAttendanceForbiddenDto,
     internal: SingleUserAttendanceInternalErrorDto,
   })
-  @Get("user-attendance/:userId")
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
+  @Get("user-attendance/:userId")
   async getSpecificUserAttendance(
     @Param() params: UserIdDto,
     @Query() query: GetAttendanceDto,
@@ -309,7 +305,6 @@ export class AttendanceController {
     forbidden: UpdateByAuthorityWeekendSetForbiddenDto,
     internal: UpdateByAuthorityWeekendSetInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Patch("update-weekend-by-authority/:userId")
   async UpdateWeekendOff(
@@ -365,7 +360,6 @@ export class AttendanceController {
     forbidden: MarkAttendanceAsAuthorityForbiddenDto,
     internal: MarkAttendanceAsAuthorityInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Patch("mark-attendance-by-authority/:userId")
   async markAttendanceByAuthority(
@@ -421,7 +415,6 @@ export class AttendanceController {
     forbidden: MarkWeekendExchangeAsAuthorityForbiddenDto,
     internal: MarkWeekendExchangeAsAuthorityInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Patch("weekend-exchange-by-authority/:userId")
   async weekendExchangeByAuthority(

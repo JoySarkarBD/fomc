@@ -28,7 +28,9 @@ import { UpdateRoleDto } from "apps/user-service/src/role-management/dto/update-
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
+import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
 import {
   RoleCreateConflictDto,
   RoleUpdateConflictDto,
@@ -100,7 +102,8 @@ export class RoleController {
     conflict: RoleCreateConflictDto,
     internal: RoleCreateInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Post()
   async create(@Body() data: CreateRoleDto) {
     return await this.roleService.create(data);
@@ -219,7 +222,8 @@ export class RoleController {
     conflict: RoleUpdateConflictDto,
     internal: RoleUpdateInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Patch(":id")
   async update(@Param() params: MongoIdDto, @Body() data: UpdateRoleDto) {
     return await this.roleService.update(params.id, data);
@@ -259,7 +263,8 @@ export class RoleController {
     notFound: RoleDeleteByIdNotFoundDto,
     internal: RoleDeleteInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Delete(":id")
   async remove(@Param() params: MongoIdDto) {
     return await this.roleService.remove(params.id);

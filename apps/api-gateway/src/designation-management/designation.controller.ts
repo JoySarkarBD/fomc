@@ -31,6 +31,7 @@ import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
 import { DesignationService } from "./designation.service";
 import {
   DesignationCreateConflictDto,
@@ -98,8 +99,8 @@ export class DesignationController {
     conflict: DesignationCreateConflictDto,
     internal: DesignationCreateInternalErrorDto,
   })
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("SUPER ADMIN")
-  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createDesignationDto: CreateDesignationDto) {
     return await this.designationService.create(createDesignationDto);
@@ -220,7 +221,7 @@ export class DesignationController {
     conflict: DesignationUpdateConflictDto,
     internal: DesignationUpdateInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("SUPER ADMIN")
   @Patch(":id")
   async update(
@@ -266,7 +267,7 @@ export class DesignationController {
     notFound: DesignationDeleteByIdNotFoundDto,
     internal: DesignationDeleteInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("SUPER ADMIN")
   @Delete(":id")
   async remove(@Param() params: MongoIdDto) {

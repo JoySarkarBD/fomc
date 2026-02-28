@@ -101,7 +101,7 @@ import { SellsShiftManagementService } from "./sells-shift-management.service";
 
 @ApiTags("Sells Shift Management")
 @Controller("sells-shift-management")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class SellsShiftManagementController {
   constructor(
     private readonly sellsShiftManagementService: SellsShiftManagementService,
@@ -148,7 +148,6 @@ export class SellsShiftManagementController {
     conflict: CreateSellsShiftConflictDto,
     internal: CreateSellsShiftInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Post(":userId")
   async create(
@@ -190,7 +189,6 @@ export class SellsShiftManagementController {
     validation: RequestShiftExchangeValidationDto,
     internal: RequestShiftExchangeInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Post("exchange/request")
   async requestShiftExchange(
@@ -240,7 +238,6 @@ export class SellsShiftManagementController {
     validation: ApproveShiftExchangeValidationDto,
     internal: ApproveShiftExchangeInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Patch("exchange/approve/:exchangeId")
   async approveShiftExchange(
@@ -291,7 +288,6 @@ export class SellsShiftManagementController {
     validation: RejectShiftExchangeValidationDto,
     internal: RejectShiftExchangeInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Patch("exchange/reject/:exchangeId")
   async rejectShiftExchange(
@@ -331,6 +327,7 @@ export class SellsShiftManagementController {
     notFound: GetMyShiftExchangesNotFoundDto,
     internal: GetMyShiftExchangesInternalErrorDto,
   })
+  @Roles("SUPER ADMIN", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get("exchange/my")
   async getMyShiftExchanges(@GetUser() user: AuthUser) {
     return this.sellsShiftManagementService.getUserShiftExchanges(user._id!);
@@ -361,7 +358,6 @@ export class SellsShiftManagementController {
     notFound: GetPendingShiftExchangesNotFoundDto,
     internal: GetPendingShiftExchangesInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Get("exchange/pending")
   async getPendingShiftExchanges() {
@@ -423,7 +419,6 @@ export class SellsShiftManagementController {
     validation: GetUserSellsShiftValidationDto,
     internal: GetUserSellsShiftInternalErrorDto,
   })
-  @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Get(":userId")
   async findShiftForUser(

@@ -29,7 +29,9 @@ import { UpdateDepartmentDto } from "../../../workforce-service/src/department-m
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
+import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
 import { DepartmentService } from "./department.service";
 import {
   DepartmentCreateConflictDto,
@@ -98,7 +100,8 @@ export class DepartmentController {
     conflict: DepartmentCreateConflictDto,
     internal: DepartmentCreateInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Post()
   async create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return await this.departmentService.create(createDepartmentDto);
@@ -219,7 +222,8 @@ export class DepartmentController {
     conflict: DepartmentUpdateConflictDto,
     internal: DepartmentUpdateInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Patch(":id")
   async update(
     @Param() params: MongoIdDto,
@@ -262,7 +266,8 @@ export class DepartmentController {
     notFound: DepartmentDeleteByIdNotFoundDto,
     internal: DepartmentDeleteInternalErrorDto,
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER ADMIN")
   @Delete(":id")
   async remove(@Param() params: MongoIdDto) {
     return await this.departmentService.remove(params.id);
