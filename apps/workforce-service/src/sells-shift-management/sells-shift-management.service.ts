@@ -225,29 +225,23 @@ export class SellsShiftManagementService {
       };
     }
 
-    // Verify if the user has the original shift on that date
-    const exchangeDate = new Date(data.exchangeDate);
-    const existingShift = await this.getShiftForDate(userId, exchangeDate);
-
-    if (existingShift) {
-      return {
-        message:
-          "You do not have the specified original shift on the exchange date",
-        exception: "HttpException",
-      };
-    }
+    const exchangeDate = convertToBDDate(new Date(data.exchangeDate));
 
     // Check if there is already a pending exchange request for the same date
     const pendingExchange = await this.shiftExchangeModel.findOne({
       user: new Types.ObjectId(userId),
       exchangeDate: exchangeDate,
-      status: ShiftExchangeStatus.PENDING,
+      status: {
+        $in: [ShiftExchangeStatus.PENDING, ShiftExchangeStatus.APPROVED],
+      },
     });
 
     if (pendingExchange) {
       return {
         message:
-          "You already have a pending shift exchange request for this date",
+          pendingExchange.status === ShiftExchangeStatus.PENDING
+            ? "There is already a pending shift exchange request for this date"
+            : "There is already an approved shift exchange for this date",
         exception: "ConflictException",
       };
     }
