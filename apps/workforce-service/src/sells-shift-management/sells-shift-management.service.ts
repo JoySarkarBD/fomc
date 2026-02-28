@@ -253,7 +253,9 @@ export class SellsShiftManagementService {
     // Check if there is already a pending exchange request for the same date
     const pendingExchange = await this.shiftExchangeModel.findOne({
       user: new Types.ObjectId(userId),
-      exchangeDate: exchangeDate,
+      exchangeDate: {
+        $eq: exchangeDate,
+      },
       $or: [
         { status: ShiftExchangeStatus.PENDING },
         { status: ShiftExchangeStatus.APPROVED },
@@ -272,7 +274,7 @@ export class SellsShiftManagementService {
 
     const shiftExchange = await this.shiftExchangeModel.create({
       user: new Types.ObjectId(userId),
-      exchangeDate: data.exchangeDate,
+      exchangeDate: exchangeDate,
       originalShift: data.originalShift,
       newShift: data.newShift,
       reason: data.reason,
