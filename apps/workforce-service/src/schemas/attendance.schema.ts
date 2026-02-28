@@ -86,6 +86,3 @@ export class Attendance extends Document {
  * Mongoose schema for the Attendance class
  */
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);
-
-// Index for fast user-date lookup
-AttendanceSchema.index({ user: 1, date: 1 }, { unique: true });

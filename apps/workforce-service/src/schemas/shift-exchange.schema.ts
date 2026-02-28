@@ -75,5 +75,3 @@ export class ShiftExchange extends Document {
 }
 
 export const ShiftExchangeSchema = SchemaFactory.createForClass(ShiftExchange);
-
-ShiftExchangeSchema.index({ user: 1, exchangeDate: 1 }, { unique: true });

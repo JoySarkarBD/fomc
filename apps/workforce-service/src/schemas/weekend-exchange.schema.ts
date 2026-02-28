@@ -42,12 +42,3 @@ export class WeekendExchange extends Document {
 
 export const WeekendExchangeSchema =
   SchemaFactory.createForClass(WeekendExchange);
-
-// Prevent duplicate exchange for same weekend
-WeekendExchangeSchema.index(
-  { user: 1, originalWeekendDate: 1 },
-  { unique: true },
-);
-
-// Prevent duplicate new off date
-WeekendExchangeSchema.index({ user: 1, newOffDate: 1 }, { unique: true });

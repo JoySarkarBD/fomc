@@ -2,6 +2,16 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, mongo, Types } from "mongoose";
 import { ShiftTypeForSales } from "./attendance.schema";
 
+export enum WeekEndOff {
+  SUNDAY = "SUNDAY",
+  SATURDAY = "SATURDAY",
+  MONDAY = "MONDAY",
+  TUESDAY = "TUESDAY",
+  WEDNESDAY = "WEDNESDAY",
+  THURSDAY = "THURSDAY",
+  FRIDAY = "FRIDAY",
+}
+
 export type SalesShiftAssignmentDocument = SalesShiftAssignment & Document;
 
 /**
@@ -37,6 +47,21 @@ export class SalesShiftAssignment extends Document {
   })
   shiftType!: ShiftTypeForSales;
 
+  // Weekend off for the assigned shift
+  @Prop({
+    type: Object,
+    required: true,
+  })
+  myWeekends!: {
+    currentWeekends: WeekEndOff[];
+    updatedWeekends?: WeekEndOff[];
+    exchangedWeekendDates?: Date[];
+  };
+
+  // Shift exchange references if approved
+  @Prop({ type: [Types.ObjectId], ref: "ShiftExchange", default: [] })
+  shiftExchanges?: mongo.ObjectId[];
+
   // Who assigned the shift (Manager)
   @Prop({ type: Types.ObjectId, required: true })
   assignedBy!: mongo.ObjectId;
@@ -48,9 +73,3 @@ export class SalesShiftAssignment extends Document {
 
 export const SalesShiftAssignmentSchema =
   SchemaFactory.createForClass(SalesShiftAssignment);
-
-// Prevent duplicate assignment per week
-SalesShiftAssignmentSchema.index(
-  { user: 1, weekStartDate: 1 },
-  { unique: true },
-);
