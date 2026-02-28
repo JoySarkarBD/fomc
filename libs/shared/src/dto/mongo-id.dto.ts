@@ -51,3 +51,12 @@ export class ExchangeIdDto {
   @IsNotEmpty({ message: "Exchange ID is required" })
   exchangeId!: string;
 }
+
+export class SalesDeptIdDto {
+  /** A valid 24-character MongoDB ObjectId representing the ID of the Sales department. */
+  @IsMongoId({
+    message: "Sales Department ID must be a valid MongoDB ObjectId",
+  })
+  @IsNotEmpty({ message: "Sales Department ID is required" })
+  salesDeptId!: string;
+}

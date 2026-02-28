@@ -13,6 +13,11 @@ export const USER_COMMANDS = {
   /** Retrieve a single user by ID. */
   GET_USER: { cmd: "get_user" },
 
+  /** Retrieve admin and project manager users for sales shift management. */
+  GET_ADMIN_AND_SELLS_PROJECT_MANAGER_USER: {
+    cmd: "get_admin_and_sells_project_manager_user",
+  },
+
   /** Create a new user account. */
   CREATE_USER: { cmd: "create_user" },
 

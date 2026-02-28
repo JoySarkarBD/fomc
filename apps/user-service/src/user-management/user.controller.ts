@@ -6,7 +6,7 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
-import { UserIdDto } from "@shared/dto/mongo-id.dto";
+import { SalesDeptIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import { WeekEndOff } from "../schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
@@ -33,6 +33,21 @@ export class UserController {
   @MessagePattern(USER_COMMANDS.GET_USERS)
   async getUsers(payload: UserSearchQueryDto) {
     return await this.userService.getUsers(payload);
+  }
+
+  /**
+   * Retrieve admin and project manager users for sales shift management.
+   *
+   * Message Pattern: { cmd: USER_COMMANDS.GET_ADMIN_AND_SELLS_PROJECT_MANAGER_USER }
+   * @returns {Promise<any>} List of admin and project manager users.
+   */
+  @MessagePattern(USER_COMMANDS.GET_ADMIN_AND_SELLS_PROJECT_MANAGER_USER)
+  async getAdminAndSellsProjectManagerUser(
+    salesDeptId: SalesDeptIdDto["salesDeptId"],
+  ) {
+    return await this.userService.getAdminAndSellsProjectManagerUser(
+      salesDeptId,
+    );
   }
 
   /**

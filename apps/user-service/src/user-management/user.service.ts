@@ -7,12 +7,17 @@ import { InjectModel } from "@nestjs/mongoose";
 import config from "@shared/config/app.config";
 import { DEPARTMENT_COMMANDS } from "@shared/constants";
 import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.constants";
-import { MongoIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
+import {
+  MongoIdDto,
+  SalesDeptIdDto,
+  UserIdDto,
+} from "@shared/dto/mongo-id.dto";
 import { getSignedUrl } from "@shared/utils/minio.client";
 import * as bcrypt from "bcrypt";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
 import { RoleService } from "../role-management/role.service";
+import { Role } from "../schemas/role.schema";
 import { User, UserDocument, WeekEndOff } from "../schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
@@ -28,6 +33,7 @@ export class UserService {
   constructor(
     @Inject("WORKFORCE_SERVICE") private readonly workForceClient: ClientProxy,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Role.name) private readonly roleModel: Model<Role>,
     @Inject(RoleService) private readonly roleService: RoleService,
   ) {}
 
@@ -295,7 +301,10 @@ export class UserService {
     delete userObj.otpExpiry;
 
     // Replace the role field with the role name for easier access in the JwtStrategy, since we only need the role name for authorization checks and not the entire role document.
-    userObj.role = userObj.role?.name;
+    userObj.role =
+      typeof userObj.role === "object" && "name" in userObj.role
+        ? userObj.role.name
+        : null;
     userObj.designation = designation?.name || null;
     userObj.department = designation?.departmentName || null;
     userObj.avatar = userObj.avatar
@@ -306,6 +315,33 @@ export class UserService {
       : null;
 
     return userObj;
+  }
+
+  /**
+   * Retrieve admin and project manager users for sales shift management.
+   */
+  async getAdminAndSellsProjectManagerUser(
+    salesDeptId: SalesDeptIdDto["salesDeptId"],
+  ): Promise<any> {
+    const [superAdminRole, projectManagerRole] = await Promise.all([
+      this.roleModel.findOne({ name: "SUPER ADMIN" }).lean(),
+      this.roleModel.findOne({ name: "PROJECT MANAGER" }).lean(),
+    ]);
+
+    const roleIds = [superAdminRole?._id, projectManagerRole?._id].filter(
+      Boolean,
+    );
+
+    // Users should have to be SUPER ADMIN or PROJECT MANGER - He should also belong to sales department
+    const users = await this.userModel
+      .find({
+        role: { $in: roleIds.filter((id): id is Types.ObjectId => !!id) },
+        department: salesDeptId,
+      })
+      .select("_id")
+      .lean();
+
+    return users;
   }
 
   /**

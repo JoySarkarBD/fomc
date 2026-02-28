@@ -236,6 +236,21 @@ export class SellsShiftManagementService {
       };
     }
 
+    // Check if there is already a pending exchange request for the same date
+    const pendingExchange = await this.shiftExchangeModel.findOne({
+      user: new Types.ObjectId(userId),
+      exchangeDate: exchangeDate,
+      status: ShiftExchangeStatus.PENDING,
+    });
+
+    if (pendingExchange) {
+      return {
+        message:
+          "You already have a pending shift exchange request for this date",
+        exception: "ConflictException",
+      };
+    }
+
     const shiftExchange = await this.shiftExchangeModel.create({
       user: new Types.ObjectId(userId),
       exchangeDate: data.exchangeDate,
@@ -252,20 +267,13 @@ export class SellsShiftManagementService {
     if (salesDept) {
       // Find users in Sales department
       const usersRes = await firstValueFrom(
-        this.userClient.send(USER_COMMANDS.GET_USERS, {
-          department: [salesDept._id.toString()],
-          pageNo: 1,
-          pageSize: 100,
-        }),
+        this.userClient.send(
+          USER_COMMANDS.GET_ADMIN_AND_SELLS_PROJECT_MANAGER_USER,
+          salesDept._id.toString(),
+        ),
       );
 
-      // Assuming that the user service returns a list of users in the "users" property of the response
-      if (usersRes && Array.isArray(usersRes.users)) {
-        const users = usersRes.users.filter(
-          (u: any) => u.role === "SUPER ADMIN",
-        );
-        users.forEach((m: any) => userIds.push(m._id.toString()));
-      }
+      userIds.push(...usersRes.map((u) => u._id.toString()));
     }
 
     if (userIds.length > 0) {
