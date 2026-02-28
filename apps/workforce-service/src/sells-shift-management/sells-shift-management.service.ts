@@ -85,7 +85,7 @@ export class SellsShiftManagementService {
     ) {
       return {
         message:
-          "weekStartDate must be Sunday and weekEndDate must be Saturday",
+          "Week start date must be Sunday and week end date must be Saturday",
         exception: "HttpException",
       };
     }
@@ -99,7 +99,7 @@ export class SellsShiftManagementService {
     // Check if weekStartDate is before weekEndDate
     if (utcStart >= utcEnd) {
       return {
-        message: "weekStartDate must be before weekEndDate",
+        message: "Week start date must be before week end date",
         exception: "HttpException",
       };
     }
