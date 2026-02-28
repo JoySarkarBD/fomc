@@ -1,5 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CustomForbiddenDto } from "apps/api-gateway/src/common/dto/custom-forbidden.dto";
+import { CustomInternalServerErrorDto } from "apps/api-gateway/src/common/dto/custom-internal-server-error.dto";
+import { CustomNotFoundDto } from "apps/api-gateway/src/common/dto/custom-not-found.dto";
+import { CustomUnauthorizedDto } from "apps/api-gateway/src/common/dto/custom-unauthorized.dto";
 import {
   FieldErrorDto,
   ValidationErrorResponseDto,
@@ -14,7 +17,7 @@ export class GetUserSellsShiftForbiddenDto extends CustomForbiddenDto {
   declare endpoint: string;
 }
 
-export class GetUserSellsShiftInternalErrorDto {
+export class GetUserSellsShiftInternalErrorDto extends CustomInternalServerErrorDto {
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
@@ -22,7 +25,7 @@ export class GetUserSellsShiftInternalErrorDto {
   declare endpoint: string;
 }
 
-export class GetUserSellsShiftNotFoundDto {
+export class GetUserSellsShiftNotFoundDto extends CustomNotFoundDto {
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
@@ -33,7 +36,7 @@ export class GetUserSellsShiftNotFoundDto {
   declare message: string;
 }
 
-export class GetUserSellsShiftUnauthorizedDto {
+export class GetUserSellsShiftUnauthorizedDto extends CustomUnauthorizedDto {
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
