@@ -5,17 +5,12 @@
  * departments) and normalises the response for the API layer.
  */
 
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.constants";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
+import { handleException } from "@shared/utils/handle.exception";
 import { CreateDesignationDto } from "apps/workforce-service/src/designation-management/dto/create-designation.dto";
 import { UpdateDesignationDto } from "apps/workforce-service/src/designation-management/dto/update-designation.dto";
 import { firstValueFrom } from "rxjs";
@@ -40,7 +35,7 @@ export class DesignationService {
         createDesignationDto,
       ),
     );
-    this.handleException(result);
+    handleException(result);
     return buildResponse("Designation created successfully", result);
   }
 
@@ -88,7 +83,7 @@ export class DesignationService {
       }),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Designation updated successfully", result);
   }
@@ -104,31 +99,8 @@ export class DesignationService {
       this.workforceClient.send(DESIGNATION_COMMANDS.DELETE_DESIGNATION, id),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Designation deleted successfully", result);
-  }
-
-  /**
-   * Handle exceptions from the Workforce micro-service responses.
-   *
-   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
-   */
-  private handleException(result: any) {
-    if (result?.exception) {
-      switch (result.exception) {
-        case "NotFoundException":
-          throw new NotFoundException(result.message);
-        case "HttpException":
-          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
-        case "ConflictException":
-          throw new HttpException(result.message, HttpStatus.CONFLICT);
-        default:
-          throw new HttpException(
-            result.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-      }
-    }
   }
 }

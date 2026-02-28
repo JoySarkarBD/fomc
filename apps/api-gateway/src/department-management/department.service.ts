@@ -5,19 +5,14 @@
  * departments) and normalises the response for the API layer.
  */
 
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateDepartmentDto } from "../../../workforce-service/src/department-management/dto/create-department.dto";
 
 import { ClientProxy } from "@nestjs/microservices";
 import { DEPARTMENT_COMMANDS } from "@shared/constants/department-command.constants";
 import { MongoIdDto } from "@shared/dto/mongo-id.dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
+import { handleException } from "@shared/utils/handle.exception";
 import { firstValueFrom } from "rxjs";
 import { UpdateDepartmentDto } from "../../../workforce-service/src/department-management/dto/update-department.dto";
 import { buildResponse } from "../common/response.util";
@@ -38,7 +33,7 @@ export class DepartmentService {
     const result = await firstValueFrom(
       this.workforceClient.send(DEPARTMENT_COMMANDS.CREATE_DEPARTMENT, data),
     );
-    this.handleException(result);
+    handleException(result);
     return buildResponse("Department created successfully", result);
   }
 
@@ -86,7 +81,7 @@ export class DepartmentService {
       }),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Department updated successfully", result);
   }
@@ -102,31 +97,8 @@ export class DepartmentService {
       this.workforceClient.send(DEPARTMENT_COMMANDS.DELETE_DEPARTMENT, id),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Department deleted successfully", result);
-  }
-
-  /**
-   * Handle exceptions from the Workforce micro-service responses.
-   *
-   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
-   */
-  private handleException(result: any) {
-    if (result?.exception) {
-      switch (result.exception) {
-        case "NotFoundException":
-          throw new NotFoundException(result.message);
-        case "HttpException":
-          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
-        case "ConflictException":
-          throw new HttpException(result.message, HttpStatus.CONFLICT);
-        default:
-          throw new HttpException(
-            result.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-      }
-    }
   }
 }

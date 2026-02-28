@@ -9,6 +9,11 @@ const accessKey = config.MINIO_ACCESS_KEY || "minioadmin";
 const secretKey = config.MINIO_SECRET_KEY || "minioadmin";
 const defaultBucket = config.MINIO_BUCKET || "avatars";
 
+/**
+ * MinIO client for handling file uploads, deletions, and signed URL generation.
+ * This client abstracts the interaction with MinIO, allowing for easy file management within the application.
+ * It supports uploading files to a specified bucket, removing files based on their path, and generating signed URLs for secure access.
+ */
 const client = new Client({
   endPoint: endpoint,
   port,
@@ -17,6 +22,11 @@ const client = new Client({
   secretKey,
 });
 
+/**
+ * Ensures that the specified bucket exists in MinIO. If the bucket does not exist, it attempts to create it.
+ *
+ * @param bucket - The name of the bucket to ensure existence for. Defaults to the configured default bucket if not provided.
+ */
 async function ensureBucket(bucket = defaultBucket) {
   try {
     const exists = await client.bucketExists(bucket);
@@ -28,6 +38,14 @@ async function ensureBucket(bucket = defaultBucket) {
   }
 }
 
+/**
+ * Uploads a file to MinIO and returns the file path. The file is stored in the specified bucket with a unique name.
+ *
+ * @param buffer - The file data as a Buffer to be uploaded.
+ * @param originalName - The original name of the file, used to determine the file extension.
+ * @param contentType - Optional MIME type of the file; defaults to "application/octet-stream" if not provided.
+ * @returns A promise that resolves to the file path in MinIO (e.g., "minio://bucket/unique-file-name.ext").
+ */
 export async function uploadFile(
   buffer: Buffer,
   originalName: string,
@@ -43,6 +61,13 @@ export async function uploadFile(
   return `minio://${bucket}/${unique}`;
 }
 
+/**
+ * Removes a file from MinIO based on the provided file path. The file path should be in the format "minio://bucket/objectName".
+ * If the file path is invalid or if an error occurs during removal, the function will silently ignore the error.
+ *
+ * @param filePath - The path of the file to be removed, expected to be in the format "minio://bucket/objectName".
+ * @return A promise that resolves when the file removal is complete. If the file path is invalid or if an error occurs, the promise will still resolve without throwing an error.
+ */
 export async function removeFile(filePath: string): Promise<void> {
   if (!filePath) return;
   const match = filePath.match(/^minio:\/\/([^\/]+)\/(.+)$/);
@@ -56,6 +81,13 @@ export async function removeFile(filePath: string): Promise<void> {
   }
 }
 
+/**
+ * Generates a signed URL for accessing a file stored in MinIO. The file path should be in the format "minio://bucket/objectName".
+ *
+ * @param filePath - The path of the file for which to generate a signed URL, expected to be in the format "minio://bucket/objectName".
+ * @param expiresInSeconds - Optional expiration time for the signed URL in seconds. If not provided, a default value from configuration will be used. The maximum allowed expiration time is 7 days (604800 seconds).
+ * @returns A promise that resolves to the signed URL for accessing the file, or null if the file path is invalid or if an error occurs during URL generation.
+ */
 export async function getSignedUrl(
   filePath: string,
   expiresInSeconds?: number,

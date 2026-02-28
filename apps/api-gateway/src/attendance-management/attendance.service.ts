@@ -5,18 +5,13 @@
  * operations and normalises the response for the API layer.
  */
 
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { ATTENDANCE_COMMANDS } from "@shared/constants/attendance-command.constants";
 import { UserIdDto } from "@shared/dto/mongo-id.dto";
 import { AuthUser } from "@shared/interfaces/auth-user.interface";
+import { handleException } from "@shared/utils/handle.exception";
 import { AttendanceByAuthorityDto } from "apps/workforce-service/src/attendance-management/dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "apps/workforce-service/src/attendance-management/dto/get-attendance.dto";
 import { UpdateByAuthorityWeekendSetDto } from "apps/workforce-service/src/attendance-management/dto/update-weekend-by-authority.dto";
@@ -42,7 +37,7 @@ export class AttendanceService {
       this.workforceClient.send(ATTENDANCE_COMMANDS.PRESENT_ATTENDANCE, user),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Attendance marked", result);
   }
@@ -76,7 +71,7 @@ export class AttendanceService {
       this.workforceClient.send(ATTENDANCE_COMMANDS.OUT_ATTENDANCE, user),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Attendance marked as out", result);
   }
@@ -102,7 +97,7 @@ export class AttendanceService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Attendance retrieved", result);
   }
@@ -125,7 +120,7 @@ export class AttendanceService {
       }),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Weekend set successfully", result);
   }
@@ -151,7 +146,7 @@ export class AttendanceService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Attendance marked by authority", result);
   }
@@ -177,31 +172,8 @@ export class AttendanceService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Weekend exchange marked by authority", result);
-  }
-
-  /**
-   * Handle exceptions from the Workforce micro-service responses.
-   *
-   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
-   */
-  private handleException(result: any) {
-    if (result?.exception) {
-      switch (result.exception) {
-        case "NotFoundException":
-          throw new NotFoundException(result.message);
-        case "HttpException":
-          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
-        case "ConflictException":
-          throw new HttpException(result.message, HttpStatus.CONFLICT);
-        default:
-          throw new HttpException(
-            result.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-      }
-    }
   }
 }

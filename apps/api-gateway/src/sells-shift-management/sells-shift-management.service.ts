@@ -1,3 +1,4 @@
+import { handleException } from './../../../../libs/shared/src/utils/handle.exception';
 /**
  * @fileoverview Sells shift management service.
  *
@@ -5,11 +6,8 @@
  */
 
 import {
-  HttpException,
-  HttpStatus,
   Inject,
-  Injectable,
-  NotFoundException,
+  Injectable
 } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-management.constants";
@@ -54,7 +52,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Sells shift created successfully", result);
   }
@@ -78,7 +76,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Sells shift retrieved", result);
   }
@@ -106,7 +104,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse(
       "Shift exchange request submitted successfully",
@@ -137,7 +135,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse(
       "Shift exchange request approved successfully",
@@ -168,7 +166,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse(
       "Shift exchange request rejected successfully",
@@ -194,7 +192,7 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("User shift exchanges retrieved", result);
   }
@@ -214,31 +212,8 @@ export class SellsShiftManagementService {
       ),
     );
 
-    this.handleException(result);
+    handleException(result);
 
     return buildResponse("Pending shift exchanges retrieved", result);
-  }
-
-  /**
-   * Handle exceptions from the Workforce micro-service responses.
-   *
-   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
-   */
-  private handleException(result: any) {
-    if (result?.exception) {
-      switch (result.exception) {
-        case "NotFoundException":
-          throw new NotFoundException(result.message);
-        case "HttpException":
-          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
-        case "ConflictException":
-          throw new HttpException(result.message, HttpStatus.CONFLICT);
-        default:
-          throw new HttpException(
-            result.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-      }
-    }
   }
 }

@@ -4,12 +4,9 @@
  * by communicating with the User Service via TCP microservice transport.
  */
 import {
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   Logger,
-  NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -17,6 +14,7 @@ import { ClientProxy } from "@nestjs/microservices";
 import config from "@shared/config/app.config";
 import { ROLE_COMMANDS } from "@shared/constants";
 import { USER_COMMANDS } from "@shared/constants/user-command.constants";
+import { handleException } from "@shared/utils/handle.exception";
 import * as bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
@@ -99,7 +97,7 @@ export class AuthService {
       this.userClient.send(USER_COMMANDS.CREATE_USER, data),
     );
 
-    this.handleException(user);
+    handleException(user);
 
     // Return a success response with the created user details (excluding sensitive fields)
     const safeUser = this.sanitizeUser(user);
@@ -260,28 +258,5 @@ export class AuthService {
   async logout(tokenId: string) {
     await this.redisTokenService.deleteToken(tokenId);
     return buildResponse("Logout successful", null);
-  }
-
-  /**
-   * Handle exceptions from the Workforce micro-service responses.
-   *
-   * @param result - The response result from the Workforce micro-service, which may contain an exception field indicating an error.
-   */
-  private handleException(result: any) {
-    if (result?.exception) {
-      switch (result.exception) {
-        case "NotFoundException":
-          throw new NotFoundException(result.message);
-        case "HttpException":
-          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
-        case "ConflictException":
-          throw new HttpException(result.message, HttpStatus.CONFLICT);
-        default:
-          throw new HttpException(
-            result.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-      }
-    }
   }
 }
