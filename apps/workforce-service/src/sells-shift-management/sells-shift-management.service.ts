@@ -230,14 +230,7 @@ export class SellsShiftManagementService {
 
     const existingShift = await this.getShiftForDate(userId, exchangeDate);
 
-    if (!existingShift) {
-      return {
-        message: "You do not have any shift assigned on this date",
-        exception: "HttpException",
-      };
-    }
-
-    if (existingShift.shiftType !== data.originalShift) {
+    if (!existingShift || existingShift.shiftType !== data.originalShift) {
       return {
         message: "You do not have the specified original shift on this date",
         exception: "HttpException",
