@@ -354,7 +354,7 @@ export class SellsShiftManagementController {
     internal: GetPendingShiftExchangesInternalErrorDto,
   })
   @UseGuards(RolesGuard)
-  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER")
+  @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Get("exchange/pending")
   async getPendingShiftExchanges() {
     return this.sellsShiftManagementService.getPendingShiftExchanges();
@@ -416,7 +416,7 @@ export class SellsShiftManagementController {
     internal: GetUserSellsShiftInternalErrorDto,
   })
   @UseGuards(RolesGuard)
-  @Roles("SUPER ADMIN")
+  @Roles("SUPER ADMIN", "PROJECT MANAGER")
   @Get(":userId")
   async findShiftForUser(
     @Param() params: UserIdDto,
