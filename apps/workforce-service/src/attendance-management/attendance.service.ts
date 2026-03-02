@@ -219,6 +219,13 @@ export class AttendanceService {
 
       shiftStartMinutes = shiftStartMap[shiftType as ShiftTypeForSales];
 
+      console.log(
+        "shiftType:",
+        shiftType,
+        "shiftStartMinutes:",
+        shiftStartMinutes,
+      );
+
       if (shiftStartMinutes === undefined) {
         return {
           message: "Invalid shift type in assignment",
