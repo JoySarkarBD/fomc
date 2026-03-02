@@ -182,25 +182,6 @@ export class AttendanceService {
 
       console.log("Has exchange today:", hasActiveExchangeToday);
 
-      // If there's an active exchange today, it overrides the assigned shift for today
-      if (hasActiveExchangeToday) {
-        const exchangeShiftToday = assignment.shiftExchanges?.find(
-          (ex: any) => {
-            return (
-              ex.status === ShiftExchangeStatus.APPROVED &&
-              new Date(ex.exchangeDate).toDateString() === today.toDateString()
-            );
-          },
-        ) as any;
-
-        shiftType = exchangeShiftToday.newShift;
-      }
-
-      // Priority for determining today's shift:
-      if (isTodayForcedWork) {
-        shiftType = assignment.shiftType;
-      }
-
       // If there's an active exchange today and today is a forced work day (originally weekend), we need to use the new shift from the exchange instead of the assigned shift
       if (hasActiveExchangeToday && isTodayForcedWork) {
         const exchangeShiftToday = assignment.shiftExchanges?.find(
@@ -223,6 +204,22 @@ export class AttendanceService {
             exception: "HttpException",
           };
         }
+      }
+      // If there's an active exchange today, it overrides the assigned shift for today
+      else if (hasActiveExchangeToday) {
+        const exchangeShiftToday = assignment.shiftExchanges?.find(
+          (ex: any) => {
+            return (
+              ex.status === ShiftExchangeStatus.APPROVED &&
+              new Date(ex.exchangeDate).toDateString() === today.toDateString()
+            );
+          },
+        ) as any;
+
+        shiftType = exchangeShiftToday.newShift;
+      } else if (isTodayForcedWork) {
+        // Priority for determining today's shift:
+        shiftType = assignment.shiftType;
       }
 
       const shiftStartMap: Record<ShiftTypeForSales, number> = {
