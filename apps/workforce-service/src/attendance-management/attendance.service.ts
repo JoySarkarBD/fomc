@@ -84,6 +84,7 @@ export class AttendanceService {
     const bdNow = new Date(
       nowUTC.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
     );
+
     const today = new Date(bdNow);
 
     const todayDayUpper = bdNow
@@ -93,7 +94,10 @@ export class AttendanceService {
     // Prevent duplicate attendance
     const existing = await this.attendanceModel.findOne({
       user: new Types.ObjectId(userId),
-      date: today,
+      date: {
+        $gte: new Date(today.setHours(0, 0, 0, 0)),
+        $lte: new Date(today.setHours(23, 59, 59, 999)),
+      },
     });
 
     if (existing) {
@@ -106,12 +110,18 @@ export class AttendanceService {
     // Weekend & exchange checks
     const exchangeMadeTodayOff = await this.weekendExchangeModel.findOne({
       user: new Types.ObjectId(userId),
-      newOffDate: today, // today became OFF day
+      newOffDate: {
+        $gte: new Date(today.setHours(0, 0, 0, 0)),
+        $lte: new Date(today.setHours(23, 59, 59, 999)),
+      }, // today became OFF day
     });
 
     const exchangeMadeTodayWorking = await this.weekendExchangeModel.findOne({
       user: new Types.ObjectId(userId),
-      originalWeekendDate: today, // today was originally weekend → now working
+      originalWeekendDate: {
+        $gte: new Date(today.setHours(0, 0, 0, 0)),
+        $lte: new Date(today.setHours(23, 59, 59, 999)),
+      }, // today was originally weekend → now working
     });
 
     const isNormallyWeekend =
@@ -247,12 +257,8 @@ export class AttendanceService {
     const diff = currentMinutes - shiftStartMinutes;
 
     if (diff < -earlyAllowanceMinutes || diff > lateAllowanceMinutes) {
-      const startH = Math.floor(shiftStartMinutes / 60);
-      const startM = shiftStartMinutes % 60;
-      const startStr = `${startH.toString().padStart(2, "0")}:${startM.toString().padStart(2, "0")}`;
-
       return {
-        message: `Outside allowed check-in window. Shift starts at ${startStr}`,
+        message: "Check-in time is outside the allowed window for the shift",
         exception: "HttpException",
       };
     }
