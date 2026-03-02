@@ -314,7 +314,10 @@ export class AttendanceService {
 
     const attendance = await this.attendanceModel.findOne({
       user: new Types.ObjectId(userId),
-      date: todayDate,
+      date: {
+        $gte: new Date(todayDate.setHours(0, 0, 0, 0)),
+        $lte: new Date(todayDate.setHours(23, 59, 59, 999)),
+      },
     });
 
     if (attendance && attendance.inType === AttendanceInType.WEEKEND) {
