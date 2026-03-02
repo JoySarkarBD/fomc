@@ -168,10 +168,23 @@ export class AttendanceService {
         }) ?? false;
 
       if (hasActiveExchangeToday && !isTodayForcedWork) {
-        return {
-          message: "Your shift for today has been exchanged away.",
-          exception: "HttpException",
-        };
+        const exchangeShiftToday = assignment.shiftExchanges?.find(
+          (ex: any) => {
+            return (
+              ex.status === ShiftExchangeStatus.APPROVED &&
+              new Date(ex.exchangeDate).toDateString() === today.toDateString()
+            );
+          },
+        ) as any;
+
+        if (exchangeShiftToday) {
+          shiftType = exchangeShiftToday.newShift;
+        } else {
+          return {
+            message: "Shift exchange data inconsistency. Contact admin.",
+            exception: "HttpException",
+          };
+        }
       }
 
       // Determine final shift type for today
@@ -222,8 +235,9 @@ export class AttendanceService {
     }
 
     const gracePeriodMinutes = 15;
-    const earlyAllowanceMinutes = 3 * 60 + 59; // can punch 4 hours early
-    const lateAllowanceMinutes = 3 * 60 + 59; // can punch 4 hours late
+    // Allow check-in from 4 hours before shift start to 4 hours after shift start
+    const earlyAllowanceMinutes = 4 * 60; // 4 hours before shift start
+    const lateAllowanceMinutes = 4 * 60; // 24 hours after shift start
 
     const diff = currentMinutes - shiftStartMinutes;
 
