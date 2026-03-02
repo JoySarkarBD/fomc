@@ -167,6 +167,8 @@ export class AttendanceService {
           );
         }) ?? false;
 
+      let exchangedShiftToday: string | undefined;
+
       if (hasActiveExchangeToday && !isTodayForcedWork) {
         const exchangeShiftToday = assignment.shiftExchanges?.find(
           (ex: any) => {
@@ -178,7 +180,7 @@ export class AttendanceService {
         ) as any;
 
         if (exchangeShiftToday) {
-          shiftType = exchangeShiftToday.newShift;
+          exchangedShiftToday = exchangeShiftToday.newShift;
         } else {
           return {
             message: "Shift exchange data inconsistency. Contact admin.",
@@ -189,11 +191,13 @@ export class AttendanceService {
 
       // Determine final shift type for today
       if (isTodayForcedWork) {
-        // Today is an exchanged working day → usually keep the original shift type
-        // (unless your business rule says something different)
-        shiftType = assignment.shiftType;
+        shiftType = hasActiveExchangeToday
+          ? (exchangedShiftToday as string)
+          : assignment.shiftType;
       } else {
-        shiftType = assignment.shiftType;
+        shiftType = hasActiveExchangeToday
+          ? (exchangedShiftToday as string)
+          : assignment.shiftType;
       }
 
       const shiftStartMap: Record<ShiftTypeForSales, number> = {
@@ -236,18 +240,28 @@ export class AttendanceService {
 
     const gracePeriodMinutes = 15;
     // Allow check-in from 4 hours before shift start to 4 hours after shift start
-    const earlyAllowanceMinutes = 4 * 60; // 4 hours before shift start
-    const lateAllowanceMinutes = 4 * 60; // 24 hours after shift start
+    const earliestCheckIn = shiftStartMinutes - 4 * 60;
+    const latestCheckIn = shiftStartMinutes + 4 * 60;
 
-    const diff = currentMinutes - shiftStartMinutes;
-
-    if (diff < -earlyAllowanceMinutes || diff > lateAllowanceMinutes) {
-      const startH = Math.floor(shiftStartMinutes / 60);
-      const startM = shiftStartMinutes % 60;
-      const startStr = `${startH.toString().padStart(2, "0")}:${startM.toString().padStart(2, "0")}`;
-
+    if (currentMinutes < earliestCheckIn || currentMinutes > latestCheckIn) {
       return {
-        message: `Outside allowed check-in window. Shift starts at ${startStr}`,
+        message: `Outside allowed check-in window. Shift starts at ${Math.floor(
+          shiftStartMinutes / 60,
+        )
+          .toString()
+          .padStart(2, "0")}:${(shiftStartMinutes % 60)
+          .toString()
+          .padStart(2, "0")}. You can check in from ${Math.floor(
+          earliestCheckIn / 60,
+        )
+          .toString()
+          .padStart(2, "0")}:${(earliestCheckIn % 60)
+          .toString()
+          .padStart(2, "0")} to ${Math.floor(latestCheckIn / 60)
+          .toString()
+          .padStart(2, "0")}:${(latestCheckIn % 60)
+          .toString()
+          .padStart(2, "0")}.`,
         exception: "HttpException",
       };
     }
