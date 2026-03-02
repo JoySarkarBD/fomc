@@ -17,6 +17,7 @@ export class CreateSellsShiftManagementSuccessDto extends SuccessResponseDto<any
 
   @ApiProperty({
     example: {
+      _id: "65f1b2c3d4e5f67890123458",
       user: "65f1b2c3d4e5f67890123456",
       weekStartDate: "2024-05-01T08:00:00.000Z",
       weekEndDate: "2024-05-07T17:00:00.000Z",
@@ -26,10 +27,20 @@ export class CreateSellsShiftManagementSuccessDto extends SuccessResponseDto<any
         updatedWeekends: ["SATURDAY"],
         exchangedWeekendDates: ["2024-05-04T00:00:00.000Z"],
       },
-      shiftExchanges: ["65f1b2c3d4e5f67890123459"],
+      shiftExchanges: [
+        {
+          _id: "65f1b2c3d4e5f67890123459",
+          user: "65f1b2c3d4e5f67890123456",
+          exchangeDate: "2024-05-04T00:00:00.000Z",
+          originalShift: "MORNING",
+          newShift: "EVENING",
+          reason: "I want to exchange",
+          approvedBy: "65f1b2c3d4e5f67890123457",
+          status: "APPROVED",
+        },
+      ],
       note: "This is a note",
       assignedBy: "65f1b2c3d4e5f67890123457",
-      _id: "65f1b2c3d4e5f67890123458",
       createdAt: "2026-02-23T12:00:00.000Z",
       updatedAt: "2026-02-23T12:00:00.000Z",
     },
@@ -50,6 +61,7 @@ export class GetUserSellsShiftSuccessDto extends SuccessResponseDto<any[]> {
   @ApiProperty({
     example: [
       {
+        _id: "65f1b2c3d4e5f67890123458",
         user: "65f1b2c3d4e5f67890123456",
         weekStartDate: "2024-05-01T08:00:00.000Z",
         weekEndDate: "2024-05-07T17:00:00.000Z",
@@ -59,10 +71,20 @@ export class GetUserSellsShiftSuccessDto extends SuccessResponseDto<any[]> {
           updatedWeekends: ["SATURDAY"],
           exchangedWeekendDates: ["2024-05-04T00:00:00.000Z"],
         },
-        shiftExchanges: ["65f1b2c3d4e5f67890123459"],
+        shiftExchanges: [
+          {
+            _id: "65f1b2c3d4e5f67890123459",
+            user: "65f1b2c3d4e5f67890123456",
+            exchangeDate: "2024-05-04T00:00:00.000Z",
+            originalShift: "MORNING",
+            newShift: "EVENING",
+            reason: "I want to exchange",
+            approvedBy: "65f1b2c3d4e5f67890123457",
+            status: "APPROVED",
+          },
+        ],
         note: "This is a note",
         assignedBy: "65f1b2c3d4e5f67890123457",
-        _id: "65f1b2c3d4e5f67890123458",
         createdAt: "2026-02-23T12:00:00.000Z",
         updatedAt: "2026-02-23T12:00:00.000Z",
       },
@@ -84,13 +106,25 @@ export class GetMyShiftSuccessDto extends SuccessResponseDto<any[]> {
   @ApiProperty({
     example: [
       {
+        _id: "65f1b2c3d4e5f67890123458",
         user: "65f1b2c3d4e5f67890123456",
         weekStartDate: "2024-05-01T08:00:00.000Z",
         weekEndDate: "2024-05-07T17:00:00.000Z",
         shiftType: "MORNING",
         note: "This is a note",
+        shiftExchanges: [
+          {
+            _id: "65f1b2c3d4e5f67890123459",
+            user: "65f1b2c3d4e5f67890123456",
+            exchangeDate: "2024-05-04T00:00:00.000Z",
+            originalShift: "MORNING",
+            newShift: "EVENING",
+            reason: "I want to exchange",
+            approvedBy: "65f1b2c3d4e5f67890123457",
+            status: "APPROVED",
+          },
+        ],
         assignedBy: "65f1b2c3d4e5f67890123457",
-        _id: "65f1b2c3d4e5f67890123458",
         createdAt: "2026-02-23T12:00:00.000Z",
         updatedAt: "2026-02-23T12:00:00.000Z",
       },
