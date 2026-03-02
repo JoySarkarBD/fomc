@@ -377,7 +377,7 @@ export class AttendanceService {
   ): Promise<Attendance[]> {
     const userId = (user.id ?? user._id) as string;
 
-    const { month /* 1-12 */, year /* 1900999*/ } = query;
+    const { month, year } = query;
 
     const filter: any = {
       user: new Types.ObjectId(userId),
@@ -431,7 +431,7 @@ export class AttendanceService {
       };
     }
 
-    const { month /* 1-12 */, year /* 1900999*/ } = query;
+    const { month, year } = query;
 
     const filter: any = {
       user: new Types.ObjectId(userId),
