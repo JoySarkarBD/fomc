@@ -218,6 +218,8 @@ export class AttendanceService {
       } else if (isTodayForcedWork) {
         // Priority for determining today's shift:
         shiftType = assignment.shiftType;
+      } else {
+        shiftType = assignment.shiftType;
       }
 
       const shiftStartMap: Record<ShiftTypeForSales, number> = {
