@@ -178,8 +178,6 @@ export class AttendanceService {
           );
         }) ?? false;
 
-      let exchangedShiftToday: string | undefined;
-
       console.log("Has exchange today:", hasActiveExchangeToday);
 
       // If there's an active exchange today and today is a forced work day (originally weekend), we need to use the new shift from the exchange instead of the assigned shift
@@ -193,11 +191,11 @@ export class AttendanceService {
           },
         ) as any;
 
-        console.log("Has exchange today up:", exchangedShiftToday);
+        console.log("Has exchange today up:", shiftType);
 
         if (exchangeShiftToday) {
-          exchangedShiftToday = exchangeShiftToday.newShift;
-          console.log("Has exchange today down:", exchangedShiftToday);
+          shiftType = exchangeShiftToday.newShift;
+          console.log("Has exchange today down:", shiftType);
         } else {
           return {
             message: "Shift exchange data inconsistency. Contact admin.",
