@@ -24,10 +24,7 @@ import {
   ShiftTypeForOperations,
   ShiftTypeForSales,
 } from "../schemas/attendance.schema";
-import {
-  SalesShiftAssignment,
-  WeekEndOff,
-} from "../schemas/sales-shift-assignment.schema";
+import { SalesShiftAssignment } from "../schemas/sales-shift-assignment.schema";
 import {
   WeekendExchange,
   WeekendExchangeDocument,
@@ -549,14 +546,7 @@ export class AttendanceService {
     if (shift) {
       shift.myWeekends = {
         currentWeekends: shift.myWeekends?.currentWeekends || [],
-        updatedWeekends: [
-          exchange.newOffDate
-            .toLocaleString("en-US", {
-              timeZone: "Asia/Dhaka",
-              weekday: "long",
-            })
-            .toUpperCase() as WeekEndOff,
-        ],
+        updatedWeekends: shift.myWeekends?.updatedWeekends || [],
         exchangedWeekendDates: [
           ...(shift.myWeekends?.exchangedWeekendDates || []),
           exchange.originalWeekendDate,
