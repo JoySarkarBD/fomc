@@ -180,6 +180,8 @@ export class AttendanceService {
 
       let exchangedShiftToday: string | undefined;
 
+      console.log("Has exchange today:", hasActiveExchangeToday);
+
       if (hasActiveExchangeToday && !isTodayForcedWork) {
         const exchangeShiftToday = assignment.shiftExchanges?.find(
           (ex: any) => {
@@ -190,8 +192,11 @@ export class AttendanceService {
           },
         ) as any;
 
+        console.log("Has exchange today up:", exchangedShiftToday);
+
         if (exchangeShiftToday) {
           exchangedShiftToday = exchangeShiftToday.newShift;
+          console.log("Has exchange today down:", exchangedShiftToday);
         } else {
           return {
             message: "Shift exchange data inconsistency. Contact admin.",
