@@ -306,11 +306,12 @@ export class AttendanceService {
 
     // Current BD Time
     const nowUTC = new Date();
-    const bdNow = convertToBDDate(nowUTC);
+    const bdNow = new Date(
+      nowUTC.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
+    );
 
     // Today's date (without time)
     const todayDate = new Date(bdNow);
-    todayDate.setHours(0, 0, 0, 0);
 
     const attendance = await this.attendanceModel.findOne({
       user: new Types.ObjectId(userId),
