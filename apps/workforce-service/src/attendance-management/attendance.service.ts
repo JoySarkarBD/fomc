@@ -536,12 +536,17 @@ export class AttendanceService {
       currentWeekEnd.getDate() + (6 - currentWeekEnd.getDay()),
     ); // Set to Saturday
 
+    console.log(currentWeekStart);
+    console.log(currentWeekEnd);
+
     // Find the shift which match the current week
     const shift = await this.salesShiftAssignmentModel.findOne({
       user: new Types.ObjectId(userId),
       weekStart: { $lte: currentWeekStart },
       weekEnd: { $gte: currentWeekEnd },
     });
+
+    console.log(shift);
 
     if (shift) {
       shift.myWeekends = {
