@@ -182,6 +182,25 @@ export class AttendanceService {
 
       console.log("Has exchange today:", hasActiveExchangeToday);
 
+      // If there's an active exchange today, it overrides the assigned shift for today
+      if (hasActiveExchangeToday) {
+        const exchangeShiftToday = assignment.shiftExchanges?.find(
+          (ex: any) => {
+            return (
+              ex.status === ShiftExchangeStatus.APPROVED &&
+              new Date(ex.exchangeDate).toDateString() === today.toDateString()
+            );
+          },
+        ) as any;
+
+        shiftType = exchangeShiftToday.newShift;
+      }
+
+      // Priority for determining today's shift:
+      if (isTodayForcedWork) {
+        shiftType = assignment.shiftType;
+      }
+
       // If there's an active exchange today and today is a forced work day (originally weekend), we need to use the new shift from the exchange instead of the assigned shift
       if (hasActiveExchangeToday && isTodayForcedWork) {
         const exchangeShiftToday = assignment.shiftExchanges?.find(
@@ -204,25 +223,6 @@ export class AttendanceService {
             exception: "HttpException",
           };
         }
-      }
-
-      // If there's an active exchange today, it overrides the assigned shift for today
-      if (hasActiveExchangeToday) {
-        const exchangeShiftToday = assignment.shiftExchanges?.find(
-          (ex: any) => {
-            return (
-              ex.status === ShiftExchangeStatus.APPROVED &&
-              new Date(ex.exchangeDate).toDateString() === today.toDateString()
-            );
-          },
-        ) as any;
-
-        shiftType = exchangeShiftToday.newShift;
-      }
-
-      // Priority for determining today's shift:
-      if (isTodayForcedWork) {
-        shiftType = assignment.shiftType;
       }
 
       const shiftStartMap: Record<ShiftTypeForSales, number> = {
@@ -273,7 +273,7 @@ export class AttendanceService {
     const gracePeriodMinutes = 15;
     // Allow check-in from 4 hours before shift start to 4 hours after shift start
     const earlyAllowanceMinutes = 4 * 60; // 4 hours before shift start
-    const lateAllowanceMinutes = 4 * 60; // 24 hours after shift start
+    const lateAllowanceMinutes = 4 * 60; // 4 hours after shift start
 
     const diff = currentMinutes - shiftStartMinutes;
 
