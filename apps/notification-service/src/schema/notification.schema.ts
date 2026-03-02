@@ -35,7 +35,7 @@ export class Notification extends Document {
 
   // Optional Sender (admin / manager / system)
 
-  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  @Prop({ type: Types.ObjectId, default: null })
   sender?: mongo.ObjectId;
 
   // Notification Title

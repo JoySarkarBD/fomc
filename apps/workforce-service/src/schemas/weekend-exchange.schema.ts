@@ -36,7 +36,7 @@ export class WeekendExchange extends Document {
   newOffDate!: Date;
 
   // Who performed the exchange (PROJECT_MANAGER)
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
+  @Prop({ type: Types.ObjectId, required: true })
   exchangedBy!: mongo.ObjectId;
 }
 

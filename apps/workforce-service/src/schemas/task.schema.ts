@@ -77,11 +77,11 @@ export class Task extends Document {
   status!: TaskStatus;
 
   // Reference to the user collection
-  @Prop({ type: Types.ObjectId, ref: "User" })
+  @Prop({ type: Types.ObjectId, required: true })
   createdBy!: Types.ObjectId;
 
   // Reference to the user collection
-  @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
+  @Prop({ type: [{ type: Types.ObjectId, required: true }] })
   assignTo!: Types.ObjectId[];
 }
 
