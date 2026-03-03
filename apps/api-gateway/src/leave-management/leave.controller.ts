@@ -15,15 +15,28 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from "@nestjs/swagger";
 import { MongoIdDto, UserIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { GetLeaveDto } from "apps/workforce-service/src/leave-management/dto/get-leave.dto";
 import { LeaveRequestDto } from "apps/workforce-service/src/leave-management/dto/leave-request.dto";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
+import { LeaveRequestForbiddenDto } from "./dto/error/leave-forbidden.dto";
+import { LeaveRequestInternalErrorDto } from "./dto/error/leave-internal-error.dto";
+import { LeaveRequestNotFoundDto } from "./dto/error/leave-not-found.dto";
+import { LeaveRequestUnauthorizedDto } from "./dto/error/leave-unauthorized.dto";
+import { LeaveRequestValidationErrorDto } from "./dto/error/leave-validation.dto";
+import { LeaveRequestSuccessDto } from "./dto/success/leave-success.dto";
 import { LeaveService } from "./leave.service";
 
 @ApiTags("Leave Management")
@@ -32,6 +45,21 @@ import { LeaveService } from "./leave.service";
 export class LeaveController {
   constructor(private readonly leaveService: LeaveService) {}
 
+  @ApiOperation({ summary: "Create a new leave request" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
+  @ApiSuccessResponse(LeaveRequestSuccessDto, 201)
+  @ApiErrorResponses({
+    validation: LeaveRequestValidationErrorDto,
+    unauthorized: LeaveRequestUnauthorizedDto,
+    forbidden: LeaveRequestForbiddenDto,
+    notFound: LeaveRequestNotFoundDto,
+    internal: LeaveRequestInternalErrorDto,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Post("request")
   async createLeaveRequest(
@@ -44,6 +72,13 @@ export class LeaveController {
     );
   }
 
+  @ApiOperation({ summary: "Retrieve user-specific leaves" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get("my-leaves")
   async getMyLeaves(@GetUser() user: AuthUser, @Query() query: GetLeaveDto) {
@@ -53,6 +88,13 @@ export class LeaveController {
     );
   }
 
+  @ApiOperation({ summary: "Retrieve a specific leave request by ID" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get("user-specific/:userId")
   async getUserSpecificLeaves(
@@ -62,12 +104,26 @@ export class LeaveController {
     return await this.leaveService.getUserSpecificLeaves(params.userId, query);
   }
 
+  @ApiOperation({ summary: "Retrieve a specific leave request by ID" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get(":id")
   async getLeaveById(@Param() params: MongoIdDto) {
     return await this.leaveService.getLeaveById(params.id);
   }
 
+  @ApiOperation({ summary: "Approve a leave request" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch("approve/:id")
   async approveLeaveRequest(
@@ -80,6 +136,13 @@ export class LeaveController {
     );
   }
 
+  @ApiOperation({ summary: "Reject a leave request" })
+  @ApiBearerAuth("Authorization")
+  @ApiHeader({
+    name: "Authorization",
+    description: "Bearer token",
+    required: true,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch("reject/:id")
   async rejectLeaveRequest(

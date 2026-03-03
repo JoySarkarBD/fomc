@@ -12,6 +12,7 @@ import { AttendanceModule } from "./attendance-management/attendance.module";
 import { AuthModule } from "./authentication/auth.module";
 import { DepartmentModule } from "./department-management/department.module";
 import { DesignationModule } from "./designation-management/designation.module";
+import { LeaveModule } from "./leave-management/leave.module";
 import { RoleModule } from "./role-management/role.module";
 import { SellsShiftManagementModule } from "./sells-shift-management/sells-shift-management.module";
 import { UserModule } from "./user-management/user.module";
@@ -25,6 +26,7 @@ import { UserModule } from "./user-management/user.module";
     AttendanceModule,
     DesignationModule,
     SellsShiftManagementModule,
+    LeaveModule,
   ],
   controllers: [AppController],
   providers: [AppService],

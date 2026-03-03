@@ -180,6 +180,13 @@ export class LeaveService {
       };
     }
 
+    if (leave.isRejected) {
+      return {
+        message: "Leave request is already rejected and cannot be approved",
+        exception: "BadRequestException",
+      };
+    }
+
     if (leave.isApproved) {
       return {
         message: "Leave request is already approved",
@@ -226,6 +233,13 @@ export class LeaveService {
       return {
         message: "Leave request not found",
         exception: "NotFoundException",
+      };
+    }
+
+    if (leave.isRejected) {
+      return {
+        message: "Leave request is already rejected",
+        exception: "BadRequestException",
       };
     }
 
