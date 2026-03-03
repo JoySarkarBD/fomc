@@ -186,10 +186,8 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles("SUPER ADMIN", "DIRECTOR", "HR", "PROJECT MANAGER", "TEAM LEADER")
   @Get(":id")
-  async getUser(@GetUser() user: AuthUser, @Param() params: MongoIdDto) {
-    const result = await this.userService.getUser(
-      (user._id ?? user.id) as MongoIdDto["id"],
-    );
+  async getUser(@Param() params: MongoIdDto) {
+    const result = await this.userService.getUser(params.id);
     return result;
   }
 
