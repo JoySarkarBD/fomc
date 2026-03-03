@@ -54,7 +54,7 @@ export class Leave extends Document {
   reason!: string;
 
   // Optional field to indicate if the leave has been approved
-  @Prop({ default: null, nullable: true })
+  @Prop({ default: false })
   isApproved?: boolean;
 
   // Optional field to indicate if the leave has been rejected
