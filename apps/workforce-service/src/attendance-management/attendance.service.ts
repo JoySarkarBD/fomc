@@ -570,6 +570,26 @@ export class AttendanceService {
       };
     }
 
+    if (userExist.weekEndOff?.length === 0) {
+      return {
+        message: "User does not have a regular weekend off to exchange",
+        exception: "HttpException",
+      };
+    }
+
+    // If user weekend day is not match with the originalWeekendDate then it will not allow to exchange
+    const originalWeekendDay = new Date(convertToBDDate(originalWeekendDate))
+      .toLocaleString("en-US", { timeZone: "Asia/Dhaka", weekday: "long" })
+      .toUpperCase();
+
+    if (!userExist.weekEndOff?.includes(originalWeekendDay)) {
+      return {
+        message:
+          "Original weekend date does not match user's regular weekend day",
+        exception: "HttpException",
+      };
+    }
+
     // Check if an exchange already exists for the original weekend date
     const existingExchange = await this.weekendExchangeModel.findOne({
       user: new Types.ObjectId(userId),
