@@ -11,3 +11,53 @@ export class LeaveRequestInternalErrorDto extends CustomInternalServerErrorDto {
   })
   declare endpoint: string;
 }
+
+export class MyLeaveInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({
+    example: "api/leave/my-leaves",
+  })
+  declare endpoint: string;
+}
+
+export class UserSpecificLeaveInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({
+    example: "api/leave/user-specific/:userId",
+  })
+  declare endpoint: string;
+}
+
+export class SpecificLeaveRequestInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({
+    example: "api/leave/:id",
+  })
+  declare endpoint: string;
+}
+
+export class LeaveRequestApprovalInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({
+    example: "api/leave/approve/:id",
+  })
+  declare endpoint: string;
+}
+
+export class LeaveRequestRejectionInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({
+    example: "api/leave/reject/:id",
+  })
+  declare endpoint: string;
+}

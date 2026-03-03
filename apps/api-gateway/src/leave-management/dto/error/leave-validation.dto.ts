@@ -6,17 +6,11 @@ import {
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
 
 export class LeaveRequestValidationErrorDto extends ValidationErrorResponseDto {
-  @ApiProperty({ example: "Leave request validation error" })
-  declare message: string;
-
   @ApiProperty({ example: Methods.POST })
   declare method: Methods.POST;
 
   @ApiProperty({ example: "api/leave/request" })
   declare endpoint: string;
-
-  @ApiProperty({ example: 201 })
-  declare statusCode: number;
 
   @ApiProperty({
     type: [FieldErrorDto],
@@ -37,6 +31,105 @@ export class LeaveRequestValidationErrorDto extends ValidationErrorResponseDto {
       {
         field: "reason",
         message: "reason must be a string - required",
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class MyLeaveValidationErrorDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({ example: "api/leave/my-leaves" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "year",
+        message: "year must be a positive integer - query param",
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class UserSpecificLeaveValidationErrorDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({ example: "api/leave/user-specific/:userId" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "userId",
+        message: "userId must be a valid UUID - path param",
+      },
+      {
+        field: "year",
+        message: "year must be a positive integer - query param",
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class SpecificLeaveRequestValidationErrorDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({ example: "api/leave/specific/:id" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "id",
+        message: "id must be a valid UUID - path param",
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class LeaveRequestApprovalValidationErrorDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/leave/approve/:id" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "id",
+        message: "id must be a valid UUID - path param",
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class LeaveRequestRejectionValidationErrorDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/leave/reject/:id" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      {
+        field: "id",
+        message: "id must be a valid UUID - path param",
       },
     ],
   })

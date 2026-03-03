@@ -23,8 +23,8 @@ export class LeaveRequestSuccessDto extends SuccessResponseDto<any> {
       type: LeaveType.CASUAL_LEAVE,
       startDate: "2026-02-20T00:00:00.000Z",
       endDate: "2026-02-22T00:00:00.000Z",
-      isApproved: "Family function",
-      isRejected: "PENDING",
+      isApproved: null,
+      isRejected: null,
       approvedBy: null,
       rejectedBy: null,
       createdAt: "2026-02-14T12:07:00.986Z",
@@ -34,183 +34,146 @@ export class LeaveRequestSuccessDto extends SuccessResponseDto<any> {
   declare data: any;
 }
 
-/* export class MarkOutAttendanceSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: "Attendance marked as out" })
-  declare message: string;
-
-  @ApiProperty({ example: Methods.POST })
-  declare method: Methods.POST;
-
-  @ApiProperty({ example: "api/attendance/out" })
-  declare endpoint: string;
-
-  @ApiProperty({
-    example: {
-      user: "698ffc1ef75d367cc3e9d955",
-      checkInTime: "2026-02-14T12:07:00.000Z",
-      checkOutTime: "2026-02-14T18:00:00.000Z",
-      date: "2026-02-13T18:00:00.000Z",
-      inType: "LATE",
-      shiftType: "DAY",
-      isLate: true,
-      _id: "699065646c98dffa195f7d7e",
-      createdAt: "2026-02-14T12:07:00.986Z",
-      updatedAt: "2026-02-14T18:00:00.123Z",
-    },
-  })
-  declare data: any;
-}
-
-export class SingleUserAttendanceSuccessDto extends SuccessResponseDto<any[]> {
-  @ApiProperty({ example: "Attendance retrieved" })
+export class MyLeavesSuccessDto extends SuccessResponseDto<any[]> {
+  @ApiProperty({ example: "My leaves retrieved successfully" })
   declare message: string;
 
   @ApiProperty({ example: Methods.GET })
   declare method: Methods.GET;
 
-  @ApiProperty({ example: "api/attendance/user-attendance" })
+  @ApiProperty({ example: "api/leave/my-leaves" })
   declare endpoint: string;
 
   @ApiProperty({
     example: [
       {
-        user: "6996d5319754977e5498ebaf",
-        checkInTime: "2026-02-23T09:05:00.000Z",
-        checkOutTime: "2026-02-23T17:00:00.000Z",
-        date: "2026-02-23T00:00:00.000Z",
-        inType: "PRESENT",
-        shiftType: "DAY",
-        isLate: false,
-        _id: "6996d5319754977e5498ebc1",
-        createdAt: "2026-02-23T09:05:00.000Z",
-        updatedAt: "2026-02-23T17:00:00.000Z",
+        _id: "699065646c98dffa195f7d7e",
+        user: "698ffc1ef75d367cc3e9d955",
+        type: LeaveType.CASUAL_LEAVE,
+        startDate: "2026-02-20T00:00:00.000Z",
+        endDate: "2026-02-22T00:00:00.000Z",
+        isApproved: null,
+        isRejected: null,
+        approvedBy: null,
+        rejectedBy: null,
+        createdAt: "2026-02-14T12:07:00.986Z",
+        updatedAt: "2026-02-14T12:07:00.986Z",
       },
     ],
   })
   declare data: any[];
 }
 
-export class UpdateByAuthorityWeekendSetSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: "Weekend updated successfully" })
+export class UserSpecificLeaveSuccessDto extends SuccessResponseDto<any[]> {
+  @ApiProperty({ example: "User-specific leaves retrieved successfully" })
   declare message: string;
 
-  @ApiProperty({ example: Methods.PATCH })
-  declare method: Methods.PATCH;
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
 
-  @ApiProperty({ example: "api/attendance/update-weekend-off/:userId" })
-  declare endpoint: string;
-
-  @ApiProperty({
-    example: {
-      _id: "69991038cc699292d0d91d99",
-      name: "Jhon Doe",
-      employeeId: "OP 1072",
-      phoneNumber: "+1234567890",
-      email: "john@example.com",
-      secondaryEmail: null,
-      role: "EMPLOYEE",
-      department: "OPERATIONS",
-      designation: "FULL STACK DEVELOPER",
-      isBlocked: false,
-      employmentStatus: true,
-      resignedDates: [],
-      reJoiningDates: [],
-      createdAt: "2026-02-21T01:54:00.517Z",
-      updatedAt: "2026-02-24T08:50:55.114Z",
-      avatar: "uploads/avatars/1771659362765-393732606.webp",
-      weekEndOff: ["SUNDAY", "SATURDAY"],
-    },
-  })
-  declare data: any;
-}
-
-export class WeekendExchangeSuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: "Weekend exchange successful" })
-  declare message: string;
-
-  @ApiProperty({ example: Methods.PATCH })
-  declare method: Methods.PATCH;
-
-  @ApiProperty({ example: "api/attendance/weekend-exchange/:userId" })
-  declare endpoint: string;
-
-  @ApiProperty({
-    example: {
-      _id: "69991038cc699292d0d91d99",
-      name: "Jhon Doe",
-      employeeId: "OP 1072",
-      phoneNumber: "+1234567890",
-      email: "john@example.com",
-      secondaryEmail: null,
-      role: "EMPLOYEE",
-      department: "OPERATIONS",
-      designation: "FULL STACK DEVELOPER",
-      isBlocked: false,
-      employmentStatus: true,
-      resignedDates: [],
-      reJoiningDates: [],
-      createdAt: "2026-02-21T01:54:00.517Z",
-      updatedAt: "2026-02-24T08:50:55.114Z",
-      avatar: "uploads/avatars/1771659362765-393732606.webp",
-      weekEndOff: ["SUNDAY", "SATURDAY"],
-    },
-  })
-  declare data: any;
-}
-
-export class MarkAttendanceAsAuthoritySuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: "Attendance marked by authority" })
-  declare message: string;
-
-  @ApiProperty({ example: Methods.PATCH })
-  declare method: Methods.PATCH;
-
-  @ApiProperty({
-    example: "api/attendance/mark-attendance-by-authority/:userId",
-  })
+  @ApiProperty({ example: "api/leave/user-specific/:userId" })
   declare endpoint: string;
 
   @ApiProperty({
     example: [
       {
-        user: "6996d5319754977e5498ebaf",
-        checkInTime: "2026-02-23T09:05:00.000Z",
-        checkOutTime: "2026-02-23T17:00:00.000Z",
-        date: "2026-02-23T00:00:00.000Z",
-        inType: "PRESENT",
-        shiftType: "DAY",
-        isLate: false,
-        _id: "6996d5319754977e5498ebc1",
-        createdAt: "2026-02-23T09:05:00.000Z",
-        updatedAt: "2026-02-23T17:00:00.000Z",
+        _id: "699065646c98dffa195f7d7e",
+        user: "698ffc1ef75d367cc3e9d955",
+        type: LeaveType.CASUAL_LEAVE,
+        startDate: "2026-02-20T00:00:00.000Z",
+        endDate: "2026-02-22T00:00:00.000Z",
+        isApproved: null,
+        isRejected: null,
+        approvedBy: null,
+        rejectedBy: null,
+        createdAt: "2026-02-14T12:07:00.986Z",
+        updatedAt: "2026-02-14T12:07:00.986Z",
       },
     ],
   })
   declare data: any[];
 }
 
-export class MarkWeekendExchangeByAuthoritySuccessDto extends SuccessResponseDto<any> {
-  @ApiProperty({ example: "Weekend exchange marked by authority" })
+export class SpecificLeaveRequestSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Leave request retrieved successfully" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.GET })
+  declare method: Methods.GET;
+
+  @ApiProperty({ example: "api/leave/specific/:id" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    example: {
+      _id: "699065646c98dffa195f7d7e",
+      user: "698ffc1ef75d367cc3e9d955",
+      type: LeaveType.CASUAL_LEAVE,
+      startDate: "2026-02-20T00:00:00.000Z",
+      endDate: "2026-02-22T00:00:00.000Z",
+      isApproved: null,
+      isRejected: null,
+      approvedBy: null,
+      rejectedBy: null,
+      createdAt: "2026-02-14T12:07:00.986Z",
+      updatedAt: "2026-02-14T12:07:00.986Z",
+    },
+  })
+  declare data: any;
+}
+
+export class LeaveRequestApprovalSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Leave request approved successfully" })
   declare message: string;
 
   @ApiProperty({ example: Methods.PATCH })
   declare method: Methods.PATCH;
 
-  @ApiProperty({
-    example: "api/attendance/weekend-exchange-by-authority/:userId",
-  })
+  @ApiProperty({ example: "api/leave/approve/:id" })
   declare endpoint: string;
 
   @ApiProperty({
     example: {
-      _id: "69991038cc699292d0d91d99",
-      user: "6996d5319754977e5498ebaf",
-      originalWeekend: "2026-02-28T00:00:00.000Z",
-      newWeekend: "2026-02-27T00:00:00.000Z",
-      createdAt: "2026-02-24T10:00:00.000Z",
-      updatedAt: "2026-02-24T10:00:00.000Z",
+      _id: "699065646c98dffa195f7d7e",
+      user: "698ffc1ef75d367cc3e9d955",
+      type: LeaveType.CASUAL_LEAVE,
+      startDate: "2026-02-20T00:00:00.000Z",
+      endDate: "2026-02-22T00:00:00.000Z",
+      isApproved: true,
+      isRejected: false,
+      approvedBy: "698ffc1ef75d367cc3e9d955",
+      rejectedBy: null,
+      createdAt: "2026-02-14T12:07:00.986Z",
+      updatedAt: "2026-02-14T12:07:00.986Z",
     },
   })
   declare data: any;
 }
- */
+
+export class LeaveRequestRejectionSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Leave request rejected successfully" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/leave/reject/:id" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    example: {
+      _id: "699065646c98dffa195f7d7e",
+      user: "698ffc1ef75d367cc3e9d955",
+      type: LeaveType.CASUAL_LEAVE,
+      startDate: "2026-02-20T00:00:00.000Z",
+      endDate: "2026-02-22T00:00:00.000Z",
+      isApproved: false,
+      isRejected: true,
+      approvedBy: null,
+      rejectedBy: "698ffc1ef75d367cc3e9d955",
+      createdAt: "2026-02-14T12:07:00.986Z",
+      updatedAt: "2026-02-14T12:07:00.986Z",
+    },
+  })
+  declare data: any;
+}

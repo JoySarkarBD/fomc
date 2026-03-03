@@ -31,12 +31,54 @@ import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { LeaveRequestForbiddenDto } from "./dto/error/leave-forbidden.dto";
-import { LeaveRequestInternalErrorDto } from "./dto/error/leave-internal-error.dto";
-import { LeaveRequestNotFoundDto } from "./dto/error/leave-not-found.dto";
-import { LeaveRequestUnauthorizedDto } from "./dto/error/leave-unauthorized.dto";
-import { LeaveRequestValidationErrorDto } from "./dto/error/leave-validation.dto";
-import { LeaveRequestSuccessDto } from "./dto/success/leave-success.dto";
+import {
+  LeaveRequestApprovalForbiddenDto,
+  LeaveRequestForbiddenDto,
+  LeaveRequestRejectionForbiddenDto,
+  MyLeaveForbiddenDto,
+  SpecificLeaveRequestForbiddenDto,
+  UserSpecificLeaveForbiddenDto,
+} from "./dto/error/leave-forbidden.dto";
+import {
+  LeaveRequestApprovalInternalErrorDto,
+  LeaveRequestInternalErrorDto,
+  LeaveRequestRejectionInternalErrorDto,
+  MyLeaveInternalErrorDto,
+  SpecificLeaveRequestInternalErrorDto,
+  UserSpecificLeaveInternalErrorDto,
+} from "./dto/error/leave-internal-error.dto";
+import {
+  LeaveRequestApprovalNotFoundDto,
+  LeaveRequestNotFoundDto,
+  LeaveRequestRejectionNotFoundDto,
+  MyLeaveNotFoundDto,
+  SpecificLeaveRequestNotFoundDto,
+  UserSpecificLeaveNotFoundDto,
+} from "./dto/error/leave-not-found.dto";
+import {
+  LeaveRequestApprovalUnauthorizedDto,
+  LeaveRequestRejectionUnauthorizedDto,
+  LeaveRequestUnauthorizedDto,
+  MyLeaveUnauthorizedDto,
+  SpecificLeaveRequestUnauthorizedDto,
+  UserSpecificLeaveUnauthorizedDto,
+} from "./dto/error/leave-unauthorized.dto";
+import {
+  LeaveRequestApprovalValidationErrorDto,
+  LeaveRequestRejectionValidationErrorDto,
+  LeaveRequestValidationErrorDto,
+  MyLeaveValidationErrorDto,
+  SpecificLeaveRequestValidationErrorDto,
+  UserSpecificLeaveValidationErrorDto,
+} from "./dto/error/leave-validation.dto";
+import {
+  LeaveRequestApprovalSuccessDto,
+  LeaveRequestRejectionSuccessDto,
+  LeaveRequestSuccessDto,
+  MyLeavesSuccessDto,
+  SpecificLeaveRequestSuccessDto,
+  UserSpecificLeaveSuccessDto,
+} from "./dto/success/leave-success.dto";
 import { LeaveService } from "./leave.service";
 
 @ApiTags("Leave Management")
@@ -79,6 +121,14 @@ export class LeaveController {
     description: "Bearer token",
     required: true,
   })
+  @ApiSuccessResponse(MyLeavesSuccessDto)
+  @ApiErrorResponses({
+    validation: MyLeaveValidationErrorDto,
+    unauthorized: MyLeaveUnauthorizedDto,
+    forbidden: MyLeaveForbiddenDto,
+    notFound: MyLeaveNotFoundDto,
+    internal: MyLeaveInternalErrorDto,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get("my-leaves")
   async getMyLeaves(@GetUser() user: AuthUser, @Query() query: GetLeaveDto) {
@@ -95,6 +145,14 @@ export class LeaveController {
     description: "Bearer token",
     required: true,
   })
+  @ApiSuccessResponse(UserSpecificLeaveSuccessDto)
+  @ApiErrorResponses({
+    validation: UserSpecificLeaveValidationErrorDto,
+    unauthorized: UserSpecificLeaveUnauthorizedDto,
+    forbidden: UserSpecificLeaveForbiddenDto,
+    notFound: UserSpecificLeaveNotFoundDto,
+    internal: UserSpecificLeaveInternalErrorDto,
+  })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get("user-specific/:userId")
   async getUserSpecificLeaves(
@@ -106,6 +164,14 @@ export class LeaveController {
 
   @ApiOperation({ summary: "Retrieve a specific leave request by ID" })
   @ApiBearerAuth("Authorization")
+  @ApiSuccessResponse(SpecificLeaveRequestSuccessDto)
+  @ApiErrorResponses({
+    validation: SpecificLeaveRequestValidationErrorDto,
+    unauthorized: SpecificLeaveRequestUnauthorizedDto,
+    forbidden: SpecificLeaveRequestForbiddenDto,
+    notFound: SpecificLeaveRequestNotFoundDto,
+    internal: SpecificLeaveRequestInternalErrorDto,
+  })
   @ApiHeader({
     name: "Authorization",
     description: "Bearer token",
@@ -123,6 +189,14 @@ export class LeaveController {
     name: "Authorization",
     description: "Bearer token",
     required: true,
+  })
+  @ApiSuccessResponse(LeaveRequestApprovalSuccessDto)
+  @ApiErrorResponses({
+    validation: LeaveRequestApprovalValidationErrorDto,
+    unauthorized: LeaveRequestApprovalUnauthorizedDto,
+    forbidden: LeaveRequestApprovalForbiddenDto,
+    notFound: LeaveRequestApprovalNotFoundDto,
+    internal: LeaveRequestApprovalInternalErrorDto,
   })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch("approve/:id")
@@ -142,6 +216,14 @@ export class LeaveController {
     name: "Authorization",
     description: "Bearer token",
     required: true,
+  })
+  @ApiSuccessResponse(LeaveRequestRejectionSuccessDto)
+  @ApiErrorResponses({
+    validation: LeaveRequestRejectionValidationErrorDto,
+    unauthorized: LeaveRequestRejectionUnauthorizedDto,
+    forbidden: LeaveRequestRejectionForbiddenDto,
+    notFound: LeaveRequestRejectionNotFoundDto,
+    internal: LeaveRequestRejectionInternalErrorDto,
   })
   @Roles("SUPER ADMIN", "HR", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch("reject/:id")
