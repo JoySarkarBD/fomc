@@ -87,6 +87,14 @@ import { LeaveService } from "./leave.service";
 export class LeaveController {
   constructor(private readonly leaveService: LeaveService) {}
 
+  /**
+   * Create a new leave request.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param user - The authenticated user making the request.
+   * @param data - The leave request data.
+   * @returns The created leave request details.
+   */
   @ApiOperation({ summary: "Create a new leave request" })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
@@ -114,6 +122,14 @@ export class LeaveController {
     );
   }
 
+  /**
+   * Retrieve the authenticated user's leave records, optionally filtered by year.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param user - The authenticated user making the request.
+   * @param query - Optional query parameters for filtering leave records (e.g., by year).
+   * @returns An array of the user's leave records matching the query criteria.
+   */
   @ApiOperation({ summary: "Retrieve user-specific leaves" })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
@@ -138,6 +154,14 @@ export class LeaveController {
     );
   }
 
+  /**
+   * Retrieve leave records for a specific user, optionally filtered by year.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param params - The parameters containing the user ID for whom to retrieve leave records.
+   * @param query - Optional query parameters for filtering leave records (e.g., by year).
+   * @returns An array of leave records for the specified user matching the query criteria.
+   */
   @ApiOperation({ summary: "Retrieve a specific leave request by ID" })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
@@ -162,6 +186,14 @@ export class LeaveController {
     return await this.leaveService.getUserSpecificLeaves(params.userId, query);
   }
 
+  /**
+   * Retrieve a specific leave request by its ID.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param params - The parameters containing the leave request ID to retrieve.
+   * @returns The details of the specified leave request if found.
+   * @throws NotFoundException if the leave request with the given ID does not exist.
+   */
   @ApiOperation({ summary: "Retrieve a specific leave request by ID" })
   @ApiBearerAuth("Authorization")
   @ApiSuccessResponse(SpecificLeaveRequestSuccessDto)
@@ -183,6 +215,15 @@ export class LeaveController {
     return await this.leaveService.getLeaveById(params.id);
   }
 
+  /**
+   * Approve a leave request by its ID.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param params - The parameters containing the leave request ID to approve.
+   * @param user - The authenticated user performing the approval action.
+   * @returns The details of the approved leave request.
+   * @throws NotFoundException if the leave request with the given ID does not exist.
+   */
   @ApiOperation({ summary: "Approve a leave request" })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
@@ -210,6 +251,14 @@ export class LeaveController {
     );
   }
 
+  /**
+   * Reject a leave request by its ID.
+   *
+   * @guards JwtAuthGuard, RolesGuard
+   * @param params - The parameters containing the leave request ID to reject.
+   * @param user - The authenticated user performing the rejection action.
+   * @return The details of the rejected leave request.
+   */
   @ApiOperation({ summary: "Reject a leave request" })
   @ApiBearerAuth("Authorization")
   @ApiHeader({
