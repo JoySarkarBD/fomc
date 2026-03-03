@@ -46,7 +46,7 @@ export class SellsShiftManagementController {
       userId: UserIdDto["userId"];
       createSellsShiftManagementDto: CreateSellsShiftManagementDto;
     },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.createForUser(
       payload.assignedBy,
       payload.userId,
@@ -69,7 +69,7 @@ export class SellsShiftManagementController {
       userId: UserIdDto["userId"];
       query: GetSellsShiftDto;
     },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.findShiftForUser(
       payload.userId,
       payload.query,
@@ -91,7 +91,7 @@ export class SellsShiftManagementController {
       userId: UserIdDto["userId"];
       requestShiftExchangeDto: RequestShiftExchangeDto;
     },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.requestShiftExchange(
       payload.userId,
       payload.requestShiftExchangeDto,
@@ -113,7 +113,7 @@ export class SellsShiftManagementController {
       exchangeId: ExchangeIdDto["exchangeId"];
       approvedBy: ApprovedByDto["approvedBy"];
     },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.approveShiftExchange(
       payload.exchangeId,
       payload.approvedBy,
@@ -136,7 +136,7 @@ export class SellsShiftManagementController {
       approvedBy: ApprovedByDto["approvedBy"];
       reason?: string;
     },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.rejectShiftExchange(
       payload.exchangeId,
       payload.approvedBy,
@@ -155,7 +155,7 @@ export class SellsShiftManagementController {
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_USER_SHIFT_EXCHANGES)
   async getUserShiftExchanges(
     @Payload() payload: { userId: UserIdDto["userId"] },
-  ) {
+  ): Promise<any> {
     return await this.sellsShiftManagementService.getUserShiftExchanges(
       payload.userId,
     );
@@ -169,7 +169,7 @@ export class SellsShiftManagementController {
    * @returns {Promise<any>} The pending shift exchanges that require approval.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.GET_PENDING_SHIFT_EXCHANGES)
-  async getPendingShiftExchanges() {
+  async getPendingShiftExchanges(): Promise<any> {
     return await this.sellsShiftManagementService.getPendingShiftExchanges();
   }
 
@@ -186,7 +186,7 @@ export class SellsShiftManagementController {
     userId: UserIdDto["userId"];
     weekEndOff: WeekEndOff;
     today: Date;
-  }) {
+  }): Promise<any> {
     return await this.sellsShiftManagementService.updateUserWeekend(
       payload.userId,
       payload.weekEndOff,

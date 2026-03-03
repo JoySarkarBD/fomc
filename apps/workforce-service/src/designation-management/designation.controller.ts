@@ -26,11 +26,14 @@ export class DesignationController {
    * Create a new designation.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.CREATE_DESIGNATION }
+   *
    * @param {CreateDesignationDto} createDesignationDto - The data transfer object containing the details of the designation to be created.
    * @returns {Promise<any>} Newly created designation.
    */
   @MessagePattern(DESIGNATION_COMMANDS.CREATE_DESIGNATION)
-  async create(@Payload() createDesignationDto: CreateDesignationDto) {
+  async create(
+    @Payload() createDesignationDto: CreateDesignationDto,
+  ): Promise<any> {
     return await this.designationService.createDesignation(
       createDesignationDto,
     );
@@ -40,6 +43,7 @@ export class DesignationController {
    * Retrieve all designations based on the provided search query parameters.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.GET_DESIGNATIONS }
+   *
    * @param {SearchQueryDto} query - The search query parameters for filtering and pagination.
    * @returns {Promise<any>} List of designations matching the search criteria.
    */
@@ -52,6 +56,7 @@ export class DesignationController {
    * Retrieve a single designation by ID.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.GET_DESIGNATION }
+   *
    * @param {MongoIdDto} payload - Object containing the designation ID.
    * @returns {Promise<any>} Designation details.
    */
@@ -64,6 +69,7 @@ export class DesignationController {
    * Update an existing designation by ID.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.UPDATE_DESIGNATION }
+   *
    * @param {Object} payload - Object containing the designation ID and the data to update.
    * @param {string} payload.id - The ID of the designation to be updated.
    * @param {UpdateDesignationDto} payload.data - The data transfer object containing the updated designation information.
@@ -82,6 +88,7 @@ export class DesignationController {
    * Delete a designation by ID.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.DELETE_DESIGNATION }
+   *
    * @param {MongoIdDto} payload - Object containing the designation ID to be deleted.
    * @returns {Promise<any>} Result of the delete operation.
    */
@@ -96,6 +103,7 @@ export class DesignationController {
    * Delete a designation by ID.
    *
    * Message Pattern: { cmd: DESIGNATION_COMMANDS.DELETE_DESIGNATION }
+   *
    * @param {MongoIdDto} payload - Object containing the designation ID to be deleted.
    * @returns {Promise<any>} Result of the delete operation.
    */

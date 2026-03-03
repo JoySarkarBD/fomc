@@ -25,8 +25,12 @@ export class NotificationController {
    * @returns The created notification document.
    */
   @MessagePattern(NOTIFICATION_COMMANDS.CREATE_NOTIFICATION)
-  createNotification(@Payload() createNotification: CreateNotificationDto) {
-    return this.notificationService.createNotification(createNotification);
+  async createNotification(
+    @Payload() createNotification: CreateNotificationDto,
+  ) {
+    return await this.notificationService.createNotification(
+      createNotification,
+    );
   }
 
   /**
@@ -38,8 +42,8 @@ export class NotificationController {
    * @returns An array of notification documents for the specified user.
    */
   @MessagePattern(NOTIFICATION_COMMANDS.GET_USER_NOTIFICATIONS)
-  getUserNotifications(data: any) {
-    return this.notificationService.getUserNotifications(data);
+  async getUserNotifications(data: any): Promise<any> {
+    return await this.notificationService.getUserNotifications(data);
   }
 
   /**
@@ -51,8 +55,8 @@ export class NotificationController {
    * @returns The updated notification document with isRead set to true.
    */
   @MessagePattern(NOTIFICATION_COMMANDS.MARK_AS_READ)
-  markAsRead(data: any) {
-    return this.notificationService.markAsRead(data);
+  async markAsRead(data: any): Promise<any> {
+    return await this.notificationService.markAsRead(data);
   }
 
   /**
@@ -64,7 +68,7 @@ export class NotificationController {
    * @returns The updated notification document with isRead set to false.
    */
   @MessagePattern(NOTIFICATION_COMMANDS.MARK_AS_UNREAD)
-  markAsUnread(data: any) {
-    return this.notificationService.markAsUnread(data);
+  async markAsUnread(data: any): Promise<any> {
+    return await this.notificationService.markAsUnread(data);
   }
 }

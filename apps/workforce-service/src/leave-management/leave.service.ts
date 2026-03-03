@@ -16,7 +16,6 @@ import {
   RejectedByDto,
   UserIdDto,
 } from "@shared/dto/mongo-id.dto";
-import { AuthUser } from "@shared/interfaces/auth-user.interface";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
 import { Leave } from "../schemas/leave.schema";
@@ -42,9 +41,10 @@ export class LeaveService {
    * - If the user details are successfully retrieved and the leave request is valid, it creates a new leave document in the database and saves it.
    * - The method handles potential exceptions that may arise during the process, such as issues with fetching user details or database operations, and returns appropriate error messages.
    */
-  async createLeaveRequest(user: AuthUser, leaveRequestDto: LeaveRequestDto) {
-    const userId = (user.id ?? user._id) as string;
-
+  async createLeaveRequest(
+    userId: UserIdDto["userId"],
+    leaveRequestDto: LeaveRequestDto,
+  ) {
     // Fetch user details
     const userDoc = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, { id: userId }),
@@ -137,7 +137,7 @@ export class LeaveService {
    * @return A promise that resolves to the leave document matching the specified ID, or null if no such document exists.
    * @remarks This method performs a simple database query to find a leave document by its ID. It uses the Mongoose `findById` method to retrieve the document and returns it as a promise. If no document with the specified ID exists, it will return null.
    */
-  async getLeaveById(id: MongoIdDto["id"]) {
+  async getLeaveRequestById(id: MongoIdDto["id"]) {
     return await this.leaveModel.findById(id).exec();
   }
 
@@ -155,7 +155,7 @@ export class LeaveService {
    * - If the leave request is already approved, it returns an error message indicating that the leave request is already approved.
    * - If the leave request is found and is not already approved, it updates the leave document to mark it as approved and associates it with the approver's ID, then saves the updated document and returns it.
    */
-  async approveLeaveRequest(
+  async approveLeaveRequestByAuthority(
     id: MongoIdDto["id"],
     approvedBy: ApprovedByDto["approvedBy"],
   ) {
@@ -204,7 +204,7 @@ export class LeaveService {
    * - If the leave request is already approved, it returns an error message indicating that the leave request cannot be rejected because it is already approved.
    * - If the leave request is found and is not already approved, it updates the leave document to mark it as rejected, associating it with the rejectedBy ID, then saves the updated document and returns it.
    */
-  async rejectLeaveRequest(
+  async rejectLeaveRequestByAuthority(
     id: MongoIdDto["id"],
     rejectedBy: RejectedByDto["rejectedBy"],
   ) {

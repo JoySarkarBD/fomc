@@ -16,27 +16,27 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @MessagePattern(TASK_COMMANDS.CREATE_TASK)
-  create(@Payload() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  async create(@Payload() createTaskDto: CreateTaskDto): Promise<any> {
+    return await this.taskService.create(createTaskDto);
   }
 
   @MessagePattern(TASK_COMMANDS.GET_TASKS)
-  findAll() {
-    return this.taskService.findAll();
+  async findAll(): Promise<any> {
+    return await this.taskService.findAll();
   }
 
   @MessagePattern(TASK_COMMANDS.GET_TASK)
-  findOne(@Payload() id: number) {
-    return this.taskService.findOne(id);
+  async findOne(@Payload() id: number): Promise<any> {
+    return await this.taskService.findOne(id);
   }
 
   @MessagePattern(TASK_COMMANDS.UPDATE_TASK)
-  update(@Payload() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(updateTaskDto.id, updateTaskDto);
+  async update(@Payload() updateTaskDto: UpdateTaskDto): Promise<any> {
+    return await this.taskService.update(updateTaskDto.id, updateTaskDto);
   }
 
   @MessagePattern(TASK_COMMANDS.DELETE_TASK)
-  remove(@Payload() id: number) {
-    return this.taskService.remove(id);
+  async remove(@Payload() id: number): Promise<any> {
+    return await this.taskService.remove(id);
   }
 }

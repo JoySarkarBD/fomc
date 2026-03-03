@@ -40,8 +40,8 @@ export class AttendanceController {
    * @returns {Promise<any>} Result of the attendance marking process.
    */
   @MessagePattern(ATTENDANCE_COMMANDS.PRESENT_ATTENDANCE)
-  presentAttendance(payload: AuthUser) {
-    return this.attendanceService.presentAttendance(payload);
+  async presentAttendance(payload: AuthUser): Promise<any> {
+    return await this.attendanceService.presentAttendance(payload);
   }
 
   /**
@@ -53,7 +53,7 @@ export class AttendanceController {
    * @returns {Promise<any>} Result of the out attendance marking process.
    */
   @MessagePattern(ATTENDANCE_COMMANDS.OUT_ATTENDANCE)
-  async outAttendance(payload: AuthUser) {
+  async outAttendance(payload: AuthUser): Promise<any> {
     return await this.attendanceService.outAttendance(payload);
   }
 
@@ -67,8 +67,14 @@ export class AttendanceController {
    * @returns {Promise<any>} The attendance records matching the specified criteria or an error message if the retrieval fails.
    */
   @MessagePattern(ATTENDANCE_COMMANDS.GET_MY_ATTENDANCE)
-  getMyAttendance(payload: { user: AuthUser; query: GetAttendanceDto }) {
-    return this.attendanceService.getMyAttendance(payload.user, payload.query);
+  async getMyAttendance(payload: {
+    user: AuthUser;
+    query: GetAttendanceDto;
+  }): Promise<any> {
+    return await this.attendanceService.getMyAttendance(
+      payload.user,
+      payload.query,
+    );
   }
 
   /**
@@ -85,7 +91,7 @@ export class AttendanceController {
   async getSpecificUserAttendance(payload: {
     userId: UserIdDto["userId"];
     query: GetAttendanceDto;
-  }) {
+  }): Promise<any> {
     return await this.attendanceService.getSpecificUserAttendance(
       payload.userId,
       payload.query,
@@ -106,7 +112,7 @@ export class AttendanceController {
   async markAttendanceAsAuthority(payload: {
     userId: UserIdDto["userId"];
     attendanceDetails: AttendanceByAuthorityDto;
-  }) {
+  }): Promise<any> {
     return await this.attendanceService.markAttendanceAsAuthority(
       payload.userId,
       payload.attendanceDetails,
@@ -127,7 +133,7 @@ export class AttendanceController {
   async weekendExchangeByAuthority(payload: {
     userId: UserIdDto["userId"];
     weekEndExchange: WeekendExchangeByAuthorityDto;
-  }) {
+  }): Promise<any> {
     return await this.attendanceService.weekendExchangeByAuthority(
       payload.userId,
       payload.weekEndExchange,

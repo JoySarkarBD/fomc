@@ -31,7 +31,7 @@ export class UserController {
    * @returns {Promise<any>} List of users.
    */
   @MessagePattern(USER_COMMANDS.GET_USERS)
-  async getUsers(payload: UserSearchQueryDto) {
+  async getUsers(payload: UserSearchQueryDto): Promise<any> {
     return await this.userService.getUsers(payload);
   }
 
@@ -44,7 +44,7 @@ export class UserController {
   @MessagePattern(USER_COMMANDS.GET_ADMIN_AND_SELLS_PROJECT_MANAGER_USER)
   async getAdminAndSellsProjectManagerUser(
     salesDeptId: SalesDeptIdDto["salesDeptId"],
-  ) {
+  ): Promise<any> {
     return await this.userService.getAdminAndSellsProjectManagerUser(
       salesDeptId,
     );
@@ -59,7 +59,7 @@ export class UserController {
    * @returns {Promise<any>} User details.
    */
   @MessagePattern(USER_COMMANDS.GET_USER)
-  async getUser(payload: { id: MongoIdDto["id"] }) {
+  async getUser(payload: { id: MongoIdDto["id"] }): Promise<any> {
     return await this.userService.getUser(payload.id);
   }
 
@@ -72,7 +72,7 @@ export class UserController {
    * @returns {Promise<any>} Newly created user.
    */
   @MessagePattern(USER_COMMANDS.CREATE_USER)
-  async createUser(data: CreateUserDto) {
+  async createUser(data: CreateUserDto): Promise<any> {
     return await this.userService.createUser(data);
   }
 
@@ -85,7 +85,7 @@ export class UserController {
   //  * @returns {Promise<any>} Updated user data.
   //  */
   // @MessagePattern(USER_COMMANDS.UPDATE_USER)
-  // async updateUser(data: UpdateUserMessageDto) {
+  // async updateUser(data: UpdateUserMessageDto): Promise<any> {
   //   const { id, ...payload } = data;
   //   return await this.userService.updateUser(id, payload);
   // }
@@ -99,7 +99,7 @@ export class UserController {
   //  * @returns {Promise<any>} Deletion result.
   //  */
   // @MessagePattern(USER_COMMANDS.DELETE_USER)
-  // async deleteUser(id: MongoIdDto["id"]) {
+  // async deleteUser(id: MongoIdDto["id"]): Promise<any> {
   //   return await this.userService.deleteUser(id);
   // }
 
@@ -108,7 +108,7 @@ export class UserController {
    * Message Pattern: { cmd: USER_COMMANDS.FIND_BY_EMAIL }
    */
   @MessagePattern(USER_COMMANDS.FIND_BY_EMAIL)
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<any> {
     return await this.userService.findByEmail(email);
   }
 
@@ -128,7 +128,7 @@ export class UserController {
     email: string;
     otp: string;
     expiry: string;
-  }) {
+  }): Promise<any> {
     const { email, otp, expiry } = payload;
     return await this.userService.setResetPasswordOtp(
       email,
@@ -148,7 +148,10 @@ export class UserController {
    * @returns {Promise<any>} Result of the password reset operation, typically indicating success or failure.
    */
   @MessagePattern(USER_COMMANDS.RESET_PASSWORD)
-  async resetPassword(payload: { otp: string; newPassword: string }) {
+  async resetPassword(payload: {
+    otp: string;
+    newPassword: string;
+  }): Promise<any> {
     return await this.userService.resetPassword(
       payload.otp,
       payload.newPassword,
@@ -169,7 +172,7 @@ export class UserController {
     id: MongoIdDto["id"];
     currentPassword: string;
     newPassword: string;
-  }) {
+  }): Promise<any> {
     const { id, currentPassword, newPassword } = payload;
     return await this.userService.changePassword(
       id,
@@ -186,7 +189,9 @@ export class UserController {
    * @returns {Promise<number>} Count of users with the specified designation.
    */
   @MessagePattern(USER_COMMANDS.GET_USERS_COUNT_BY_DESIGNATION)
-  async getUsersCountByDesignation(designationId: MongoIdDto["id"]) {
+  async getUsersCountByDesignation(
+    designationId: MongoIdDto["id"],
+  ): Promise<any> {
     return await this.userService.getUsersCountByDesignation(designationId);
   }
 
@@ -199,7 +204,9 @@ export class UserController {
    * @returns {Promise<number>} Count of users in the specified department.
    */
   @MessagePattern(USER_COMMANDS.GET_USERS_COUNT_BY_DEPARTMENT)
-  async getUsersCountByDepartment(departmentId: MongoIdDto["id"]) {
+  async getUsersCountByDepartment(
+    departmentId: MongoIdDto["id"],
+  ): Promise<any> {
     return await this.userService.getUsersCountByDepartment(departmentId);
   }
 
@@ -217,7 +224,7 @@ export class UserController {
   async updateUserProfile(payload: {
     id: MongoIdDto["id"];
     data: UpdateUserProfileDto;
-  }) {
+  }): Promise<any> {
     return await this.userService.updateUserProfile(payload.id, payload.data);
   }
 
@@ -235,7 +242,7 @@ export class UserController {
   async updateWeekendOff(payload: {
     userId: UserIdDto["userId"];
     weekEndOff: WeekEndOff;
-  }) {
+  }): Promise<any> {
     return await this.userService.updateWeekendOff(
       payload.userId,
       payload.weekEndOff,
