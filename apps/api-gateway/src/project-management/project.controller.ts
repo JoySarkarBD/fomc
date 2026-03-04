@@ -22,51 +22,21 @@ import {
 } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
+import {
+  CreateClientDto,
+  UpdateClientDto,
+} from "apps/workforce-service/src/project-management/dto/client.dto";
 import { CreateProjectDto } from "apps/workforce-service/src/project-management/dto/create-project.dto";
+import {
+  CreateProfileDto,
+  UpdateProfileDto,
+} from "apps/workforce-service/src/project-management/dto/profile.dto";
 import { UpdateProjectDto } from "apps/workforce-service/src/project-management/dto/update-project.dto";
+import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { ProjectService } from "./project.service";
-import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
-import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
-import {
-  ClientCreateSuccessDto,
-  ClientDeleteSuccessDto,
-  ClientListSuccessDto,
-  ClientUpdateSuccessDto,
-  ProfileCreateSuccessDto,
-  ProfileDeleteSuccessDto,
-  ProfileListSuccessDto,
-  ProfileUpdateSuccessDto,
-  ProjectByIdSuccessDto,
-  ProjectCreateSuccessDto,
-  ProjectDeleteSuccessDto,
-  ProjectListSuccessDto,
-  ProjectUpdateSuccessDto,
-} from "./dto/success/project-success.dto";
-import {
-  ClientCreateValidationDto,
-  ClientDeleteValidationDto,
-  ClientUpdateValidationDto,
-  ProfileCreateValidationDto,
-  ProfileDeleteValidationDto,
-  ProfileUpdateValidationDto,
-  ProjectByIdValidationDto,
-  ProjectCreateValidationDto,
-  ProjectDeleteValidationDto,
-  ProjectListValidationDto,
-  ProjectUpdateValidationDto,
-} from "./dto/error/project-validation.dto";
-import {
-  ClientDeleteNotFoundDto,
-  ClientUpdateNotFoundDto,
-  ProfileDeleteNotFoundDto,
-  ProfileUpdateNotFoundDto,
-  ProjectByIdNotFoundDto,
-  ProjectDeleteNotFoundDto,
-  ProjectUpdateNotFoundDto,
-} from "./dto/error/project-not-found.dto";
 import {
   ClientCreateForbiddenDto,
   ClientDeleteForbiddenDto,
@@ -98,6 +68,15 @@ import {
   ProjectUpdateInternalErrorDto,
 } from "./dto/error/project-internal-error.dto";
 import {
+  ClientDeleteNotFoundDto,
+  ClientUpdateNotFoundDto,
+  ProfileDeleteNotFoundDto,
+  ProfileUpdateNotFoundDto,
+  ProjectByIdNotFoundDto,
+  ProjectDeleteNotFoundDto,
+  ProjectUpdateNotFoundDto,
+} from "./dto/error/project-not-found.dto";
+import {
   ClientCreateUnauthorizedDto,
   ClientDeleteUnauthorizedDto,
   ClientListUnauthorizedDto,
@@ -112,8 +91,35 @@ import {
   ProjectListUnauthorizedDto,
   ProjectUpdateUnauthorizedDto,
 } from "./dto/error/project-unauthorized.dto";
-import { CreateClientDto, UpdateClientDto } from "apps/workforce-service/src/project-management/dto/client.dto";
-import { CreateProfileDto, UpdateProfileDto } from "apps/workforce-service/src/project-management/dto/profile.dto";
+import {
+  ClientCreateValidationDto,
+  ClientDeleteValidationDto,
+  ClientUpdateValidationDto,
+  ProfileCreateValidationDto,
+  ProfileDeleteValidationDto,
+  ProfileUpdateValidationDto,
+  ProjectByIdValidationDto,
+  ProjectCreateValidationDto,
+  ProjectDeleteValidationDto,
+  ProjectListValidationDto,
+  ProjectUpdateValidationDto,
+} from "./dto/error/project-validation.dto";
+import {
+  ClientCreateSuccessDto,
+  ClientDeleteSuccessDto,
+  ClientListSuccessDto,
+  ClientUpdateSuccessDto,
+  ProfileCreateSuccessDto,
+  ProfileDeleteSuccessDto,
+  ProfileListSuccessDto,
+  ProfileUpdateSuccessDto,
+  ProjectByIdSuccessDto,
+  ProjectCreateSuccessDto,
+  ProjectDeleteSuccessDto,
+  ProjectListSuccessDto,
+  ProjectUpdateSuccessDto,
+} from "./dto/success/project-success.dto";
+import { ProjectService } from "./project.service";
 
 @ApiTags("Project Management")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -144,7 +150,7 @@ export class ProjectController {
     forbidden: ProjectCreateForbiddenDto,
     internal: ProjectCreateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Post()
   async create(@Body() data: CreateProjectDto) {
     return await this.projectService.createProject(data);
@@ -173,7 +179,7 @@ export class ProjectController {
     forbidden: ProjectListForbiddenDto,
     internal: ProjectListInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
   @Get()
   async findAll(@Query() query: SearchQueryDto) {
     return await this.projectService.getProjects(query);
@@ -203,7 +209,7 @@ export class ProjectController {
     notFound: ProjectByIdNotFoundDto,
     internal: ProjectByIdInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
   @Get(":id")
   async findOne(@Param() params: MongoIdDto) {
     return await this.projectService.getProject(params.id);
@@ -234,7 +240,7 @@ export class ProjectController {
     notFound: ProjectUpdateNotFoundDto,
     internal: ProjectUpdateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Patch(":id")
   async update(@Param() params: MongoIdDto, @Body() data: UpdateProjectDto) {
     return await this.projectService.updateProject(params.id, data);
@@ -264,7 +270,7 @@ export class ProjectController {
     notFound: ProjectDeleteNotFoundDto,
     internal: ProjectDeleteInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Delete(":id")
   async remove(@Param() params: MongoIdDto) {
     return await this.projectService.deleteProject(params.id);
@@ -290,7 +296,7 @@ export class ProjectController {
     forbidden: ClientCreateForbiddenDto,
     internal: ClientCreateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Post("client")
   async createClient(@Body() data: CreateClientDto) {
     return await this.projectService.createClient(data);
@@ -315,7 +321,7 @@ export class ProjectController {
     forbidden: ClientListForbiddenDto,
     internal: ClientListInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
   @Get("client")
   async getClients() {
     return await this.projectService.getClients();
@@ -342,9 +348,12 @@ export class ProjectController {
     notFound: ClientUpdateNotFoundDto,
     internal: ClientUpdateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Patch("client/:id")
-  async updateClient(@Param() params: MongoIdDto, @Body() data: UpdateClientDto) {
+  async updateClient(
+    @Param() params: MongoIdDto,
+    @Body() data: UpdateClientDto,
+  ) {
     return await this.projectService.updateClient(params.id, data);
   }
 
@@ -369,7 +378,7 @@ export class ProjectController {
     notFound: ClientDeleteNotFoundDto,
     internal: ClientDeleteInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Delete("client/:id")
   async deleteClient(@Param() params: MongoIdDto) {
     return await this.projectService.deleteClient(params.id);
@@ -395,7 +404,7 @@ export class ProjectController {
     forbidden: ProfileCreateForbiddenDto,
     internal: ProfileCreateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Post("profile")
   async createProfile(@Body() data: CreateProfileDto) {
     return await this.projectService.createProfile(data);
@@ -420,7 +429,7 @@ export class ProjectController {
     forbidden: ProfileListForbiddenDto,
     internal: ProfileListInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR", "PROJECT MANAGER", "TEAM LEADER")
+  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
   @Get("profile")
   async getProfiles() {
     return await this.projectService.getProfiles();
@@ -447,9 +456,12 @@ export class ProjectController {
     notFound: ProfileUpdateNotFoundDto,
     internal: ProfileUpdateInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Patch("profile/:id")
-  async updateProfile(@Param() params: MongoIdDto, @Body() data: UpdateProfileDto) {
+  async updateProfile(
+    @Param() params: MongoIdDto,
+    @Body() data: UpdateProfileDto,
+  ) {
     return await this.projectService.updateProfile(params.id, data);
   }
 
@@ -474,7 +486,7 @@ export class ProjectController {
     notFound: ProfileDeleteNotFoundDto,
     internal: ProfileDeleteInternalErrorDto,
   })
-  @Roles("SUPER ADMIN", "DIRECTOR")
+  @Roles("SALES")
   @Delete("profile/:id")
   async deleteProfile(@Param() params: MongoIdDto) {
     return await this.projectService.deleteProfile(params.id);

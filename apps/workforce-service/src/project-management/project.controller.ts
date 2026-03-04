@@ -1,7 +1,7 @@
 /**
  * @fileoverview Project Controller
  *
- * Microservice message pattern handlers for project management.
+ * Handles incoming messages related to project management in the Workforce microservice. Defines message patterns for creating, retrieving, updating, and deleting projects, clients, and profiles. Delegates business logic to the ProjectService.
  */
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
@@ -14,12 +14,20 @@ import { CreateProfileDto, UpdateProfileDto } from "./dto/profile.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { ProjectService } from "./project.service";
 
+/**
+ * Project Controller
+ *
+ * Handles all project-related microservice message patterns in the
+ * Workforce service. Supports CRUD operations on projects, clients, and profiles via TCP transport.
+ */
 @Controller()
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   /**
-   * Handle create_project message.
+   * Create a new project.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.CREATE_PROJECT }
    *
    * @param {CreateProjectDto} createProjectDto - The project data to be created.
    * @returns {Promise<any>}
@@ -30,7 +38,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle get_projects message.
+   * Retrieve projects message with pagination and search.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.GET_PROJECTS }
    *
    * @param {SearchQueryDto} query - Search and pagination parameters.
    * @returns {Promise<any>}
@@ -41,8 +51,11 @@ export class ProjectController {
   }
 
   /**
-   * Handle get_project message.
+   * Get project by its ID.
    *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.GET_PROJECT }
+   *
+   * @param {Object} payload - Object containing the project ID.
    * @param {Object} payload - Object containing the project ID.
    * @param {string} payload.id - The ID of the project to retrieve.
    * @returns {Promise<any>}
@@ -53,7 +66,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle update_project message.
+   * Update project by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.UPDATE_PROJECT }
    *
    * @param {UpdateProjectDto} payload - The project update data including ID.
    * @returns {Promise<any>}
@@ -66,7 +81,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle delete_project message.
+   * Delete project by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.DELETE_PROJECT }
    *
    * @param {Object} payload - Object containing the project ID.
    * @param {string} payload.id - The ID of the project to delete.
@@ -78,7 +95,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle create_client message.
+   * Create a new client.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.CREATE_CLIENT }
    *
    * @param {CreateClientDto} payload - Object containing client data.
    * @returns {Promise<any>}
@@ -89,7 +108,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle get_clients message.
+   * Get all clients.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.GET_CLIENTS }
    *
    * @returns {Promise<any>}
    */
@@ -99,7 +120,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle update_client message.
+   * Update client by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.UPDATE_CLIENT }
    *
    * @param {UpdateClientDto} payload - Object containing client ID and update data.
    * @returns {Promise<any>}
@@ -112,7 +135,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle delete_client message.
+   * Delete client by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.DELETE_CLIENT }
    *
    * @param {Object} payload - Object containing client ID.
    * @returns {Promise<any>}
@@ -123,7 +148,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle create_profile message.
+   * Create a new profile.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.CREATE_PROFILE }
    *
    * @param {CreateProfileDto} payload - Object containing profile data.
    * @returns {Promise<any>}
@@ -134,7 +161,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle get_profiles message.
+   * Get all profiles.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.GET_PROFILES }
    *
    * @returns {Promise<any>}
    */
@@ -144,7 +173,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle update_profile message.
+   * Update profile by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.UPDATE_PROFILE }
    *
    * @param {UpdateProfileDto} payload - Object containing profile ID and update data.
    * @returns {Promise<any>}
@@ -161,7 +192,9 @@ export class ProjectController {
   }
 
   /**
-   * Handle delete_profile message.
+   * Delete profile by its ID.
+   *
+   * Message Pattern: { cmd: PROJECT_COMMANDS.DELETE_PROFILE }
    *
    * @param {Object} payload - Object containing profile ID.
    * @returns {Promise<any>}
