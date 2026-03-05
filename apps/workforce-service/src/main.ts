@@ -59,6 +59,7 @@ async function bootstrap(): Promise<void> {
       transform: true,
       stopAtFirstError: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => errors,
     }),
   );
 
