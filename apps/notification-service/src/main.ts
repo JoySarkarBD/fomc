@@ -31,8 +31,8 @@ async function bootstrap(): Promise<void> {
     {
       transport: Transport.RMQ,
       options: {
-        urls: [config.RABBITMQ_URL],
-        queue: config.NOTIFICATION_QUEUE,
+        urls: [config.RABBITMQ_URL || "amqp://localhost:5672"],
+        queue: config.NOTIFICATION_QUEUE || "notification_queue",
         queueOptions: {
           durable: false,
         },
