@@ -30,13 +30,11 @@ import {
 } from "@nestjs/swagger";
 import { MongoIdDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
-import { removeFile, uploadFile } from "@shared/utils/minio.client";
+import { uploadFile } from "@shared/utils/minio.client";
 import { UpdateUserProfileDto } from "apps/user-service/src/user-management/dto/update-user-profile.dto";
 import { UserSearchQueryDto } from "apps/user-service/src/user-management/dto/user-search-query.dto";
-import * as fs from "fs";
 import type { Multer } from "multer";
 import { memoryStorage } from "multer";
-import * as path from "path";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
@@ -307,11 +305,6 @@ export class UserController {
       }
     }
 
-    // Fetch existing profile to remove old avatar if needed
-    const existingProfile = avatarFile
-      ? await this.userService.getUser(user._id! as MongoIdDto["id"])
-      : null;
-
     const updated = await this.userService.updateUserProfile(
       user._id! as MongoIdDto["id"],
       {
@@ -319,24 +312,6 @@ export class UserController {
         ...(avatarPath ? { avatar: avatarPath } : {}),
       },
     );
-
-    // Remove old avatar
-    if (
-      avatarFile &&
-      existingProfile?.data?.avatar &&
-      existingProfile.data.avatar !== avatarPath
-    ) {
-      const oldAvatar = existingProfile.data.avatar;
-      if (oldAvatar.startsWith("uploads/avatars/")) {
-        const absolutePath = path.join(
-          process.cwd(),
-          oldAvatar.replace(/^\/+/, ""),
-        );
-        if (fs.existsSync(absolutePath)) fs.unlinkSync(absolutePath);
-      } else if (oldAvatar.startsWith("minio://")) {
-        await removeFile(oldAvatar);
-      }
-    }
 
     return updated;
   }

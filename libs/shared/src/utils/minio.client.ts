@@ -70,14 +70,21 @@ export async function uploadFile(
  */
 export async function removeFile(filePath: string): Promise<void> {
   if (!filePath) return;
+
   const match = filePath.match(/^minio:\/\/([^\/]+)\/(.+)$/);
-  if (!match) return;
+  if (!match) {
+    console.warn(`removeFile: Invalid file path format: ${filePath}`);
+    return;
+  }
+
   const bucket = match[1];
   const objectName = match[2];
+
   try {
     await client.removeObject(bucket, objectName);
+    console.log(`Removed file: ${objectName} from bucket: ${bucket}`);
   } catch (err) {
-    // ignore removal errors
+    console.error(`Failed to remove file ${filePath}:`, err);
   }
 }
 
@@ -104,7 +111,7 @@ export async function getSignedUrl(
     // MinIO/Minio-js enforces a maximum expiry of 7 days (in seconds).
     const MAX_EXPIRES = 7 * 24 * 60 * 60; // 7 days in seconds
 
-    const expires = Math.min(MAX_EXPIRES);
+    const expires = Math.min(MAX_EXPIRES, expiresInSeconds || MAX_EXPIRES);
 
     if (expiresInSeconds && expiresInSeconds > MAX_EXPIRES) {
       console.warn(

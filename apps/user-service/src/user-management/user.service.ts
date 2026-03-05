@@ -14,7 +14,7 @@ import {
   UserIdDto,
 } from "@shared/dto/mongo-id.dto";
 import { convertToBDDate } from "@shared/utils/convert-to-db-date";
-import { getSignedUrl } from "@shared/utils/minio.client";
+import { getSignedUrl, removeFile } from "@shared/utils/minio.client";
 import * as bcrypt from "bcrypt";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
@@ -518,21 +518,30 @@ export class UserService {
     const update: Partial<Pick<User, "name" | "avatar">> = {};
 
     if (data.name !== undefined) update.name = data.name;
-    if (data.avatar !== undefined) update.avatar = data.avatar;
 
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, update, { new: true, runValidators: true })
-      .exec();
+    const user = await this.userModel.findById(id).exec();
 
-    if (!updatedUser) {
+    if (!user) {
       return {
         message: "User not found",
         exception: "NotFoundException",
       };
     }
 
-    const userObj = (await this.getUser(updatedUser._id.toString())) as any;
+    // Remove old avatar if a new one is provided and the user has an existing avatar
+    if (data.avatar && user.avatar) {
+      await removeFile(user.avatar);
+      update.avatar = data.avatar;
+    } else if (data.avatar) {
+      update.avatar = data.avatar;
+    }
 
+    // Update the user document in the database
+    await this.userModel
+      .findByIdAndUpdate(id, update, { new: true, runValidators: true })
+      .exec();
+
+    const userObj = (await this.getUser(user._id.toString())) as any;
     return userObj;
   }
 
