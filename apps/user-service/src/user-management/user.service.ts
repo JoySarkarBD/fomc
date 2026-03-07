@@ -10,6 +10,7 @@ import { DESIGNATION_COMMANDS } from "@shared/constants/designation-command.cons
 import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-management.constants";
 import {
   MongoIdDto,
+  MongoIdsDto,
   SalesDeptIdDto,
   UserIdDto,
 } from "@shared/dto/mongo-id.dto";
@@ -308,6 +309,82 @@ export class UserService {
     userObj.avatar = userObj.avatar ? await getSignedUrl(userObj.avatar) : null;
 
     return userObj;
+  }
+
+  /**
+   * Retrieve users by Ids (minimal implementation used by JwtStrategy).
+   * Returns a sanitized users array of object or an empty array.
+   */
+  async getUserByIds(ids: MongoIdsDto["ids"]): Promise<any[]> {
+    if (!ids?.length) return [];
+
+    const objectIds = ids.map((id) => new Types.ObjectId(id));
+
+    const users = await this.userModel
+      .find({ _id: { $in: objectIds } })
+      .populate({
+        path: "role",
+        select: "name",
+      })
+      .lean()
+      .exec();
+
+    if (!users.length) return [];
+
+    const designationIds = Array.from(
+      new Set(
+        users
+          .map((user: any) => user.designation?.toString())
+          .filter((id): id is string => Boolean(id)),
+      ),
+    );
+
+    const designationMap = new Map<string, any>();
+
+    if (designationIds.length) {
+      const designations = await firstValueFrom(
+        this.workForceClient.send(
+          DESIGNATION_COMMANDS.GET_DESIGNATIONS_BY_IDS,
+          { ids: designationIds },
+        ),
+      );
+
+      if (Array.isArray(designations)) {
+        designations.forEach((item: any) => {
+          designationMap.set(item?._id?.toString(), item);
+        });
+      }
+    }
+
+    const formattedUsers = await Promise.all(
+      users.map(async (user: any) => {
+        const designationData = user.designation
+          ? designationMap.get(user.designation.toString())
+          : null;
+
+        delete user.password;
+        delete user.otp;
+        delete user.otpExpiry;
+
+        return {
+          _id: user._id,
+          name: user.name,
+          avatar: user.avatar ? await getSignedUrl(user.avatar) : null,
+          employeeId: user.employeeId,
+          phoneNumber: user.phoneNumber,
+          email: user.email,
+          role: user.role?.name || null,
+          designation: designationData?.name || null,
+          department: designationData?.departmentId?.name || null,
+          isBlocked: user.isBlocked,
+          employmentStatus: user.employmentStatus,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        };
+      }),
+    );
+
+    return formattedUsers;
   }
 
   /**

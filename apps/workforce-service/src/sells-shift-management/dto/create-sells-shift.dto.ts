@@ -1,13 +1,13 @@
 /**
- * @fileoverview This file defines the CreateSellsShiftManagementDto class, which is a Data Transfer Object (DTO) used for creating a new sells shift management entry in the workforce service.
+ * @fileoverview This file defines the CreateSellsShiftDto class, which is a Data Transfer Object (DTO) used for creating a new sells shift management entry in the workforce service.
  *
- * The CreateSellsShiftManagementDto class includes the following properties:
+ * The CreateSellsShiftDto class includes the following properties:
  * - weekStartDate: A required Date property that represents the start date of the week for the sells shift management. It must be a valid UTC date string.
  * - weekEndDate: A required Date property that represents the end date of the week for the sells shift management. It must be a valid UTC date string.
  * - shiftType: A required property that represents the type of shift for the sells shift management. It must be a valid value from the ShiftTypeForSales enum.
  * - note: An optional string property that can be used to add a note for the sells shift management.
  *
- * The CreateSellsShiftManagementDto class uses decorators from the class-validator library to enforce validation rules on the properties, ensuring that the data provided for creating a new sells shift management entry is valid and correctly formatted before processing the request in the workforce service.
+ * The CreateSellsShiftDto class uses decorators from the class-validator library to enforce validation rules on the properties, ensuring that the data provided for creating a new sells shift management entry is valid and correctly formatted before processing the request in the workforce service.
  */
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsEnum, IsOptional, IsString } from "class-validator";
@@ -16,10 +16,10 @@ import { ShiftTypeForSales } from "../../schemas/attendance.schema";
 /**
  * Data Transfer Object for creating a new sells shift management entry in the workforce service.
  * Contains fields for week start date, week end date, shift type, and an optional note, with validation rules to ensure that the required fields are provided and meet specific validation criteria, ensuring that any new sells shift management entries created in the system are valid and correctly formatted before processing the request to create a new sells shift management entry in the workforce service.
- * The CreateSellsShiftManagementDto is used in the sells shift management service to handle create sells shift management requests and ensure that the provided data meets the required format before processing the request to create a new sells shift management entry in the system.
+ * The CreateSellsShiftDto is used in the sells shift management service to handle create sells shift management requests and ensure that the provided data meets the required format before processing the request to create a new sells shift management entry in the system.
  * The validation rules defined in this DTO help maintain data integrity and ensure that only valid sells shift management information is accepted when creating new sells shift management entries through the workforce service.
  */
-export class CreateSellsShiftManagementDto {
+export class CreateSellsShiftDto {
   @ApiProperty({
     required: true,
     description: "The start date of the week for the sells shift management",

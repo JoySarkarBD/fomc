@@ -22,7 +22,7 @@ import {
 } from "@nestjs/swagger";
 import { ExchangeIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import type { AuthUser } from "@shared/interfaces";
-import { CreateSellsShiftManagementDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift-management.dto";
+import { CreateSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift.dto";
 import { GetSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/get-sells-shift.dto";
 import { RequestShiftExchangeDto } from "apps/workforce-service/src/sells-shift-management/dto/request-shift-exchange.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
@@ -168,7 +168,7 @@ export class SellsShiftManagementController {
    *
    * @param {AuthUser} user - The authenticated user making the request, extracted from the JWT token.
    * @param {UserIdDto} params - The route parameters containing the user ID for whom the shift is being created.
-   * @param {CreateSellsShiftManagementDto} data - The request body containing the details of the sells shift management entry to be created.
+   * @param {CreateSellsShiftDto} data - The request body containing the details of the sells shift management entry to be created.
    * @returns {Promise<any>} A response indicating the success of the operation, along with the created sells shift management entry.
    */
   @ApiOperation({
@@ -207,7 +207,7 @@ export class SellsShiftManagementController {
   async create(
     @GetUser() user: AuthUser,
     @Param() params: UserIdDto,
-    @Body() data: CreateSellsShiftManagementDto,
+    @Body() data: CreateSellsShiftDto,
   ) {
     return this.sellsShiftManagementService.create(
       user._id!,

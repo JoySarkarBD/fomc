@@ -30,7 +30,7 @@ import {
   WeekendExchange,
   WeekendExchangeDocument,
 } from "../schemas/weekend-exchange.schema";
-import { SellsShiftManagementService } from "../sells-shift-management/sells-shift-management.service";
+import { SellsShiftManagementService } from "../sells-shift-management/sells-shift.service";
 import { AttendanceByAuthorityDto } from "./dto/attendance-by-authority.dto";
 import { GetAttendanceDto } from "./dto/get-attendance.dto";
 import { WeekendExchangeByAuthorityDto } from "./dto/weekend-exchange-by-authority.dto";

@@ -17,8 +17,8 @@ import {
   ShiftExchange,
   ShiftExchangeSchema,
 } from "../schemas/shift-exchange.schema";
-import { SellsShiftManagementController } from "./sells-shift-management.controller";
-import { SellsShiftManagementService } from "./sells-shift-management.service";
+import { SellsShiftManagementController } from "./sells-shift.controller";
+import { SellsShiftManagementService } from "./sells-shift.service";
 
 @Module({
   imports: [

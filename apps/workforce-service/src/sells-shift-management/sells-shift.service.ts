@@ -14,6 +14,12 @@ import { convertToBDDate } from "@shared/utils/convert-to-db-date";
 import { WeekEndOff } from "apps/user-service/src/schemas/user.schema";
 import { Model, Types } from "mongoose";
 import { firstValueFrom } from "rxjs";
+import {
+  ApprovedByDto,
+  AssignedByDto,
+  ExchangeIdDto,
+  UserIdDto,
+} from "../../../../libs/shared/src/dto/mongo-id.dto";
 import { NotificationType } from "../../../notification-service/src/schema/notification.schema";
 import { Department, DepartmentDocument } from "../schemas/department.schema";
 import {
@@ -25,13 +31,7 @@ import {
   ShiftExchangeDocument,
   ShiftExchangeStatus,
 } from "../schemas/shift-exchange.schema";
-import {
-  ApprovedByDto,
-  AssignedByDto,
-  ExchangeIdDto,
-  UserIdDto,
-} from "./../../../../libs/shared/src/dto/mongo-id.dto";
-import { CreateSellsShiftManagementDto } from "./dto/create-sells-shift-management.dto";
+import { CreateSellsShiftDto } from "./dto/create-sells-shift.dto";
 import { GetSellsShiftDto } from "./dto/get-sells-shift.dto";
 import { RequestShiftExchangeDto } from "./dto/request-shift-exchange.dto";
 
@@ -54,14 +54,14 @@ export class SellsShiftManagementService {
    *
    * @param {AssignedByDto["assignedBy"]} assignedBy - The ID of the user who is assigning the shift.
    * @param {UserIdDto["userId"]} userId - The ID of the user for whom the shift is being assigned.
-   * @param {CreateSellsShiftManagementDto} createSellsShiftManagementDto - The data transfer object containing the details of the shift to be assigned, including week start and end dates, shift type, and any additional notes.
+   * @param {CreateSellsShiftDto} CreateSellsShiftDto - The data transfer object containing the details of the shift to be assigned, including week start and end dates, shift type, and any additional notes.
    * @returns {Promise<any>} The newly created sells shift management record, or an error message if the user does not exist or if a shift is already assigned for the same week.
    * @remarks This method first checks if the user exists by communicating with the user service. It then checks if there is already an existing shift assignment for the same week to prevent duplicate assignments. If both checks pass, it creates a new shift assignment record in the database and returns it.
    */
   async createForUser(
     assignedBy: AssignedByDto["assignedBy"],
     userId: UserIdDto["userId"],
-    createSellsShiftManagementDto: CreateSellsShiftManagementDto,
+    CreateSellsShiftDto: CreateSellsShiftDto,
   ) {
     const userExist = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USER, { id: userId }),
@@ -74,10 +74,8 @@ export class SellsShiftManagementService {
       };
     }
 
-    const utcWeekStartDate = new Date(
-      createSellsShiftManagementDto.weekStartDate,
-    );
-    const utcWeekEndDate = new Date(createSellsShiftManagementDto.weekEndDate);
+    const utcWeekStartDate = new Date(CreateSellsShiftDto.weekStartDate);
+    const utcWeekEndDate = new Date(CreateSellsShiftDto.weekEndDate);
 
     // Check time Sunday to Saturday
     if (
@@ -92,10 +90,8 @@ export class SellsShiftManagementService {
     }
 
     // Convert to BD Time
-    const utcStart = convertToBDDate(
-      createSellsShiftManagementDto.weekStartDate,
-    );
-    const utcEnd = convertToBDDate(createSellsShiftManagementDto.weekEndDate);
+    const utcStart = convertToBDDate(CreateSellsShiftDto.weekStartDate);
+    const utcEnd = convertToBDDate(CreateSellsShiftDto.weekEndDate);
 
     // Check if weekStartDate is before weekEndDate
     if (utcStart >= utcEnd) {
@@ -138,7 +134,7 @@ export class SellsShiftManagementService {
       user: new Types.ObjectId(userId),
       weekStartDate: utcStart,
       weekEndDate: utcEnd,
-      shiftType: createSellsShiftManagementDto.shiftType,
+      shiftType: CreateSellsShiftDto.shiftType,
       myWeekends: {
         currentWeekends: userExist.weekEndOff || [],
         updatedWeekends: [],
@@ -146,7 +142,7 @@ export class SellsShiftManagementService {
       },
       shiftExchanges: [],
       assignedBy: new Types.ObjectId(assignedBy),
-      note: createSellsShiftManagementDto.note,
+      note: CreateSellsShiftDto.note,
     });
 
     return result;

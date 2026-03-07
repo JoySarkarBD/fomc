@@ -18,6 +18,9 @@ export const TASK_COMMANDS = {
   /** Update an existing task. */
   UPDATE_TASK: { cmd: "update_task" },
 
+  /** Update the status of a task. */
+  UPDATE_TASK_STATUS: { cmd: "update_task_status" },
+
   /** Delete a task. */
   DELETE_TASK: { cmd: "delete_task" },
 } as const;

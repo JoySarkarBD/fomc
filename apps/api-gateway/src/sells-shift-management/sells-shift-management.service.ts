@@ -1,14 +1,11 @@
-import { handleException } from './../../../../libs/shared/src/utils/handle.exception';
+import { handleException } from "./../../../../libs/shared/src/utils/handle.exception";
 /**
  * @fileoverview Sells shift management service.
  *
  * Sends TCP commands to the Workforce micro-service for managing sells shift schedules, including creating new shift entries for users. This service acts as an intermediary between the API layer and the Workforce micro-service, handling the communication and data transformation required for sells shift management operations.
  */
 
-import {
-  Inject,
-  Injectable
-} from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { SELLS_SHIFT_MANAGEMENT_COMMANDS } from "@shared/constants/sells-shift-management.constants";
 import {
@@ -17,7 +14,7 @@ import {
   ExchangeIdDto,
   UserIdDto,
 } from "@shared/dto/mongo-id.dto";
-import { CreateSellsShiftManagementDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift-management.dto";
+import { CreateSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/create-sells-shift.dto";
 import { GetSellsShiftDto } from "apps/workforce-service/src/sells-shift-management/dto/get-sells-shift.dto";
 import { RequestShiftExchangeDto } from "apps/workforce-service/src/sells-shift-management/dto/request-shift-exchange.dto";
 import { firstValueFrom } from "rxjs";
@@ -39,7 +36,7 @@ export class SellsShiftManagementService {
   async create(
     assignedBy: AssignedByDto["assignedBy"],
     userId: UserIdDto["userId"],
-    data: CreateSellsShiftManagementDto,
+    data: CreateSellsShiftDto,
   ) {
     const result = await firstValueFrom(
       this.workforceClient.send(
@@ -47,7 +44,7 @@ export class SellsShiftManagementService {
         {
           assignedBy,
           userId,
-          createSellsShiftManagementDto: data,
+          CreateSellsShiftDto: data,
         },
       ),
     );

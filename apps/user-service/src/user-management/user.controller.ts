@@ -6,7 +6,7 @@ import { Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { USER_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
-import { SalesDeptIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
+import { MongoIdsDto, SalesDeptIdDto, UserIdDto } from "@shared/dto/mongo-id.dto";
 import { WeekEndOff } from "../schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
@@ -61,6 +61,19 @@ export class UserController {
   @MessagePattern(USER_COMMANDS.GET_USER)
   async getUser(payload: { id: MongoIdDto["id"] }): Promise<any> {
     return await this.userService.getUser(payload.id);
+  }
+
+  /**
+   * Retrieve users by IDs.
+   *
+   * Message pattern: {cmd: USER_COMMANDS.GET_USERS_BY_IDS}
+   *
+   * @param {MongoIdsDto} params - Object containing the user IDs.
+   * @returns {Promise<any>} Users details.
+   */
+  @MessagePattern(USER_COMMANDS.GET_USERS_BY_IDS)
+  async getUserByIds(payload: { ids: MongoIdsDto["ids"] }): Promise<any> {
+    return await this.userService.getUserByIds(payload.ids);
   }
 
   /**

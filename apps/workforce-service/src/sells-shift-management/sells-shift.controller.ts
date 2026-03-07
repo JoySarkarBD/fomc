@@ -13,10 +13,10 @@ import {
   UserIdDto,
 } from "@shared/dto/mongo-id.dto";
 import { WeekEndOff } from "apps/user-service/src/schemas/user.schema";
-import { CreateSellsShiftManagementDto } from "./dto/create-sells-shift-management.dto";
+import { CreateSellsShiftDto } from "./dto/create-sells-shift.dto";
 import { GetSellsShiftDto } from "./dto/get-sells-shift.dto";
 import { RequestShiftExchangeDto } from "./dto/request-shift-exchange.dto";
-import { SellsShiftManagementService } from "./sells-shift-management.service";
+import { SellsShiftManagementService } from "./sells-shift.service";
 
 /**
  * Sells Shift Management Controller
@@ -35,7 +35,7 @@ export class SellsShiftManagementController {
    *
    * Message Pattern: { cmd: SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER }
    *
-   * @param {Object} payload - The data transfer object containing the details of the sells shift management record to be created, including the assignedBy user ID, target user ID, and the createSellsShiftManagementDto with shift details.
+   * @param {Object} payload - The data transfer object containing the details of the sells shift management record to be created, including the assignedBy user ID, target user ID, and the CreateSellsShiftDto with shift details.
    * @returns {Promise<any>} Newly created sells shift management record.
    */
   @MessagePattern(SELLS_SHIFT_MANAGEMENT_COMMANDS.CREATE_SELLS_SHIFT_FOR_USER)
@@ -44,13 +44,13 @@ export class SellsShiftManagementController {
     payload: {
       assignedBy: AssignedByDto["assignedBy"];
       userId: UserIdDto["userId"];
-      createSellsShiftManagementDto: CreateSellsShiftManagementDto;
+      CreateSellsShiftDto: CreateSellsShiftDto;
     },
   ): Promise<any> {
     return await this.sellsShiftManagementService.createForUser(
       payload.assignedBy,
       payload.userId,
-      payload.createSellsShiftManagementDto,
+      payload.CreateSellsShiftDto,
     );
   }
 

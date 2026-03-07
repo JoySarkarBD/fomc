@@ -6,10 +6,15 @@
  * and adds a required MongoDB ObjectId for identifying the task.
  */
 import { PartialType } from "@nestjs/mapped-types";
-import { IsMongoId } from "class-validator";
+import { IsEnum } from "class-validator";
+import { TaskStatus } from "../../schemas/task.schema";
 import { CreateTaskDto } from "./create-task.dto";
 
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {
-  @IsMongoId({ message: "ID must be a valid Mongo ID" })
-  id!: string;
+export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
+
+export class UpdateTaskStatusDto {
+  @IsEnum(TaskStatus, {
+    message: `Invalid task status - ${Object.values(TaskStatus).join(", ")}`,
+  })
+  status: TaskStatus;
 }
