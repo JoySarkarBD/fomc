@@ -107,6 +107,15 @@ export class ProjectService {
 
     return await this.projectModel.create({
       ...createProjectDto,
+      client: createProjectDto.client
+        ? new Types.ObjectId(createProjectDto.client)
+        : undefined,
+      profile: createProjectDto.profile
+        ? new Types.ObjectId(createProjectDto.profile)
+        : undefined,
+      assignedDepartment: createProjectDto.assignedDepartment
+        ? new Types.ObjectId(createProjectDto.assignedDepartment)
+        : undefined,
       createdBy: new Types.ObjectId(user.id),
     });
   }

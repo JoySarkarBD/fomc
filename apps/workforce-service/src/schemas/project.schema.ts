@@ -118,13 +118,6 @@ export class Project extends Document {
   })
   profile?: Types.ObjectId;
 
-  // Reference to the user collection
-  @Prop({
-    type: Types.ObjectId,
-    required: false,
-  })
-  salesMember?: Types.ObjectId;
-
   // Departments currently assigned to handle the project. (Transfer history not required as we will maintain)
   @Prop({
     type: Types.ObjectId,

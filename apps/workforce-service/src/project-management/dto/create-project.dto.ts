@@ -57,15 +57,6 @@ export class CreateProjectDto {
 
   @ApiProperty({
     required: false,
-    description: "The ID of the sales member associated with the project",
-    example: "60c72b2f9b1d8e5a5c8f9e7d",
-  })
-  @IsMongoId({ message: "salesMember must be a valid ObjectId" })
-  @IsOptional()
-  salesMember?: string;
-
-  @ApiProperty({
-    required: false,
     description: "The ID of the department currently assigned to the project",
     example: "60c72b2f9b1d8e5a5c8f9e7d",
   })
