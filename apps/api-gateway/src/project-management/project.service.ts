@@ -33,14 +33,14 @@ export class ProjectService {
    * Create a new project.
    *
    * @param {AuthUser} user - The authenticated user creating the project.
-   * @param {CreateProjectDto} data - The project data.
+   * @param {CreateProjectDto} createProjectDto - The project data.
    * @returns {Promise<any>}
    */
-  async createProject(user: AuthUser, data: CreateProjectDto) {
+  async createProject(user: AuthUser, createProjectDto: CreateProjectDto) {
     const result = await firstValueFrom(
       this.workforceClient.send(PROJECT_COMMANDS.CREATE_PROJECT, {
         user,
-        data,
+        createProjectDto,
       }),
     );
 

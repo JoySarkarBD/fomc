@@ -157,8 +157,11 @@ export class ProjectController {
   })
   @SalesOnly()
   @Post()
-  async create(@GetUser() user: AuthUser, @Body() data: CreateProjectDto) {
-    return await this.projectService.createProject(user, data);
+  async create(
+    @GetUser() user: AuthUser,
+    @Body() createProjectDto: CreateProjectDto,
+  ) {
+    return await this.projectService.createProject(user, createProjectDto);
   }
 
   /**
