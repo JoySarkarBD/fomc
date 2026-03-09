@@ -12,6 +12,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
 } from "class-validator";
 import { ProjectStatus, ProjectTeam } from "../../schemas/project.schema";
 
@@ -81,7 +82,7 @@ export class CreateProjectDto {
     example: ["https://example.com/file1.pdf", "https://example.com/file2.jpg"],
   })
   @IsArray({ message: "projectFiles must be an array" })
-  @IsString({ each: true, message: "Each file path must be a string" })
+  @IsUrl({}, { each: true, message: "Each file path must be a valid URL" })
   @IsOptional()
   projectFiles?: string[];
 
