@@ -34,6 +34,7 @@ import {
 } from "apps/workforce-service/src/project-management/dto/profile.dto";
 import { UpdateProjectDto } from "apps/workforce-service/src/project-management/dto/update-project.dto";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
+import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { SalesOnly } from "../common/decorators/department.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
@@ -309,6 +310,16 @@ export class ProjectController {
     description: "Bearer token",
     required: true,
   })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the project to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
+  })
   @ApiSuccessResponse(ProjectByIdSuccessDto, 200)
   @ApiErrorResponses({
     validation: ProjectByIdValidationDto,
@@ -341,6 +352,16 @@ export class ProjectController {
     description: "Bearer token",
     required: true,
   })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the project to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
+  })
   @ApiSuccessResponse(ProjectUpdateSuccessDto, 200)
   @ApiErrorResponses({
     validation: ProjectUpdateValidationDto,
@@ -371,6 +392,16 @@ export class ProjectController {
     description: "Bearer token",
     required: true,
   })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the project to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
+  })
   @ApiSuccessResponse(ProjectDeleteSuccessDto, 200)
   @ApiErrorResponses({
     validation: ProjectDeleteValidationDto,
@@ -397,6 +428,16 @@ export class ProjectController {
     name: "Authorization",
     description: "Bearer token",
     required: true,
+  })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the project to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
   })
   @ApiSuccessResponse(ClientUpdateSuccessDto, 200)
   @ApiErrorResponses({
@@ -428,6 +469,16 @@ export class ProjectController {
     description: "Bearer token",
     required: true,
   })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the client to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
+  })
   @ApiSuccessResponse(ClientDeleteSuccessDto, 200)
   @ApiErrorResponses({
     validation: ClientDeleteValidationDto,
@@ -454,6 +505,16 @@ export class ProjectController {
     name: "Authorization",
     description: "Bearer token",
     required: true,
+  })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the profile to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
   })
   @ApiSuccessResponse(ProfileUpdateSuccessDto, 200)
   @ApiErrorResponses({
@@ -484,6 +545,16 @@ export class ProjectController {
     name: "Authorization",
     description: "Bearer token",
     required: true,
+  })
+  @ApiRequestDetails({
+    params: [
+      {
+        name: "id",
+        description: "The ID of the profile to retrieve",
+        required: true,
+        type: String,
+      },
+    ],
   })
   @ApiSuccessResponse(ProfileDeleteSuccessDto, 200)
   @ApiErrorResponses({
