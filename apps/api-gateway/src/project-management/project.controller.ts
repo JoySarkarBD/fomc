@@ -33,6 +33,7 @@ import {
   UpdateProfileDto,
 } from "apps/workforce-service/src/project-management/dto/profile.dto";
 import { UpdateProjectDto } from "apps/workforce-service/src/project-management/dto/update-project.dto";
+import { ProjectStatus } from "apps/workforce-service/src/schemas/project.schema";
 import { ApiErrorResponses } from "../common/decorators/api-error-response.decorator";
 import { ApiRequestDetails } from "../common/decorators/api-request.decorator";
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
@@ -186,7 +187,7 @@ export class ProjectController {
   @SalesOnly()
   @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Get()
-  async findAll(@Query() query: SearchQueryDto) {
+  async findAll(@Query() query: SearchQueryDto & { status?: ProjectStatus }) {
     return await this.projectService.getProjects(query);
   }
 

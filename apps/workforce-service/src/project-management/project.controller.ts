@@ -9,6 +9,7 @@ import { PROJECT_COMMANDS } from "@shared/constants";
 import { MongoIdDto } from "@shared/dto";
 import { SearchQueryDto } from "@shared/dto/search-query.dto";
 import type { AuthUser } from "@shared/interfaces/auth-user.interface";
+import { ProjectStatus } from "../schemas/project.schema";
 import { CreateClientDto, UpdateClientDto } from "./dto/client.dto";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { CreateProfileDto, UpdateProfileDto } from "./dto/profile.dto";
@@ -52,7 +53,7 @@ export class ProjectController {
    * @returns {Promise<any>}
    */
   @MessagePattern(PROJECT_COMMANDS.GET_PROJECTS)
-  async findAll(@Payload() query: SearchQueryDto) {
+  async findAll(@Payload() query: SearchQueryDto & { status?: ProjectStatus }) {
     return await this.projectService.findAll(query);
   }
 

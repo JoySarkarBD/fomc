@@ -17,6 +17,7 @@ import {
   Profile,
   Project,
   ProjectDocument,
+  ProjectStatus,
 } from "../schemas/project.schema";
 import { UpdateClientDto } from "./dto/client.dto";
 import { CreateProjectDto } from "./dto/create-project.dto";
@@ -126,35 +127,34 @@ export class ProjectService {
    * @param {SearchQueryDto} query - The search query parameters for filtering and pagination.
    * @returns {Promise<{ projects: any[]; total: number; totalPages: number }>}
    */
-  async findAll(query: SearchQueryDto) {
-    const { pageNo, pageSize } = query;
-    const searchKey =
-      typeof query.searchKey === "string" ? query.searchKey : "";
+  async findAll(query: SearchQueryDto & { status?: ProjectStatus }) {
+    const { pageNo, pageSize, status } = query;
+    const searchKey = typeof query.searchKey === "string" ? query.searchKey : "";
 
-    const matchStage = searchKey
-      ? {
-          $match: {
-            $or: [
-              { name: { $regex: searchKey, $options: "i" } },
-              { orderId: { $regex: searchKey, $options: "i" } },
-              { "client.name": { $regex: searchKey, $options: "i" } },
-              { "profile.name": { $regex: searchKey, $options: "i" } },
-            ],
-          },
-        }
-      : { $match: {} };
+    // Build $match filter
+    const matchFilter: any = {};
+    if (searchKey) {
+      matchFilter.$or = [
+        { name: { $regex: searchKey, $options: "i" } },
+        { orderId: { $regex: searchKey, $options: "i" } },
+        { "client.name": { $regex: searchKey, $options: "i" } },
+        { "profile.name": { $regex: searchKey, $options: "i" } },
+      ];
+    }
+    if (status) {
+      matchFilter.status = status;
+    }
 
     const aggregation = await this.projectModel.aggregate([
       {
         $lookup: {
-          from: "clients", // collection name (lowercase plural)
+          from: "clients",
           localField: "client",
           foreignField: "_id",
           as: "client",
         },
       },
       { $unwind: { path: "$client", preserveNullAndEmptyArrays: true } },
-
       {
         $lookup: {
           from: "profiles",
@@ -164,11 +164,8 @@ export class ProjectService {
         },
       },
       { $unwind: { path: "$profile", preserveNullAndEmptyArrays: true } },
-
-      matchStage,
-
+      { $match: matchFilter },
       { $sort: { createdAt: -1 } },
-
       {
         $facet: {
           data: [{ $skip: (pageNo - 1) * pageSize }, { $limit: pageSize }],
