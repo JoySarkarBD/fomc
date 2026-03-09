@@ -30,8 +30,9 @@ import { ApiErrorResponses } from "../common/decorators/api-error-response.decor
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
+import { SalesOnly } from "../common/decorators/department.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
-import { RolesGuard } from "../common/guards/roles.guard";
+import { AccessGuard } from "../common/guards/access.guard";
 import {
   TaskByIdForbiddenDto,
   TaskCreateForbiddenDto,
@@ -81,7 +82,7 @@ import {
 import { TaskService } from "./task.service";
 
 @ApiTags("Task Management")
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, AccessGuard)
 @Controller("task")
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
@@ -112,7 +113,7 @@ export class TaskController {
     forbidden: TaskCreateForbiddenDto,
     internal: TaskCreateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Post()
   async create(
     @GetUser() user: AuthUser,
@@ -148,7 +149,8 @@ export class TaskController {
     forbidden: TaskListForbiddenDto,
     internal: TaskListInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get()
   async findAll(@GetUser() user: AuthUser, @Query() query: SearchQueryDto) {
     return await this.taskService.findAll(user, query);
@@ -182,7 +184,8 @@ export class TaskController {
     forbidden: TaskByIdForbiddenDto,
     internal: TaskByIdInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get(":id")
   async findOne(@GetUser() user: AuthUser, @Query() param: MongoIdDto) {
     return await this.taskService.findOne(user, param.id);
@@ -217,7 +220,8 @@ export class TaskController {
     forbidden: TaskUpdateForbiddenDto,
     internal: TaskUpdateInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch(":id")
   async update(
     @GetUser() user: AuthUser,
@@ -256,7 +260,8 @@ export class TaskController {
     forbidden: TaskStatusUpdateForbiddenDto,
     internal: TaskStatusUpdateInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Patch(":id/status")
   async updateTaskStatus(
     @GetUser() user: AuthUser,
@@ -298,7 +303,8 @@ export class TaskController {
     forbidden: TaskDeleteForbiddenDto,
     internal: TaskDeleteInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Delete(":id")
   async delete(@GetUser() user: AuthUser, @Query() param: MongoIdDto) {
     return await this.taskService.delete(user, param.id);

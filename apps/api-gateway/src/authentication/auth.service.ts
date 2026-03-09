@@ -145,7 +145,13 @@ export class AuthService {
     user.designation = designation?.data?.name ?? user.designation;
 
     const safeUser = this.sanitizeUser(user);
-    const payload = { sub: id, email: safeUser.email, role: safeUser.role };
+    const payload = {
+      sub: id,
+      email: safeUser.email,
+      role: safeUser.role,
+      department: safeUser.department,
+      designation: safeUser.designation,
+    };
     const accessToken = this.jwtService.sign(payload);
     const tokenId = randomUUID();
 

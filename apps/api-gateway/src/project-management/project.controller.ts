@@ -37,8 +37,9 @@ import { ApiErrorResponses } from "../common/decorators/api-error-response.decor
 import { ApiSuccessResponse } from "../common/decorators/api-success-response.decorator";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
+import { SalesOnly } from "../common/decorators/department.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
-import { RolesGuard } from "../common/guards/roles.guard";
+import { AccessGuard } from "../common/guards/access.guard";
 import {
   ClientCreateForbiddenDto,
   ClientDeleteForbiddenDto,
@@ -124,7 +125,7 @@ import {
 import { ProjectService } from "./project.service";
 
 @ApiTags("Project Management")
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, AccessGuard)
 @Controller("project")
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -152,7 +153,7 @@ export class ProjectController {
     forbidden: ProjectCreateForbiddenDto,
     internal: ProjectCreateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Post()
   async create(@GetUser() user: AuthUser, @Body() data: CreateProjectDto) {
     return await this.projectService.createProject(user, data);
@@ -181,7 +182,8 @@ export class ProjectController {
     forbidden: ProjectListForbiddenDto,
     internal: ProjectListInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Get()
   async findAll(@Query() query: SearchQueryDto) {
     return await this.projectService.getProjects(query);
@@ -211,7 +213,8 @@ export class ProjectController {
     notFound: ProjectByIdNotFoundDto,
     internal: ProjectByIdInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Get(":id")
   async findOne(@Param() params: MongoIdDto) {
     return await this.projectService.getProject(params.id);
@@ -242,7 +245,7 @@ export class ProjectController {
     notFound: ProjectUpdateNotFoundDto,
     internal: ProjectUpdateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Patch(":id")
   async update(@Param() params: MongoIdDto, @Body() data: UpdateProjectDto) {
     return await this.projectService.updateProject(params.id, data);
@@ -272,7 +275,7 @@ export class ProjectController {
     notFound: ProjectDeleteNotFoundDto,
     internal: ProjectDeleteInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Delete(":id")
   async remove(@Param() params: MongoIdDto) {
     return await this.projectService.deleteProject(params.id);
@@ -298,7 +301,7 @@ export class ProjectController {
     forbidden: ClientCreateForbiddenDto,
     internal: ClientCreateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Post("client")
   async createClient(@Body() data: CreateClientDto) {
     return await this.projectService.createClient(data);
@@ -323,7 +326,8 @@ export class ProjectController {
     forbidden: ClientListForbiddenDto,
     internal: ClientListInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Get("client")
   async getClients() {
     return await this.projectService.getClients();
@@ -350,7 +354,7 @@ export class ProjectController {
     notFound: ClientUpdateNotFoundDto,
     internal: ClientUpdateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Patch("client/:id")
   async updateClient(
     @Param() params: MongoIdDto,
@@ -380,7 +384,7 @@ export class ProjectController {
     notFound: ClientDeleteNotFoundDto,
     internal: ClientDeleteInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Delete("client/:id")
   async deleteClient(@Param() params: MongoIdDto) {
     return await this.projectService.deleteClient(params.id);
@@ -406,7 +410,7 @@ export class ProjectController {
     forbidden: ProfileCreateForbiddenDto,
     internal: ProfileCreateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Post("profile")
   async createProfile(@Body() data: CreateProfileDto) {
     return await this.projectService.createProfile(data);
@@ -431,7 +435,8 @@ export class ProjectController {
     forbidden: ProfileListForbiddenDto,
     internal: ProfileListInternalErrorDto,
   })
-  @Roles("SALES", "PROJECT MANAGER", "TEAM LEADER")
+  @SalesOnly()
+  @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Get("profile")
   async getProfiles() {
     return await this.projectService.getProfiles();
@@ -458,7 +463,7 @@ export class ProjectController {
     notFound: ProfileUpdateNotFoundDto,
     internal: ProfileUpdateInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Patch("profile/:id")
   async updateProfile(
     @Param() params: MongoIdDto,
@@ -488,7 +493,7 @@ export class ProjectController {
     notFound: ProfileDeleteNotFoundDto,
     internal: ProfileDeleteInternalErrorDto,
   })
-  @Roles("SALES")
+  @SalesOnly()
   @Delete("profile/:id")
   async deleteProfile(@Param() params: MongoIdDto) {
     return await this.projectService.deleteProfile(params.id);
