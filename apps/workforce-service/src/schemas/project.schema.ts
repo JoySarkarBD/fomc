@@ -1,3 +1,4 @@
+import { Project } from "./project.schema";
 /**
  * @fileoverview Project Schema
  *
@@ -23,6 +24,12 @@ export enum ProjectStatus {
   DELIVERED = "DELIVERED",
   CANCELLED = "CANCELLED",
   REVISION = "REVISION",
+}
+
+export enum ProjectTeam {
+  WORDPRESS = "Wordpress",
+  SHOPIFY = "Shopify",
+  CUSTOM = "Custom",
 }
 
 /**
@@ -124,6 +131,10 @@ export class Project extends Document {
     required: false,
   })
   assignedDepartment?: Types.ObjectId;
+
+  // Enum for project assign team (Wordpress, Shopify, etc.)
+  @Prop({ enum: ProjectTeam, required: false })
+  projectTeam?: ProjectTeam;
 
   // List of associated project file URLs or storage paths.
   @Prop({ type: [String], default: [] })

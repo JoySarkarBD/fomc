@@ -13,7 +13,7 @@ import {
   IsOptional,
   IsString,
 } from "class-validator";
-import { ProjectStatus } from "../../schemas/project.schema";
+import { ProjectStatus, ProjectTeam } from "../../schemas/project.schema";
 
 /**
  * Data Transfer Object for creating a new project.
@@ -63,6 +63,18 @@ export class CreateProjectDto {
   @IsMongoId({ message: "assignedDepartment must be a valid ObjectId" })
   @IsOptional()
   assignedDepartment?: string;
+
+  @ApiProperty({
+    required: false,
+    description: `The team assigned to the project - ${Object.values(ProjectTeam).join(", ")}`,
+    enum: ProjectTeam,
+    example: ProjectTeam.WORDPRESS,
+  })
+  @IsEnum(ProjectTeam, {
+    message: `Invalid project team - ${Object.values(ProjectTeam).join(", ")}`,
+  })
+  @IsOptional()
+  projectTeam?: ProjectTeam;
 
   @ApiProperty({
     description: "List of project file URLs or storage paths",

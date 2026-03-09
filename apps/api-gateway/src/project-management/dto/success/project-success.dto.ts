@@ -21,9 +21,17 @@ export class ProjectCreateSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      orderId: "ORD-123456",
       client: "60c72b2f9b1d8e5a5c8f9e7a",
+      orderId: "ORD-123456",
+      profile: "60c72b2f9b1d8e5a5c8f9e7b",
+      assignedDepartment: "60c72b2f9b1d8e5a5c8f9e7c",
+      projectTeam: "WORDPRESS",
+      projectFiles: [],
+      projectRemarks: "",
+      dueDate: "2024-06-30T23:59:59.000Z",
+      deliveryDate: null,
       status: "WIP",
+      createdBy: "60c72b2f9b1d8e5a5c8f9e7d",
       createdAt: "2024-03-04T10:00:00.000Z",
       updatedAt: "2024-03-04T10:00:00.000Z",
     },
@@ -268,7 +276,10 @@ export class ProfileUpdateSuccessDto extends SuccessResponseDto<any> {
   declare statusCode: number;
 
   @ApiProperty({
-    example: { _id: "60c72b2f9b1d8e5a5c8f9e7b", name: "Standard Profile Updated" },
+    example: {
+      _id: "60c72b2f9b1d8e5a5c8f9e7b",
+      name: "Standard Profile Updated",
+    },
   })
   declare data: any;
 }
