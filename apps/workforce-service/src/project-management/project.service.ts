@@ -150,56 +150,22 @@ export class ProjectService {
       matchFilter.status = status;
     }
 
-    const aggregation = await this.projectModel.aggregate([
-      {
-        $lookup: {
-          from: "clients",
-          localField: "client",
-          foreignField: "_id",
-          as: "client",
-        },
-      },
-      { $unwind: { path: "$client", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "profiles",
-          localField: "profile",
-          foreignField: "_id",
-          as: "profile",
-        },
-      },
-      {
-        $lookup: {
-          from: "departments",
-          localField: "assignedDepartment",
-          foreignField: "_id",
-          as: "assignedDepartment",
-        },
-      },
-      { $unwind: { path: "$profile", preserveNullAndEmptyArrays: true } },
-      {
-        $unwind: {
-          path: "$assignedDepartment",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      { $match: matchFilter },
-      { $sort: { createdAt: -1 } },
-      {
-        $facet: {
-          data: [{ $skip: (pageNo - 1) * pageSize }, { $limit: pageSize }],
-          totalCount: [{ $count: "count" }],
-        },
-      },
+    const [projects, count] = await Promise.all([
+      this.projectModel
+        .find(matchFilter)
+        .populate("client")
+        .populate("profile")
+        .populate("assignedDepartment")
+        .skip((pageNo - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.projectModel.countDocuments(matchFilter).exec(),
     ]);
-
-    const projects = aggregation[0].data;
-    const total = aggregation[0].totalCount[0]?.count || 0;
 
     return {
       projects,
-      total,
-      totalPages: Math.ceil(total / pageSize),
+      total: count,
+      totalPages: Math.ceil(count / pageSize),
     };
   }
 
