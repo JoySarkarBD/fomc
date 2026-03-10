@@ -57,3 +57,45 @@ export class TaskDeleteNotFoundDto extends CustomNotFoundDto {
   @ApiProperty({ example: "Task not found" })
   declare error: string;
 }
+
+export class TaskDCRSubmissionNotFoundDto extends CustomNotFoundDto {
+  @ApiProperty({ example: "Task not found" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: "Task not found" })
+  declare error: string;
+}
+
+export class TaskDCRSubmissionStatusUpdateNotFoundDto extends CustomNotFoundDto {
+  @ApiProperty({ example: "Task not found" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: "Task not found" })
+  declare error: string;
+}
+
+export class TaskDCRReviewOnReplyNotFoundDto extends CustomNotFoundDto {
+  @ApiProperty({ example: "Task not found" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/reply-on-dcr-review" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: "Task not found" })
+  declare error: string;
+}

@@ -7,7 +7,7 @@
  * creator and assignees.
  */
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema, Types } from "mongoose";
+import { Document, Types } from "mongoose";
 export type TaskDocument = Task & Document;
 
 /**
@@ -29,6 +29,13 @@ export enum TaskStatus {
   COMPLETED = "COMPLETED",
   BLOCKED = "BLOCKED",
   DELIVERED = "DELIVERED",
+}
+
+export enum DcrSubmissionStatus {
+  NOT_SUBMITTED = "NOT_SUBMITTED",
+  SUBMITTED = "SUBMITTED",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
 /**
@@ -85,6 +92,33 @@ export class Task extends Document {
   // Reference to the user collection
   @Prop({ type: [{ type: Types.ObjectId, required: true }] })
   assignTo!: Types.ObjectId[];
+
+  // Optional array of file paths associated with the task
+  @Prop()
+  dcrLinks?: string[];
+
+  // DCR submission status for the task
+  @Prop({
+    enum: DcrSubmissionStatus,
+    default: DcrSubmissionStatus.NOT_SUBMITTED,
+  })
+  dcrSubmissionStatus!: DcrSubmissionStatus;
+
+  @Prop()
+  dcrApprovedBy?: Types.ObjectId; // Reference to the user collection for DCR approver
+
+  @Prop()
+  dcrRejectedBy?: Types.ObjectId; // Reference to the user collection for DCR rejector
+
+  // Optional array of review replies for the task
+  @Prop()
+  reviewReply?: [
+    {
+      reviewer: Types.ObjectId; // Reference to the user collection
+      comment: string;
+      createdAt: Date;
+    },
+  ];
 }
 
 /**

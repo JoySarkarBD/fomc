@@ -197,3 +197,115 @@ export class TaskDeleteSuccessDto extends SuccessResponseDto<any> {
   })
   declare data: any;
 }
+
+export class TaskDcrSubmitSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "DCR submitted successfully" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: 200 })
+  declare statusCode: number;
+
+  @ApiProperty({
+    example: {
+      _id: "60c72b2f9b1d8e5a5c8f9e7d",
+      name: "Order Tracking System",
+      client: "Acme Corp",
+      orderId: "ORD-123456",
+      project: "Mobile App Development",
+      dueDate: "2024-06-30T23:59:59.000Z",
+      priority: "HIGH",
+      description:
+        "This task involves creating comprehensive documentation for the project.",
+      status: "WIP",
+      dcrLinks: [
+        "https://example.com/dcrs/dcr1.pdf",
+        "https://example.com/dcrs/dcr2.pdf",
+      ],
+      dcrSubmissionStatus: "SUBMITTED",
+      createdAt: "2024-03-04T10:00:00.000Z",
+      updatedAt: "2024-03-05T15:30:00.000Z",
+    },
+  })
+  declare data: any;
+}
+
+export class TaskDcrSubmissionStatusSuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "DCR status updated successfully" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: 200 })
+  declare statusCode: number;
+
+  @ApiProperty({
+    example: {
+      _id: "60c72b2f9b1d8e5a5c8f9e7d",
+      name: "Order Tracking System",
+      client: "Acme Corp",
+      orderId: "ORD-123456",
+      project: "Mobile App Development",
+      dueDate: "2024-06-30T23:59:59.000Z",
+      priority: "HIGH",
+      description:
+        "This task involves creating comprehensive documentation for the project.",
+      status: "WIP",
+      dcrLinks: [
+        "https://example.com/dcrs/dcr1.pdf",
+        "https://example.com/dcrs/dcr2.pdf",
+      ],
+      dcrSubmissionStatus: "APPROVED",
+      createdAt: "2024-03-04T10:00:00.000Z",
+      updatedAt: "2024-03-06T12:00:00.000Z",
+    },
+  })
+  declare data: any;
+}
+
+export class TaskDcrReviewReplySuccessDto extends SuccessResponseDto<any> {
+  @ApiProperty({ example: "Replied to DCR review successfully" })
+  declare message: string;
+
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/reply-on-dcr-review" })
+  declare endpoint: string;
+
+  @ApiProperty({ example: 200 })
+  declare statusCode: number;
+
+  @ApiProperty({
+    example: {
+      _id: "60c72b2f9b1d8e5a5c8f9e7d",
+      name: "Order Tracking System",
+      client: "Acme Corp",
+      orderId: "ORD-123456",
+      project: "Mobile App Development",
+      dueDate: "2024-06-30T23:59:59.000Z",
+      priority: "HIGH",
+      description:
+        "This task involves creating comprehensive documentation for the project.",
+      status: "WIP",
+      dcrLinks: [
+        "https://example.com/dcrs/dcr1.pdf",
+        "https://example.com/dcrs/dcr2.pdf",
+      ],
+      dcrSubmissionStatus: "REVIEWED",
+      reviewReply: "Please provide more details on the issue.",
+      createdAt: "2024-03-04T10:00:00.000Z",
+      updatedAt: "2024-03-07T09:00:00.000Z",
+    },
+  })
+  declare data: any;
+}

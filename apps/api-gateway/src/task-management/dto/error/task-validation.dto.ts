@@ -4,7 +4,10 @@ import {
   ValidationErrorResponseDto,
 } from "apps/api-gateway/src/common/dto/validation-error.dto";
 import { Methods } from "apps/api-gateway/src/common/enum/methods.enum";
-import { TaskStatus } from "apps/workforce-service/src/schemas/task.schema";
+import {
+  DcrSubmissionStatus,
+  TaskStatus,
+} from "apps/workforce-service/src/schemas/task.schema";
 
 export class TaskCreateValidationDto extends ValidationErrorResponseDto {
   @ApiProperty({ example: Methods.POST })
@@ -145,6 +148,60 @@ export class TaskStatusUpdateValidationDto extends ValidationErrorResponseDto {
       {
         field: "status",
         message: `status must be a valid enum ${Object.values(TaskStatus).join(", ")}`,
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class TaskDCRSubmissionValidationDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [{ field: "id", message: "id must be a valid ObjectId" }],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class TaskDCRSubmissionStatusUpdateValidationDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      { field: "id", message: "id must be a valid ObjectId" },
+      {
+        field: "dcrSubmissionStatus",
+        message: `dcrSubmissionStatus must be a valid enum ${Object.values(DcrSubmissionStatus).join(", ")}`,
+      },
+    ],
+  })
+  declare errors: FieldErrorDto[];
+}
+
+export class TaskDCRReviewOnReplyValidationDto extends ValidationErrorResponseDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+
+  @ApiProperty({
+    type: [FieldErrorDto],
+    example: [
+      { field: "id", message: "id must be a valid ObjectId" },
+      {
+        field: "dcrSubmissionStatus",
+        message: `dcrSubmissionStatus must be a valid enum ${Object.values(DcrSubmissionStatus).join(", ")}`,
       },
     ],
   })

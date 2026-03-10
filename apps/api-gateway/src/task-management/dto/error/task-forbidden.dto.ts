@@ -49,3 +49,27 @@ export class TaskDeleteForbiddenDto extends CustomForbiddenDto {
   @ApiProperty({ example: "api/task/:id" })
   declare endpoint: string;
 }
+
+export class TaskDCRSubmissionForbiddenDto extends CustomForbiddenDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+}
+
+export class TaskDCRSubmissionStatusUpdateForbiddenDto extends CustomForbiddenDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+}
+
+export class TaskDCRReviewReplyForbiddenDto extends CustomForbiddenDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/reply-on-dcr-review" })
+  declare endpoint: string;
+}

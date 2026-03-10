@@ -49,3 +49,27 @@ export class TaskDeleteInternalErrorDto extends CustomInternalServerErrorDto {
   @ApiProperty({ example: "api/task/:id" })
   declare endpoint: string;
 }
+
+export class TaskDCRSubmissionInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+}
+
+export class TaskDCRSubmissionStatusInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+}
+
+export class TaskReplyOnDcrReviewInternalErrorDto extends CustomInternalServerErrorDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/reply-on-dcr-review" })
+  declare endpoint: string;
+}

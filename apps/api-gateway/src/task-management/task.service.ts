@@ -6,6 +6,8 @@ import type { AuthUser } from "@shared/interfaces";
 import { handleException } from "@shared/utils/handle.exception";
 import { CreateTaskDto } from "apps/workforce-service/src/task-management/dto/create-task.dto";
 import {
+  ReplyOnDcrReviewDto,
+  UpdateDcrSubmissionStatusDto,
   UpdateTaskDto,
   UpdateTaskStatusDto,
 } from "apps/workforce-service/src/task-management/dto/update-task.dto";
@@ -154,5 +156,79 @@ export class TaskService {
     );
     handleException(result);
     return buildResponse("Task deleted successfully", result);
+  }
+
+  /**
+   * Submit a DCR for a task.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.DCR_SUBMIT }
+   *
+   * @param {AuthUser} user - The authenticated user submitting the DCR.
+   * @param {MongoIdDto["id"]} id - The ID of the task for which the DCR is being submitted.
+   * @param {string[]} dcrFiles - An array of file paths for the DCR files being submitted.
+   * @returns {Promise<any>} A message indicating the result of the DCR submission.
+   */
+  async submitDcr(user: AuthUser, id: MongoIdDto["id"], dcrFiles: string[]) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(TASK_COMMANDS.DCR_SUBMIT, {
+        user,
+        id,
+        uploadedFileLinks: dcrFiles,
+      }),
+    );
+    handleException(result);
+    return buildResponse("DCR submitted successfully", result);
+  }
+
+  /**
+   * Update the DCR submission status of a task.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.UPDATE_DCR_SUBMISSION_STATUS }
+   *
+   * @param {AuthUser} user - The authenticated user updating the status.
+   * @param {MongoIdDto["id"]} id - The ID of the task to update.
+   * @param {UpdateDcrSubmissionStatusDto} data - The status update details.
+   * @returns {Promise<any>} The updated task details.
+   */
+  async updateDcrStatus(
+    user: AuthUser,
+    id: MongoIdDto["id"],
+    data: UpdateDcrSubmissionStatusDto,
+  ) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(TASK_COMMANDS.UPDATE_DCR_SUBMISSION_STATUS, {
+        user,
+        id,
+        data,
+      }),
+    );
+    handleException(result);
+    return buildResponse("DCR status updated successfully", result);
+  }
+
+  /**
+   * Reply to a DCR review comment for a specific task.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.REPLY_ON_DCR_REVIEW }
+   *
+   * @param {AuthUser} user - The authenticated user replying to the DCR review.
+   * @param {MongoIdDto["id"]} taskId - The ID of the task for which the DCR review reply is being made.
+   * @param {string} comment - The comment for the DCR review reply.
+   * @returns {Promise<any>} The updated task details with the new review reply.
+   */
+  async replyOnDcrReview(
+    user: AuthUser,
+    id: MongoIdDto["id"],
+    comment: ReplyOnDcrReviewDto["comment"],
+  ) {
+    const result = await firstValueFrom(
+      this.workforceClient.send(TASK_COMMANDS.REPLY_ON_DCR_REVIEW, {
+        user,
+        id,
+        comment,
+      }),
+    );
+    handleException(result);
+    return buildResponse("Reply added to DCR review successfully", result);
   }
 }

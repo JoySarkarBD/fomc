@@ -49,3 +49,27 @@ export class TaskDeleteUnauthorizedDto extends CustomUnauthorizedDto {
   @ApiProperty({ example: "api/task/:id" })
   declare endpoint: string;
 }
+
+export class TaskDCRSubmissionUnauthorizedDto extends CustomUnauthorizedDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submit" })
+  declare endpoint: string;
+}
+
+export class TaskDCRSubmissionStatusUpdateUnauthorizedDto extends CustomUnauthorizedDto {
+  @ApiProperty({ example: Methods.PATCH })
+  declare method: Methods.PATCH;
+
+  @ApiProperty({ example: "api/task/:id/dcr-submission-status" })
+  declare endpoint: string;
+}
+
+export class TaskReplyOnDcrReviewUnauthorizedDto extends CustomUnauthorizedDto {
+  @ApiProperty({ example: Methods.POST })
+  declare method: Methods.POST;
+
+  @ApiProperty({ example: "api/task/:id/reply-on-dcr-review" })
+  declare endpoint: string;
+}

@@ -10,7 +10,12 @@ import { TASK_COMMANDS } from "@shared/constants/task-command.constants";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { CreateTaskDto } from "./dto/create-task.dto";
-import { UpdateTaskDto, UpdateTaskStatusDto } from "./dto/update-task.dto";
+import {
+  ReplyOnDcrReviewDto,
+  UpdateDcrSubmissionStatusDto,
+  UpdateTaskDto,
+  UpdateTaskStatusDto,
+} from "./dto/update-task.dto";
 import { TaskService } from "./task.service";
 
 /**
@@ -142,5 +147,72 @@ export class TaskController {
     @Payload() payload: { user: AuthUser; id: MongoIdDto["id"] },
   ): Promise<any> {
     return await this.taskService.remove(payload.user, payload.id);
+  }
+
+  /**
+   * Submit a DCR for a specific task by its ID.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.DCR_SUBMIT }
+   *
+   * @param {Object} payload - The payload containing the task ID and the DCR file links.
+   * @param {AuthUser} payload.user - The authenticated user submitting the DCR.
+   * @param {MongoIdDto["id"]} payload.id - The ID of the task for which the DCR is being submitted.
+   * @param {string[]} payload.uploadedFileLinks - The links to the uploaded DCR files.
+   * @return {Promise<any>} The updated task document with the submitted DCR details.
+   */
+  @MessagePattern(TASK_COMMANDS.DCR_SUBMIT)
+  async submitDcr(payload: {
+    user: AuthUser;
+    id: MongoIdDto["id"];
+    uploadedFileLinks: string[];
+  }): Promise<any> {
+    const { user, id, uploadedFileLinks } = payload;
+    return await this.taskService.submitDcr(
+      (user.id ?? user._id) as string,
+      id,
+      uploadedFileLinks,
+    );
+  }
+
+  /**
+   * Update the DCR submission status of a specific task by its ID.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.UPDATE_DCR_SUBMISSION_STATUS }
+   *
+   * @param {Object} payload - The payload containing the task ID and the new DCR submission status.
+   * @param {AuthUser} payload.user - The authenticated user updating the DCR submission status.
+   * @param {MongoIdDto["id"]} payload.id - The ID of the task to update.
+   * @param {UpdateDcrSubmissionStatusDto} payload.data - The new DCR submission status and an optional comment.
+   * @return {Promise<any>} The updated task document.
+   */
+  @MessagePattern(TASK_COMMANDS.UPDATE_DCR_SUBMISSION_STATUS)
+  async updateDcrSubmissionStatus(payload: {
+    user: AuthUser;
+    id: MongoIdDto["id"];
+    data: UpdateDcrSubmissionStatusDto;
+  }): Promise<any> {
+    const { user, id, data } = payload;
+    return await this.taskService.updateDcrSubmissionStatus(user, id, data);
+  }
+
+  /**
+   * Reply on a DCR review for a specific task by its ID.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.REPLY_ON_DCR_REVIEW }
+   *
+   * @param {Object} payload - The payload containing the task ID and the review comment.
+   * @param {AuthUser} payload.user - The authenticated user replying to the DCR review.
+   * @param {MongoIdDto["id"]} payload.id - The ID of the task for which the DCR review reply is being made.
+   * @param {string} payload.comment - The comment for the DCR review reply.
+   * @return {Promise<any>} The updated task document with the new review reply.
+   */
+  @MessagePattern(TASK_COMMANDS.REPLY_ON_DCR_REVIEW)
+  async replyOnDcrReview(payload: {
+    user: AuthUser;
+    id: MongoIdDto["id"];
+    comment: ReplyOnDcrReviewDto["comment"];
+  }): Promise<any> {
+    const { user, id, comment } = payload;
+    return await this.taskService.replyOnDcrReview(user, id, comment);
   }
 }
