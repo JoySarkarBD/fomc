@@ -341,7 +341,7 @@ export class TaskController {
     forbidden: TaskStatusUpdateForbiddenDto,
     internal: TaskStatusUpdateInternalErrorDto,
   })
-  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
+  @Roles("PROJECT MANAGER", "TEAM LEADER")
   @Patch(":id/status")
   async updateTaskStatus(
     @GetUser() user: AuthUser,
