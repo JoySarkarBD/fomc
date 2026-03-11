@@ -217,7 +217,7 @@ export class ProjectController {
     internal: ProjectListInternalErrorDto,
   })
   @SalesOnly()
-  @Roles("PROJECT MANAGER", "TEAM LEADER")
+  @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get()
   async findAll(@Query() query: SearchQueryDto & { status?: ProjectStatus }) {
     return await this.projectService.getProjects(query);
