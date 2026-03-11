@@ -93,15 +93,6 @@ export class TaskService {
       };
     }
 
-    const client = await this.clientModel.findById(createTaskDto.client).lean();
-
-    if (!client) {
-      return {
-        message: "Client not found",
-        exception: "NotFoundException",
-      };
-    }
-
     const result = await this.taskModel.create({
       ...createTaskDto,
       createdBy: userId,
@@ -110,7 +101,6 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      client: client.name,
       project: project.name,
       dueDate: result.dueDate,
       priority: result.priority,
@@ -163,15 +153,6 @@ export class TaskService {
         { $match: filter },
         {
           $lookup: {
-            from: "clients",
-            localField: "client",
-            foreignField: "_id",
-            as: "client",
-          },
-        },
-        { $unwind: { path: "$client", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
             from: "projects",
             localField: "project",
             foreignField: "_id",
@@ -202,7 +183,6 @@ export class TaskService {
           $project: {
             _id: 1,
             name: 1,
-            client: { name: "$client.name" },
             project: { name: "$project.name" },
             dueDate: 1,
             priority: 1,
@@ -253,8 +233,7 @@ export class TaskService {
     const formattedTasks = tasks.map(async (task: any) => ({
       _id: task._id,
       name: task.name,
-      client: task.client?.name,
-      project: task.project?.name,
+      project: task.project,
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -311,8 +290,7 @@ export class TaskService {
           },
         ],
       })
-      .populate("client", "name")
-      .populate("project", "name")
+      .populate("project")
       .lean()) as any;
 
     if (!task) {
@@ -345,8 +323,7 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      client: task.client?.name,
-      project: task.project?.name,
+      project: task.project,
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -410,8 +387,7 @@ export class TaskService {
           runValidators: true,
         },
       )
-      .populate("client", "name")
-      .populate("project", "name")
+      .populate("project")
       .lean()) as any;
 
     if (!task) {
@@ -443,8 +419,7 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      client: task.client?.name,
-      project: task.project?.name,
+      project: task.project,
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -507,8 +482,7 @@ export class TaskService {
           new: true,
         },
       )
-      .populate("client", "name")
-      .populate("project", "name")
+      .populate("project")
       .lean()) as any;
 
     if (!task) {
@@ -541,8 +515,7 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      client: task.client?.name,
-      project: task.project?.name,
+      project: task.project,
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -676,14 +649,16 @@ export class TaskService {
       userMap.set(u._id.toString(), u);
     });
 
-    const result = await this.taskModel.findByIdAndUpdate(
-      taskId,
-      {
-        dcrLinks,
-        dcrSubmissionStatus: DcrSubmissionStatus.SUBMITTED,
-      },
-      { new: true },
-    );
+    const result = await this.taskModel
+      .findByIdAndUpdate(
+        taskId,
+        {
+          dcrLinks,
+          dcrSubmissionStatus: DcrSubmissionStatus.SUBMITTED,
+        },
+        { new: true },
+      )
+      .populate("project");
 
     if (!result) {
       return {
@@ -695,7 +670,6 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      client: result.client,
       project: result.project,
       dueDate: result.dueDate,
       priority: result.priority,
@@ -739,7 +713,7 @@ export class TaskService {
     const { status } = updateDto;
     const userId = (user.id ?? user._id) as string;
 
-    const task = await this.taskModel.findById(taskId);
+    const task = await this.taskModel.findById(taskId).lean();
 
     if (!task) {
       return {
@@ -780,6 +754,7 @@ export class TaskService {
 
     const result = await this.taskModel
       .findByIdAndUpdate(taskId, updateData, { new: true })
+      .populate("project")
       .lean();
 
     if (!result) {
@@ -792,7 +767,6 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      client: result.client,
       project: result.project,
       dueDate: result.dueDate,
       priority: result.priority,
@@ -835,7 +809,7 @@ export class TaskService {
   ) {
     const userId = (user.id ?? user._id) as string;
 
-    const task = await this.taskModel.findById(id);
+    const task = await this.taskModel.findById(id).lean();
 
     if (!task) {
       return {
@@ -876,6 +850,7 @@ export class TaskService {
 
     const result = await this.taskModel
       .findByIdAndUpdate(id, { reviewReply: task.reviewReply }, { new: true })
+      .populate("project")
       .lean();
 
     if (!result) {
@@ -888,7 +863,6 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      client: result.client,
       project: result.project,
       dueDate: result.dueDate,
       priority: result.priority,

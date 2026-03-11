@@ -38,15 +38,6 @@ export class CreateTaskDto {
 
   @ApiProperty({
     required: true,
-    description: "The client associated with the task",
-    example: "60c72b2f9b1d8e5a5c8f9e7d",
-  })
-  @IsMongoId({ message: "Client must be a valid ID" })
-  @IsNotEmpty({ message: "Client is required" })
-  client!: string;
-
-  @ApiProperty({
-    required: true,
     description: "The project associated with the task",
     example: "60c72b2f9b1d8e5a5c8f9e7d",
   })

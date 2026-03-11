@@ -53,14 +53,6 @@ export class Task extends Document {
   @Prop({ required: true })
   name!: string;
 
-  // Reference to the client collection
-  @Prop({
-    type: Types.ObjectId,
-    ref: "Client",
-    required: true,
-  })
-  client!: Types.ObjectId;
-
   // Reference to the project collection
   @Prop({
     type: Types.ObjectId,

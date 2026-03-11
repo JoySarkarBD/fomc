@@ -21,7 +21,6 @@ export class TaskCreateSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -54,7 +53,6 @@ export class TaskListSuccessDto extends SuccessResponseDto<any[]> {
       {
         _id: "60c72b2f9b1d8e5a5c8f9e7d",
         name: "Order Tracking System",
-        client: "Acme Corp",
         orderId: "ORD-123456",
         project: "Mobile App Development",
         dueDate: "2024-06-30T23:59:59.000Z",
@@ -87,7 +85,6 @@ export class TaskByIdSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -119,7 +116,6 @@ export class TaskUpdateSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -151,7 +147,6 @@ export class TaskStatusUpdateFoundDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -183,7 +178,6 @@ export class TaskDeleteSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -215,7 +209,6 @@ export class TaskDcrSubmitSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -252,7 +245,6 @@ export class TaskDcrSubmissionStatusSuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
@@ -289,7 +281,6 @@ export class TaskDcrReviewReplySuccessDto extends SuccessResponseDto<any> {
     example: {
       _id: "60c72b2f9b1d8e5a5c8f9e7d",
       name: "Order Tracking System",
-      client: "Acme Corp",
       orderId: "ORD-123456",
       project: "Mobile App Development",
       dueDate: "2024-06-30T23:59:59.000Z",
