@@ -484,6 +484,16 @@ export class TaskController {
     return await this.taskService.submitDcr(user, param.id, uploadedFileLinks);
   }
 
+  /**
+   * Updates the DCR submission status of a task
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.UPDATE_DCR_SUBMISSION_STATUS }
+   *
+   * @param {AuthUser} user - The authenticated user updating the DCR submission status.
+   * @param {MongoIdDto["id"]} id - The ID of the task for which the DCR submission status is being updated.
+   * @param {UpdateDcrSubmissionStatusDto} updateDcrSubmissionStatusDto - The new DCR submission status.
+   * @returns {Promise<any>} A message indicating the result of the DCR submission status update.
+   */
   @ApiOperation({
     summary: "Update the DCR submission status of a task",
     description:
@@ -529,6 +539,16 @@ export class TaskController {
     );
   }
 
+  /**
+   * Reply to a DCR review comment for a specific task by its ID.
+   *
+   * Message Pattern: { cmd: TASK_COMMANDS.REPLY_ON_DCR_REVIEW }
+   *
+   * @param {AuthUser} user - The authenticated user replying to the DCR review.
+   * @param {MongoIdDto["id"]} id - The ID of the task for which the DCR review reply is being made.
+   * @param {ReplyOnDcrReviewDto["comment"]} comment - The comment for the DCR review reply.
+   * @returns {Promise<any>} The updated task details with the new review reply.
+   */
   @ApiOperation({
     summary: "Reply on a DCR review for a task",
     description:
