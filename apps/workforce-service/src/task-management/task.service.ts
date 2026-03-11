@@ -97,6 +97,7 @@ export class TaskService {
 
     const result = await this.taskModel.create({
       ...createTaskDto,
+      project: new Types.ObjectId(createTaskDto.project),
       createdBy: new Types.ObjectId(userId),
     });
 
