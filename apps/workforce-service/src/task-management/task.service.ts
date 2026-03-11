@@ -123,7 +123,7 @@ export class TaskService {
       dcrApprovedBy: result.dcrApprovedBy,
       dcrRejectedBy: result.dcrRejectedBy,
       reviewReply: result.reviewReply,
-      assignTo: assignees.map((a) => a.name),
+      assignTo: assignees?.map((a) => a.name),
     };
   }
 
