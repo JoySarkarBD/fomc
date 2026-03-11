@@ -129,7 +129,10 @@ export class TaskService {
    * @param {CreateTaskDto} createTaskDto - The details of the task to create.
    * @returns {Promise<any>} The created task or an error message if validation fails.
    */
-  async findAll(user: AuthUser, query: SearchQueryDto) {
+  async findAll(
+    user: AuthUser,
+    query: SearchQueryDto & { status: TaskStatus },
+  ) {
     const filter: any = {};
 
     // If the user is employee then he can only see the tasks assigned to him or created by him
@@ -137,13 +140,17 @@ export class TaskService {
       filter.$or = [{ createdBy: user.id }, { assignTo: { $in: [user.id] } }];
     }
 
-    const { pageNo = 1, pageSize = 10, searchKey } = query;
+    const { pageNo = 1, pageSize = 10, searchKey, status } = query;
 
     if (searchKey) {
       filter.$or = [
         { name: { $regex: searchKey, $options: "i" } },
         { description: { $regex: searchKey, $options: "i" } },
       ];
+    }
+
+    if (status) {
+      filter.status = status;
     }
 
     const skip = (pageNo - 1) * pageSize;

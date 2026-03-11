@@ -4,6 +4,7 @@ import { TASK_COMMANDS } from "@shared/constants/task-command.constants";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
 import { handleException } from "@shared/utils/handle.exception";
+import { TaskStatus } from "apps/workforce-service/src/schemas/task.schema";
 import { CreateTaskDto } from "apps/workforce-service/src/task-management/dto/create-task.dto";
 import {
   ReplyOnDcrReviewDto,
@@ -55,7 +56,10 @@ export class TaskService {
    * @param {SearchQueryDto} query - The search query parameters for filtering tasks.
    * @returns {Promise<any>} A list of all tasks matching the search criteria.
    */
-  async findAll(user: AuthUser, query: SearchQueryDto) {
+  async findAll(
+    user: AuthUser,
+    query: SearchQueryDto & { status: TaskStatus },
+  ) {
     const result = await firstValueFrom(
       this.workforceClient.send(TASK_COMMANDS.GET_TASKS, {
         user,

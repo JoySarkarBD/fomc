@@ -30,6 +30,7 @@ import {
 } from "@nestjs/swagger";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
+import { TaskStatus } from "apps/workforce-service/src/schemas/task.schema";
 import { CreateTaskDto } from "apps/workforce-service/src/task-management/dto/create-task.dto";
 import {
   ReplyOnDcrReviewDto,
@@ -182,7 +183,10 @@ export class TaskController {
   })
   @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get()
-  async findAll(@GetUser() user: AuthUser, @Query() query: SearchQueryDto) {
+  async findAll(
+    @GetUser() user: AuthUser,
+    @Query() query: SearchQueryDto & { status: TaskStatus },
+  ) {
     return await this.taskService.findAll(user, query);
   }
 

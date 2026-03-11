@@ -9,6 +9,7 @@ import { MessagePattern, Payload } from "@nestjs/microservices";
 import { TASK_COMMANDS } from "@shared/constants/task-command.constants";
 import { MongoIdDto, SearchQueryDto } from "@shared/dto";
 import type { AuthUser } from "@shared/interfaces";
+import { TaskStatus } from "../schemas/task.schema";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import {
   ReplyOnDcrReviewDto,
@@ -56,7 +57,11 @@ export class TaskController {
    */
   @MessagePattern(TASK_COMMANDS.GET_TASKS)
   async findAll(
-    @Payload() payload: { user: AuthUser; query: SearchQueryDto },
+    @Payload()
+    payload: {
+      user: AuthUser;
+      query: SearchQueryDto & { status: TaskStatus };
+    },
   ): Promise<any> {
     return await this.taskService.findAll(payload.user, payload.query);
   }

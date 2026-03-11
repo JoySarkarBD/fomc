@@ -59,6 +59,11 @@ export class TaskListValidationDto extends ValidationErrorResponseDto {
     example: [
       { field: "pageNo", message: "pageNo must be a positive integer" },
       { field: "pageSize", message: "pageSize must be a positive integer" },
+      { field: "searchKey", message: "search must be a string" },
+      {
+        field: "status",
+        message: `status must be a valid enum ${Object.values(TaskStatus).join(", ")}`,
+      },
     ],
   })
   declare errors: FieldErrorDto[];
