@@ -208,7 +208,8 @@ export class TaskService {
           $project: {
             _id: 1,
             name: 1,
-            project: { _id: 1, name: 1 },
+            "project._id": 1,
+            "project.name": 1,
             dueDate: 1,
             priority: 1,
             description: 1,
@@ -280,10 +281,9 @@ export class TaskService {
       tasks.map(async (task: any) => ({
         _id: task._id,
         name: task.name,
-        project: {
-          _id: task.project?._id,
-          name: task.project?.name,
-        },
+        project: task.project
+          ? { _id: task.project._id, name: task.project.name }
+          : null,
         dueDate: task.dueDate,
         priority: task.priority,
         description: task.description,
