@@ -103,7 +103,10 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      project: project,
+      project: {
+        _id: project._id,
+        name: project.name,
+      },
       dueDate: result.dueDate,
       priority: result.priority,
       description: result.description,
@@ -205,7 +208,7 @@ export class TaskService {
           $project: {
             _id: 1,
             name: 1,
-            project: 1,
+            project: { _id: 1, name: 1 },
             dueDate: 1,
             priority: 1,
             description: 1,
@@ -277,7 +280,10 @@ export class TaskService {
       tasks.map(async (task: any) => ({
         _id: task._id,
         name: task.name,
-        project: task.project,
+        project: {
+          _id: task.project?._id,
+          name: task.project?.name,
+        },
         dueDate: task.dueDate,
         priority: task.priority,
         description: task.description,
@@ -399,7 +405,10 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      project: task.project,
+      project: {
+        _id: task.project?._id,
+        name: task.project?.name,
+      },
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -526,7 +535,10 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      project: task.project,
+      project: {
+        _id: task.project?._id,
+        name: task.project?.name,
+      },
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -667,7 +679,10 @@ export class TaskService {
     return {
       _id: task._id,
       name: task.name,
-      project: task.project,
+      project: {
+        _id: task.project?._id,
+        name: task.project?.name,
+      },
       dueDate: task.dueDate,
       priority: task.priority,
       description: task.description,
@@ -790,7 +805,7 @@ export class TaskService {
     /**
      * Update DCR
      */
-    const result = await this.taskModel
+    const result = (await this.taskModel
       .findByIdAndUpdate(
         taskId,
         {
@@ -800,7 +815,7 @@ export class TaskService {
         { new: true },
       )
       .populate("project")
-      .lean();
+      .lean()) as any;
 
     if (!result) {
       return {
@@ -856,7 +871,10 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      project: result.project,
+      project: {
+        _id: result.project?._id,
+        name: result.project?.name,
+      },
       dueDate: result.dueDate,
       priority: result.priority,
       description: result.description,
@@ -938,10 +956,10 @@ export class TaskService {
     /**
      * Update task
      */
-    const result = await this.taskModel
+    const result = (await this.taskModel
       .findByIdAndUpdate(taskId, updateData, { new: true })
       .populate("project")
-      .lean();
+      .lean()) as any;
 
     if (!result) {
       return {
@@ -997,7 +1015,10 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      project: result.project,
+      project: {
+        _id: result.project?._id,
+        name: result.project?.name,
+      },
       dueDate: result.dueDate,
       priority: result.priority,
       description: result.description,
@@ -1063,7 +1084,7 @@ export class TaskService {
     /**
      * Add review reply (atomic update)
      */
-    const result = await this.taskModel
+    const result = (await this.taskModel
       .findByIdAndUpdate(
         id,
         {
@@ -1078,7 +1099,7 @@ export class TaskService {
         { new: true },
       )
       .populate("project")
-      .lean();
+      .lean()) as any;
 
     if (!result) {
       return {
@@ -1134,7 +1155,10 @@ export class TaskService {
     return {
       _id: result._id,
       name: result.name,
-      project: result.project,
+      project: {
+        _id: result.project?._id,
+        name: result.project?.name,
+      },
       dueDate: result.dueDate,
       priority: result.priority,
       description: result.description,
