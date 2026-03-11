@@ -135,7 +135,7 @@ export class TaskService {
   ) {
     const filter: any = {};
 
-    // If the user is employee then he can only see the tasks assigned to him or created by him
+    // Employee can only see own created or assigned tasks
     if (user.role === "EMPLOYEE") {
       filter.$or = [
         { createdBy: new Types.ObjectId(user._id) },
@@ -164,6 +164,7 @@ export class TaskService {
     const [tasks, total] = await Promise.all([
       this.taskModel.aggregate([
         { $match: filter },
+
         {
           $lookup: {
             from: "projects",
@@ -172,7 +173,9 @@ export class TaskService {
             as: "project",
           },
         },
+
         { $unwind: { path: "$project", preserveNullAndEmptyArrays: true } },
+
         {
           $addFields: {
             statusOrder: {
@@ -189,9 +192,13 @@ export class TaskService {
             },
           },
         },
+
         { $sort: { statusOrder: 1, createdAt: -1 } },
+
         { $skip: skip },
+
         { $limit: pageSize },
+
         {
           $project: {
             _id: 1,
@@ -203,10 +210,16 @@ export class TaskService {
             status: 1,
             createdBy: 1,
             assignTo: 1,
+            dcrLinks: 1,
+            dcrSubmissionStatus: 1,
+            dcrApprovedBy: 1,
+            dcrRejectedBy: 1,
+            reviewReply: 1,
             createdAt: 1,
           },
         },
       ]),
+
       this.taskModel.countDocuments(filter),
     ]);
 
@@ -218,64 +231,98 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
+    /**
+     * Collect all user IDs
+     */
     const userIds = new Set<string>();
 
     tasks.forEach((task: any) => {
-      userIds.add(task.createdBy.toString());
-      task.assignTo.forEach((id: any) => userIds.add(id.toString()));
-      task.dcrApprovedBy?.forEach((id: any) => userIds.add(id.toString()));
-      task.dcrRejectedBy?.forEach((id: any) => userIds.add(id.toString()));
-      task.reviewReply?.forEach((reply: any) =>
-        userIds.add(reply.reviewer.toString()),
-      );
+      if (task.createdBy) {
+        userIds.add(task.createdBy.toString());
+      }
+
+      task.assignTo?.forEach((id: any) => {
+        userIds.add(id.toString());
+      });
+
+      if (task.dcrApprovedBy) {
+        userIds.add(task.dcrApprovedBy.toString());
+      }
+
+      if (task.dcrRejectedBy) {
+        userIds.add(task.dcrRejectedBy.toString());
+      }
+
+      task.reviewReply?.forEach((reply: any) => {
+        userIds.add(reply.reviewer.toString());
+      });
     });
 
+    /**
+     * Fetch users from user-service
+     */
     const users = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
         ids: Array.from(userIds),
       }),
     );
 
+    /**
+     * Create user map
+     */
     const userMap = new Map();
 
     users.forEach((u: any) => {
       userMap.set(u._id.toString(), u);
     });
 
-    const formattedTasks = tasks.map(async (task: any) => ({
-      _id: task._id,
-      name: task.name,
-      project: task.project,
-      dueDate: task.dueDate,
-      priority: task.priority,
-      description: task.description,
-      status: task.status,
-      createdBy: userMap.get(task.createdBy.toString())?.name || null,
-      assignTo: task.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name || null,
-      ),
-      dcrLinks: task.dcrLinks
-        ? await Promise.all(
-            task.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
-            }),
-          )
-        : undefined,
-      dcrSubmissionStatus: task.dcrSubmissionStatus,
-      dcrApprovedBy: task.dcrApprovedBy
-        ? userMap.get(task.dcrApprovedBy.toString())?.name
-        : null,
-      dcrRejectedBy: task.dcrRejectedBy
-        ? userMap.get(task.dcrRejectedBy.toString())?.name
-        : null,
-      reviewReply: task.reviewReply?.map((reply: any) => ({
-        reviewer: userMap.get(reply.reviewer.toString())?.name || null,
-        comment: reply.comment,
-        createdAt: reply.createdAt,
+    /**
+     * Format tasks
+     */
+    const formattedTasks = await Promise.all(
+      tasks.map(async (task: any) => ({
+        _id: task._id,
+        name: task.name,
+        project: task.project,
+        dueDate: task.dueDate,
+        priority: task.priority,
+        description: task.description,
+        status: task.status,
+
+        createdBy: userMap.get(task.createdBy?.toString())?.name || null,
+
+        assignTo:
+          task.assignTo?.map(
+            (id: any) => userMap.get(id.toString())?.name || null,
+          ) || [],
+
+        dcrLinks: task.dcrLinks
+          ? await Promise.all(
+              task.dcrLinks.map(async (link: string) => {
+                return await getSignedUrl(link);
+              }),
+            )
+          : [],
+
+        dcrSubmissionStatus: task.dcrSubmissionStatus,
+
+        dcrApprovedBy: task.dcrApprovedBy
+          ? userMap.get(task.dcrApprovedBy.toString())?.name
+          : null,
+
+        dcrRejectedBy: task.dcrRejectedBy
+          ? userMap.get(task.dcrRejectedBy.toString())?.name
+          : null,
+
+        reviewReply: task.reviewReply?.map((reply: any) => ({
+          reviewer: userMap.get(reply.reviewer.toString())?.name || null,
+          comment: reply.comment,
+          createdAt: reply.createdAt,
+        })),
+
+        createdAt: task.createdAt,
       })),
-      createdAt: task.createdAt,
-    }));
+    );
 
     return {
       tasks: formattedTasks,
@@ -295,10 +342,10 @@ export class TaskService {
       .findOne({
         _id: new Types.ObjectId(id),
         $or: [
-          { createdBy: user.id },
+          { createdBy: new Types.ObjectId(user._id) },
           {
             assignTo: {
-              $in: [user.id],
+              $in: [new Types.ObjectId(user._id)],
             },
           },
         ],
@@ -313,26 +360,50 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
+    /**
+     * Collect user IDs (remove duplicates)
+     */
+    const userIds = new Set<string>();
+
+    if (task.createdBy) userIds.add(task.createdBy.toString());
+
+    task.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (task.dcrApprovedBy) {
+      userIds.add(task.dcrApprovedBy.toString());
+    }
+
+    if (task.dcrRejectedBy) {
+      userIds.add(task.dcrRejectedBy.toString());
+    }
+
+    task.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
     const users = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-          ...(task.reviewReply?.map((r: any) => r.reviewer) || []),
-        ].filter(Boolean) as string[],
+        ids: Array.from(userIds),
       }),
     );
 
+    /**
+     * Create user map
+     */
     const userMap = new Map();
 
-    // Create a map of userId to user details for easy lookup
     users.forEach((u: any) => {
       userMap.set(u._id.toString(), u);
     });
 
+    /**
+     * Format response
+     */
     return {
       _id: task._id,
       name: task.name,
@@ -341,29 +412,38 @@ export class TaskService {
       priority: task.priority,
       description: task.description,
       status: task.status,
-      createdBy: userMap.get(task.createdBy.toString())?.name,
-      assignTo: task.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(task.createdBy?.toString())?.name || null,
+
+      assignTo:
+        task.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: task.dcrLinks
         ? await Promise.all(
-            task.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            task.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: task.dcrSubmissionStatus,
+
       dcrApprovedBy: task.dcrApprovedBy
         ? userMap.get(task.dcrApprovedBy.toString())?.name
         : null,
+
       dcrRejectedBy: task.dcrRejectedBy
         ? userMap.get(task.dcrRejectedBy.toString())?.name
         : null,
+
       reviewReply: task.reviewReply?.map((reply: any) => ({
         reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
+
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
@@ -386,10 +466,10 @@ export class TaskService {
         {
           _id: new Types.ObjectId(id),
           $or: [
-            { createdBy: user.id },
+            { createdBy: new Types.ObjectId(user._id) },
             {
               assignTo: {
-                $in: [user.id],
+                $in: [new Types.ObjectId(user._id)],
               },
             },
           ],
@@ -410,25 +490,50 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
+    /**
+     * Collect user IDs
+     */
+    const userIds = new Set<string>();
+
+    if (task.createdBy) userIds.add(task.createdBy.toString());
+
+    task.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (task.dcrApprovedBy) {
+      userIds.add(task.dcrApprovedBy.toString());
+    }
+
+    if (task.dcrRejectedBy) {
+      userIds.add(task.dcrRejectedBy.toString());
+    }
+
+    task.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
     const users = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-        ].filter(Boolean) as string[],
+        ids: Array.from(userIds),
       }),
     );
 
+    /**
+     * Create user map
+     */
     const userMap = new Map();
 
-    // Create a map of userId to user details for easy lookup
     users.forEach((u: any) => {
       userMap.set(u._id.toString(), u);
     });
 
+    /**
+     * Format response
+     */
     return {
       _id: task._id,
       name: task.name,
@@ -437,29 +542,38 @@ export class TaskService {
       priority: task.priority,
       description: task.description,
       status: task.status,
-      createdBy: userMap.get(task.createdBy.toString())?.name,
-      assignTo: task.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(task.createdBy?.toString())?.name || null,
+
+      assignTo:
+        task.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: task.dcrLinks
         ? await Promise.all(
-            task.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            task.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: task.dcrSubmissionStatus,
+
       dcrApprovedBy: task.dcrApprovedBy
         ? userMap.get(task.dcrApprovedBy.toString())?.name
         : null,
+
       dcrRejectedBy: task.dcrRejectedBy
         ? userMap.get(task.dcrRejectedBy.toString())?.name
         : null,
+
       reviewReply: task.reviewReply?.map((reply: any) => ({
         reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
+
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
@@ -477,40 +591,33 @@ export class TaskService {
     id: MongoIdDto["id"],
     updateTaskStatusDto: UpdateTaskStatusDto,
   ) {
-    const task = (await this.taskModel
-      .findOneAndUpdate(
+    const existingTask = await this.taskModel.findOne({
+      _id: new Types.ObjectId(id),
+      $or: [
+        { createdBy: new Types.ObjectId(user._id) },
         {
-          _id: new Types.ObjectId(id),
-          $or: [
-            { createdBy: user.id },
-            {
-              assignTo: {
-                $in: [user.id],
-              },
-            },
-          ],
+          assignTo: {
+            $in: [new Types.ObjectId(user._id)],
+          },
         },
-        updateTaskStatusDto,
-        {
-          new: true,
-        },
-      )
-      .populate("project")
-      .lean()) as any;
+      ],
+    });
 
-    if (!task) {
+    if (!existingTask) {
       return {
         message: "Task not found",
         exception: "NotFoundException",
       };
     }
 
-    // Prevent update if task is in progress, blocked, delivered or completed
+    /**
+     * Prevent update if task already in locked status
+     */
     if (
-      TaskStatus.WIP === task.status ||
-      TaskStatus.BLOCKED === task.status ||
-      TaskStatus.DELIVERED === task.status ||
-      TaskStatus.COMPLETED === task.status
+      existingTask.status === TaskStatus.WIP ||
+      existingTask.status === TaskStatus.BLOCKED ||
+      existingTask.status === TaskStatus.DELIVERED ||
+      existingTask.status === TaskStatus.COMPLETED
     ) {
       return {
         message:
@@ -519,26 +626,58 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
+    /**
+     * Update task
+     */
+    const task = (await this.taskModel
+      .findByIdAndUpdate(id, updateTaskStatusDto, { new: true })
+      .populate("project")
+      .lean()) as any;
+
+    /**
+     * Collect user ids
+     */
+    const userIds = new Set<string>();
+
+    if (task.createdBy) userIds.add(task.createdBy.toString());
+
+    task.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (task.dcrApprovedBy) {
+      userIds.add(task.dcrApprovedBy.toString());
+    }
+
+    if (task.dcrRejectedBy) {
+      userIds.add(task.dcrRejectedBy.toString());
+    }
+
+    task.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
     const users = await firstValueFrom(
       this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-          ...(task.reviewReply?.map((r: any) => r.reviewer) || []),
-        ].filter(Boolean) as string[],
+        ids: Array.from(userIds),
       }),
     );
 
+    /**
+     * Create user map
+     */
     const userMap = new Map();
 
-    // Create a map of userId to user details for easy lookup
     users.forEach((u: any) => {
       userMap.set(u._id.toString(), u);
     });
 
+    /**
+     * Format response
+     */
     return {
       _id: task._id,
       name: task.name,
@@ -547,29 +686,38 @@ export class TaskService {
       priority: task.priority,
       description: task.description,
       status: task.status,
-      createdBy: userMap.get(task.createdBy.toString())?.name,
-      assignTo: task.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(task.createdBy?.toString())?.name || null,
+
+      assignTo:
+        task.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: task.dcrLinks
         ? await Promise.all(
-            task.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            task.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: task.dcrSubmissionStatus,
+
       dcrApprovedBy: task.dcrApprovedBy
         ? userMap.get(task.dcrApprovedBy.toString())?.name
         : null,
+
       dcrRejectedBy: task.dcrRejectedBy
         ? userMap.get(task.dcrRejectedBy.toString())?.name
         : null,
+
       reviewReply: task.reviewReply?.map((reply: any) => ({
         reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
+
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
@@ -586,10 +734,10 @@ export class TaskService {
       .findOne({
         _id: new Types.ObjectId(id),
         $or: [
-          { createdBy: user.id },
+          { createdBy: new Types.ObjectId(user._id) },
           {
             assignTo: {
-              $in: [user.id],
+              $in: [new Types.ObjectId(user._id)],
             },
           },
         ],
@@ -656,26 +804,9 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
-    const users = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-          ...(task.reviewReply?.map((r: any) => r.reviewer) || []),
-        ].filter(Boolean) as string[],
-      }),
-    );
-
-    const userMap = new Map();
-
-    // Create a map of userId to user details for easy lookup
-    users.forEach((u: any) => {
-      userMap.set(u._id.toString(), u);
-    });
-
+    /**
+     * Update DCR
+     */
     const result = await this.taskModel
       .findByIdAndUpdate(
         taskId,
@@ -685,7 +816,8 @@ export class TaskService {
         },
         { new: true },
       )
-      .populate("project");
+      .populate("project")
+      .lean();
 
     if (!result) {
       return {
@@ -694,6 +826,50 @@ export class TaskService {
       };
     }
 
+    /**
+     * Collect user IDs
+     */
+    const userIds = new Set<string>();
+
+    if (result.createdBy) userIds.add(result.createdBy.toString());
+
+    result.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (result.dcrApprovedBy) {
+      userIds.add(result.dcrApprovedBy.toString());
+    }
+
+    if (result.dcrRejectedBy) {
+      userIds.add(result.dcrRejectedBy.toString());
+    }
+
+    result.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
+    const users = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
+        ids: Array.from(userIds),
+      }),
+    );
+
+    /**
+     * Create user map
+     */
+    const userMap = new Map();
+
+    users.forEach((u: any) => {
+      userMap.set(u._id.toString(), u);
+    });
+
+    /**
+     * Format response
+     */
     return {
       _id: result._id,
       name: result.name,
@@ -702,22 +878,34 @@ export class TaskService {
       priority: result.priority,
       description: result.description,
       status: result.status,
-      createdBy: userMap.get(result.createdBy.toString())?.name,
-      assignTo: result.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(result.createdBy?.toString())?.name || null,
+
+      assignTo:
+        result.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: result.dcrLinks
         ? await Promise.all(
-            result.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            result.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: result.dcrSubmissionStatus,
-      dcrApprovedBy: userMap.get(result.dcrApprovedBy?.toString())?.name,
-      dcrRejectedBy: userMap.get(result.dcrRejectedBy?.toString())?.name,
+
+      dcrApprovedBy: result.dcrApprovedBy
+        ? userMap.get(result.dcrApprovedBy.toString())?.name
+        : null,
+
+      dcrRejectedBy: result.dcrRejectedBy
+        ? userMap.get(result.dcrRejectedBy.toString())?.name
+        : null,
+
       reviewReply: result.reviewReply?.map((reply: any) => ({
-        reviewer: userMap.get(reply.reviewer.toString())?.name,
+        reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
@@ -749,36 +937,24 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
-    const users = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-          ...(task.reviewReply?.map((r: any) => r.reviewer) || []),
-        ].filter(Boolean) as string[],
-      }),
-    );
-
-    const userMap = new Map();
-
-    // Create a map of userId to user details for easy lookup
-    users.forEach((u: any) => {
-      userMap.set(u._id.toString(), u);
-    });
-
+    /**
+     * Prepare update payload
+     */
     const updateData: any = { dcrSubmissionStatus: status };
 
     if (status === DcrSubmissionStatus.APPROVED) {
       updateData.dcrApprovedBy = new Types.ObjectId(userId);
       updateData.dcrRejectedBy = null;
-    } else if (status === DcrSubmissionStatus.REJECTED) {
+    }
+
+    if (status === DcrSubmissionStatus.REJECTED) {
       updateData.dcrRejectedBy = new Types.ObjectId(userId);
       updateData.dcrApprovedBy = null;
     }
 
+    /**
+     * Update task
+     */
     const result = await this.taskModel
       .findByIdAndUpdate(taskId, updateData, { new: true })
       .populate("project")
@@ -791,6 +967,50 @@ export class TaskService {
       };
     }
 
+    /**
+     * Collect user ids (unique)
+     */
+    const userIds = new Set<string>();
+
+    if (result.createdBy) userIds.add(result.createdBy.toString());
+
+    result.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (result.dcrApprovedBy) {
+      userIds.add(result.dcrApprovedBy.toString());
+    }
+
+    if (result.dcrRejectedBy) {
+      userIds.add(result.dcrRejectedBy.toString());
+    }
+
+    result.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
+    const users = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
+        ids: Array.from(userIds),
+      }),
+    );
+
+    /**
+     * Create user map
+     */
+    const userMap = new Map();
+
+    users.forEach((u: any) => {
+      userMap.set(u._id.toString(), u);
+    });
+
+    /**
+     * Response formatter
+     */
     return {
       _id: result._id,
       name: result.name,
@@ -799,22 +1019,34 @@ export class TaskService {
       priority: result.priority,
       description: result.description,
       status: result.status,
-      createdBy: userMap.get(result.createdBy.toString())?.name,
-      assignTo: result.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(result.createdBy?.toString())?.name || null,
+
+      assignTo:
+        result.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: result.dcrLinks
         ? await Promise.all(
-            result.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            result.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: result.dcrSubmissionStatus,
-      dcrApprovedBy: userMap.get(result.dcrApprovedBy?.toString())?.name,
-      dcrRejectedBy: userMap.get(result.dcrRejectedBy?.toString())?.name,
+
+      dcrApprovedBy: result.dcrApprovedBy
+        ? userMap.get(result.dcrApprovedBy.toString())?.name
+        : null,
+
+      dcrRejectedBy: result.dcrRejectedBy
+        ? userMap.get(result.dcrRejectedBy.toString())?.name
+        : null,
+
       reviewReply: result.reviewReply?.map((reply: any) => ({
-        reviewer: userMap.get(reply.reviewer.toString())?.name,
+        reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
@@ -845,38 +1077,23 @@ export class TaskService {
       };
     }
 
-    // Collect all user ids
-    const users = await firstValueFrom(
-      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
-        ids: [
-          task.createdBy,
-          ...task.assignTo,
-          task.dcrApprovedBy,
-          task.dcrRejectedBy,
-          ...(task.reviewReply?.map((r: any) => r.reviewer) || []),
-        ].filter(Boolean) as string[],
-      }),
-    );
-
-    const userMap = new Map();
-
-    // Create a map of userId to user details for easy lookup
-    users.forEach((u: any) => {
-      userMap.set(u._id.toString(), u);
-    });
-
-    if (!task.reviewReply) {
-      task.reviewReply = [] as any;
-    }
-
-    task.reviewReply?.push({
-      reviewer: new Types.ObjectId(userId),
-      comment,
-      createdAt: new Date(),
-    });
-
+    /**
+     * Add review reply (atomic update)
+     */
     const result = await this.taskModel
-      .findByIdAndUpdate(id, { reviewReply: task.reviewReply }, { new: true })
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            reviewReply: {
+              reviewer: new Types.ObjectId(userId),
+              comment,
+              createdAt: new Date(),
+            },
+          },
+        },
+        { new: true },
+      )
       .populate("project")
       .lean();
 
@@ -887,6 +1104,50 @@ export class TaskService {
       };
     }
 
+    /**
+     * Collect user ids (unique)
+     */
+    const userIds = new Set<string>();
+
+    if (result.createdBy) userIds.add(result.createdBy.toString());
+
+    result.assignTo?.forEach((id: any) => {
+      userIds.add(id.toString());
+    });
+
+    if (result.dcrApprovedBy) {
+      userIds.add(result.dcrApprovedBy.toString());
+    }
+
+    if (result.dcrRejectedBy) {
+      userIds.add(result.dcrRejectedBy.toString());
+    }
+
+    result.reviewReply?.forEach((r: any) => {
+      userIds.add(r.reviewer.toString());
+    });
+
+    /**
+     * Fetch users
+     */
+    const users = await firstValueFrom(
+      this.userClient.send(USER_COMMANDS.GET_USERS_BY_IDS, {
+        ids: Array.from(userIds),
+      }),
+    );
+
+    /**
+     * Create user map
+     */
+    const userMap = new Map();
+
+    users.forEach((u: any) => {
+      userMap.set(u._id.toString(), u);
+    });
+
+    /**
+     * Format response
+     */
     return {
       _id: result._id,
       name: result.name,
@@ -895,22 +1156,34 @@ export class TaskService {
       priority: result.priority,
       description: result.description,
       status: result.status,
-      createdBy: userMap.get(result.createdBy.toString())?.name,
-      assignTo: result.assignTo.map(
-        (id: any) => userMap.get(id.toString())?.name,
-      ),
+
+      createdBy: userMap.get(result.createdBy?.toString())?.name || null,
+
+      assignTo:
+        result.assignTo?.map(
+          (id: any) => userMap.get(id.toString())?.name || null,
+        ) || [],
+
       dcrLinks: result.dcrLinks
         ? await Promise.all(
-            result.dcrLinks.map(async (link) => {
-              await getSignedUrl(link);
+            result.dcrLinks.map(async (link: string) => {
+              return await getSignedUrl(link);
             }),
           )
-        : undefined,
+        : [],
+
       dcrSubmissionStatus: result.dcrSubmissionStatus,
-      dcrApprovedBy: userMap.get(result.dcrApprovedBy?.toString())?.name,
-      dcrRejectedBy: userMap.get(result.dcrRejectedBy?.toString())?.name,
+
+      dcrApprovedBy: result.dcrApprovedBy
+        ? userMap.get(result.dcrApprovedBy.toString())?.name
+        : null,
+
+      dcrRejectedBy: result.dcrRejectedBy
+        ? userMap.get(result.dcrRejectedBy.toString())?.name
+        : null,
+
       reviewReply: result.reviewReply?.map((reply: any) => ({
-        reviewer: userMap.get(reply.reviewer.toString())?.name,
+        reviewer: userMap.get(reply.reviewer.toString())?.name || null,
         comment: reply.comment,
         createdAt: reply.createdAt,
       })),
