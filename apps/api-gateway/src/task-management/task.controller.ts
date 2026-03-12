@@ -334,6 +334,16 @@ export class TaskController {
     description: "Bearer token",
     required: true,
   })
+  @ApiRequestDetails({
+    params: {
+      name: "id",
+      description: "The ID of the task to update the status for",
+      required: true,
+      type: String,
+      example: "65f1b2c3d4e5f67890123456",
+    },
+    paramDto: MongoIdDto,
+  })
   @ApiSuccessResponse(TaskStatusUpdateFoundDto, 200)
   @ApiErrorResponses({
     notFound: TaskStatusUpdateNotFoundDto,
