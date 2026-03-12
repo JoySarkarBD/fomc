@@ -523,12 +523,22 @@ export class TaskService {
         id,
         {
           ...existingTask,
-          name: updateTaskDto.name ?? existingTask.name,
-          dueDate: updateTaskDto.dueDate ?? existingTask.dueDate,
-          priority: updateTaskDto.priority ?? existingTask.priority,
-          description: updateTaskDto.description ?? existingTask.description,
-          status: updateTaskDto.status ?? existingTask.status,
-          assignTo: updateTaskDto.assignTo ?? existingTask.assignTo,
+          name: updateTaskDto.name ? updateTaskDto.name : existingTask.name,
+          dueDate: updateTaskDto.dueDate
+            ? updateTaskDto.dueDate
+            : existingTask.dueDate,
+          priority: updateTaskDto.priority
+            ? updateTaskDto.priority
+            : existingTask.priority,
+          description: updateTaskDto.description
+            ? updateTaskDto.description
+            : existingTask.description,
+          status: updateTaskDto.status
+            ? updateTaskDto.status
+            : existingTask.status,
+          assignTo: updateTaskDto.assignTo
+            ? updateTaskDto.assignTo
+            : existingTask.assignTo,
         },
         { new: true },
       )
