@@ -531,6 +531,13 @@ export class TaskService {
           exception: "BadRequestException",
         };
       }
+
+      if (updateTaskDto.assignTo?.length) {
+        return {
+          message: "Employees cannot update task assignees",
+          exception: "BadRequestException",
+        };
+      }
     }
 
     const task = (await this.taskModel
