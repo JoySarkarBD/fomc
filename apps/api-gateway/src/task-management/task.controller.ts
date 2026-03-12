@@ -12,6 +12,7 @@ import {
   Get,
   InternalServerErrorException,
   Logger,
+  Param,
   Patch,
   Post,
   Query,
@@ -259,7 +260,7 @@ export class TaskController {
   })
   @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Get(":id")
-  async findOne(@GetUser() user: AuthUser, @Query() param: MongoIdDto) {
+  async findOne(@GetUser() user: AuthUser, @Param() param: MongoIdDto) {
     return await this.taskService.findOne(user, param.id);
   }
 
@@ -306,7 +307,7 @@ export class TaskController {
   @Patch(":id")
   async update(
     @GetUser() user: AuthUser,
-    @Query() param: MongoIdDto,
+    @Param() param: MongoIdDto,
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
     return await this.taskService.update(user, param.id, updateTaskDto);
@@ -345,7 +346,7 @@ export class TaskController {
   @Patch(":id/status")
   async updateTaskStatus(
     @GetUser() user: AuthUser,
-    @Query() param: MongoIdDto,
+    @Param() param: MongoIdDto,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
   ) {
     return await this.taskService.updateStatus(
@@ -395,7 +396,7 @@ export class TaskController {
   })
   @Roles("PROJECT MANAGER", "TEAM LEADER", "EMPLOYEE")
   @Delete(":id")
-  async delete(@GetUser() user: AuthUser, @Query() param: MongoIdDto) {
+  async delete(@GetUser() user: AuthUser, @Param() param: MongoIdDto) {
     return await this.taskService.delete(user, param.id);
   }
 
@@ -490,7 +491,7 @@ export class TaskController {
   @Post(":id/dcr-submit")
   async submitDcr(
     @GetUser() user: AuthUser,
-    @Query() param: MongoIdDto,
+    @Param() param: MongoIdDto,
     @UploadedFiles() dcrFiles: Multer.File[],
   ) {
     const logger = new Logger(TaskController.name);
@@ -562,7 +563,7 @@ export class TaskController {
   @Patch(":id/dcr-submission-status")
   async updateDcrSubmissionStatus(
     @GetUser() user: AuthUser,
-    @Query() param: MongoIdDto,
+    @Param() param: MongoIdDto,
     @Body() updateDcrSubmissionStatusDto: UpdateDcrSubmissionStatusDto,
   ) {
     return await this.taskService.updateDcrStatus(
@@ -615,7 +616,7 @@ export class TaskController {
   @Post(":id/reply-on-dcr-review")
   async replyOnDcrReview(
     @GetUser() user: AuthUser,
-    @Query() param: MongoIdDto,
+    @Param() param: MongoIdDto,
     @Body() body: ReplyOnDcrReviewDto,
   ) {
     return await this.taskService.replyOnDcrReview(
